@@ -5,18 +5,32 @@
         <style type="text/css">
 #container
 {
-margin-right: auto;
-margin-left : auto;
+    margin-right: auto;
+    margin-left : auto;
   height: 600px;
   position: relative;
   width: 600px;
 }
-#board
+#imageboard
 {
   height: 100%;
   width: 100%;
-  background-color:#663300;
-  position: relative;
+  position: absolute;
+  z-index: 1;
+}
+#lineboard
+{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 2;
+}
+#stoneboard
+{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 3;
 }
 #controls
 {
@@ -30,7 +44,7 @@ margin-left : auto;
     font-size: 45px;
 }
 .circle{
-    background-color:#663300;
+    background-color:#ffffff;
     height: 25px;
     width: 25px;
     border-radius: 100%;
@@ -42,28 +56,43 @@ margin-left : auto;
         <title>五目並べ</title>
         <script src="/socket.io/socket.io.js"></script> <!--websocketでsocket.io使うなら-->
     </head>
-    <body style="background-color:#064610;">
+    <body style="background-color:aliceblue;">
         <header>
             <h1 class="header">
                 <a>五目並べ</a>
             </h1>
         </header>
         <div id="container">
-            <canvas id="board">
-            </canvas>
+            <canvas id="imageboard"></canvas>
+            <canvas id="lineboard"></canvas>
+            <canvas id="stoneboard"></canvas>
             <script type="text/javascript">
-                var canvas =document.getElementById('board');
-                if ( ! canvas || ! canvas.getContext ) {
-                    console.log('failed')
+                var imageboard=document.getElementById('imageboard');
+                var lineboard=document.getElementById('lineboard');
+                var stoneboard=document.getElementById('stoneboard');
+                var myturn=0;//1
+                var mycolor=1//null
+                window.onload=()=>{
+                    var imgcontext=imageboard.getContext('2d');
+                    var img=new Image();
+                    img.src="image/boardimg.jpg"
+                    img.onload=()=>{
+                        imgcontext.drawImage(img,0,0);
+                    }
                 }
-                const width=canvas.clientWidth;
-                const height=canvas.clientHeight;
-                console.log('client');
-                canvas.width=600;
-                canvas.height=600;
-                console.log('canvas');
-                var context = canvas.getContext('2d');
-                console.log('koko');
+                
+                const width=imageboard.clientWidth;
+                const height=imageboard.clientHeight;
+                imageboard.width=600;
+                imageboard.height=600;
+                lineboard.width=600;
+                lineboard.height=600;
+                stoneboard.width=600;
+                stoneboard.height=600;
+                
+                
+                var context = lineboard.getContext('2d');
+                
                 for(let i=0;i<=14;i++){
                     context.beginPath();
                     context.moveTo(20+i*40,20);
@@ -76,12 +105,38 @@ margin-left : auto;
                     context.lineTo(580,20+i*40);
                     context.stroke();
                 }
+                var stonecontext=stoneboard.getContext('2d');
+                function　drawcircle(x,y,color){
+                    if(color){
+                        stonecontext.fillStyle="#ffffff";
+                    }else{
+                        stonecontext.fillStyle="#000000"
+                    }
+                    stonecontext.beginPath();
+                    stonecontext.arc(x,y,10,0,2*Math.PI,true);
+                    stonecontext.fill();
+                    stonecontext.stroke();
+                }
+                
+                stoneboard.addEventListener('click',(event)=>{
+                    if(myturn){
+                        return;
+                    }
+                    myturn=1;
+                    var rect=stoneboard.getBoundingClientRect();
+                    var x=event.clientX-Math.floor(rect.left);
+                    var y=event.clientY-Math.floor(rect.top);
+                    console.log(x,y);
+                    drawcircle(x,y,mycolor);
+                })
+                
+
             </script>
             <menu id="controls">
                 <!--idがかぶらないようにボタンの複数設置ができなくてとんでもないコードになってしまった。ただこれ以降、ボタンのイベントに関しては
                 for(i=0;i<225;i++){
                     配列[i/15][i%15]=document.getElementById('str(i)');
-                とでもやって配列にボタンを保持しておけば大丈夫。また"circle"classですべてのボタンを一気に無効化、有効化が可-->
+                とでもやって配列にボタンを保持しておけば大丈夫。また"circle"classですべてのボタンを一気に無効化、有効化が可
                 <button class="circle" type="button" id="0"></button>
                 <button class="circle" type="button" id="1"></button>
                 <button class="circle" type="button" id="2"></button>
@@ -307,6 +362,7 @@ margin-left : auto;
                 <button class="circle" type="button" id="222"></button>
                 <button class="circle" type="button" id="223"></button>
                 <button class="circle" type="button" id="224"></button>
+                -->
 
                 
                 
