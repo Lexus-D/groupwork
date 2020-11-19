@@ -66,17 +66,19 @@
             var imageboard=document.getElementById('imageboard');
             var lineboard=document.getElementById('lineboard');
             var stoneboard=document.getElementById('stoneboard');
-            var myturn=1;//初期カラーが黒なら1白なら0
-            var mycolor=1//null
-            window.onload=()=>{
-                var imgcontext=imageboard.getContext('2d');
-                var img=new Image();
-                img.src="image/boardimg.jpg"
+            var myturn=0;//初期カラーが黒なら1白なら0
+            var mycolor=1;//null
+            //window.onload=()=>{
+            //}
+            var imgcontext=imageboard.getContext('2d');
+            var img=new Image();
+            img.src="image/boardimg.jpg";
+            img.addEventListener('load',()=>{
+                
                 imgcontext.drawImage(img,0,0);
-                img.onload=()=>{
-                    imgcontext.drawImage(img,0,0);
-                }
-            }
+            });
+            
+            
 
             const width=imageboard.clientWidth;
             const height=imageboard.clientHeight;
@@ -129,17 +131,24 @@
                 stone[0]=x;
                 stone[1]=y;
                 stone[2]=mycolor;
+                console.log('mycolor:'+mycolor);
                 socket.emit('message',stone);
                 drawcircle(20+x*40,20+y*40,mycolor);
             });
             socket.on('message',(msg)=>{
-                var x=msg[0];
-                var y=msg[1];
-                var yourcolor=[2];
-                drawcircle(20+x*40,20+y*40,yourcolor);
-                myturn=1;
-
-            })
+                if(msg==0){   //最初の色決め
+                    mycolor=0;
+                    myturn=1;
+                }
+                else{
+                    var x=msg[0];
+                    var y=msg[1];
+                    var color=msg[2];
+                    console.log('color:'+color)
+                    drawcircle(20+x*40,20+y*40,color);
+                    myturn=1;
+                }
+            });
 
             </script>
         </div>
