@@ -1,52 +1,29 @@
-//五目並べの処理
-
-const io = require('socket.io-client');
-
-var serverIpAddress = 'http://localhost:8000';
-var socket = io.connect(serverIpAddress);//接続先のサーバを指定
-
-//石を置く位置を保持する配列を初期化(15行15列)
-var putStoneButton = new Array(15);
-for(var y = 0; y < 15; y++) {
-    putStoneButton[y] = new Array(15).fill(0);
-}
-
-socket.on('connect' ,function (data) {//コネクションの接続
-    //サーバからのレスポンス（自分の番かどうかなど）
-    socket.on('response',function(msg){
-        msg = msg['data'];
-        console.log(msg);
-    });
-
-    //石を置く位置を取得
-    for(var i = 0; i < 225; i++){
-        putStoneButton[i/15][i%15] = document.getElementById(str(i));
-    }
-
-    //石を置く位置を送信
-    socket.emit('exec',command,function(coordinate){
-        console.log(putStoneButton);
-    });
-
-    //Socket通信を終了する
-    socket.on('exit',function(msg){
-        console.log(msg);
-        socket.disconnect()
-    });
-});
+var socket=window.io();
+var stone=new Array(3);
 var imageboard=document.getElementById('imageboard');
 var lineboard=document.getElementById('lineboard');
 var stoneboard=document.getElementById('stoneboard');
-var myturn=0;//1
-var mycolor=1//null
+var turn=document.getElementById("turn");
+var myturn=0;//初期カラーが黒なら1白なら0
+var mycolor=1;//null
 window.onload=()=>{
     var imgcontext=imageboard.getContext('2d');
     var img=new Image();
-    img.src="../image/boardimg.jpg"
-    img.onload=()=>{
+    img.src="image/boardimg.jpg";
+    img.addEventListener('load',()=>{
+        
         imgcontext.drawImage(img,0,0);
-    }
-}
+    });
+};
+var imgcontext=imageboard.getContext('2d');
+var img=new Image();
+img.src="image/boardimg.jpg";
+img.addEventListener('load',()=>{
+    
+    imgcontext.drawImage(img,0,0);
+});
+
+
 
 const width=imageboard.clientWidth;
 const height=imageboard.clientHeight;
@@ -86,15 +63,54 @@ function　drawcircle(x,y,color){
 }
 
 stoneboard.addEventListener('click',(event)=>{
-    if(myturn){
+    if(!myturn){
         return;
     }
-    myturn=1;
     var rect=stoneboard.getBoundingClientRect();
     var x=event.clientX-Math.floor(rect.left);
     var y=event.clientY-Math.floor(rect.top);
     x=Math.floor(x/40);
     y=Math.floor(y/40);
     console.log(x,y);
-    drawcircle(x,y,mycolor);
+    stone[0]=x;
+    stone[1]=y;
+    stone[2]=mycolor;
+    console.log('mycolor:'+mycolor);
+    socket.emit('message',stone);
+    drawcircle(20+x*40,20+y*40,mycolor);
+    changeturn(0);
 });
+socket.on('message',(msg)=>{
+    if(msg==0){   //最初の色決め
+        mycolor=0;
+        changeturn(1);
+    }
+    else if(msg==1){
+        mycolor=1;
+        changeturn(0);
+    }
+    else if(msg=="win"){
+        //勝った時の処理
+    }
+    else if(msg=="lose"){
+        //負けた時の処理
+    }
+    else{
+        var x=msg[0];
+        var y=msg[1];
+        var color=msg[2];
+        console.log('color:'+color)
+        drawcircle(20+x*40,20+y*40,color);
+        changeturn(1);
+    }
+});
+function changeturn(flag){
+    if(flag){
+        myturn=1;
+        turn.innerText="あなたの番";
+    }
+    else{
+        myturn=0;
+        turn.innerText="相手の番";
+    }
+}
