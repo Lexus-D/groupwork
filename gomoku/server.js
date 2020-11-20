@@ -29,48 +29,32 @@ server.listen(PORT,()=>{
 
 //クライアントの処理
 io.on('connection',socket=>{
-  
-    var id=socket.id;
 
-      // 人数の確認
+    // 人数の確認
     iCountUser=iCountUser+1;
-    if(iCountUser==1){
-      io.to(id).emit('message',0);
-    }
-    else if(iCountUser==2){
-      io.to(id).emit('message',1);
-    }
     console.log(iCountUser);
+    var userid = socket.id;
+    var info={id: userid, number: iCountUser-1};
 
+    if(iCountUser<3)
+    {
+        idCheck[iCountUser-1]=userid;
+        io.to(userid).emit('setting',info);
+    }
+    
     socket.on('message',msg=>{
-        // 調整中
-        /*
-        if(iCountUser<3 && msg[0]==-1 && msg[1]==-1)
+        if(msg.id==idCheck[0])
         {
-            var id = socket.id;
-            idCheck[iCountUser-1]=id;
-            msg[3]=id;
-            console.log(id);
-            io.to(id).emit('personal',msg);
-            console.log("tyakka");
+            io.to(idCheck[1]).emit('message',msg.stoneinfo);
         }
-        else if(msg[3]==idCheck[0])
+        else if(msg.id==idCheck[1])
         {
-            msg[3]==idCheck[1];
-            io.to(idCheck[1]).emit('personal',msg);
-            console.log(idCheck[1]);
-            console.log("oita");
+            io.to(idCheck[0]).emit('message',msg.stoneinfo);
         }
-        else if(msg[3]==idCheck[1])
+        else
         {
-            msg[3]==idCheck[0];
-            io.to(idCheck[0]).emit('personal',msg);
-            console.log(idCheck[0]);
-            console.log("oita");
+            console.log("watch only");
         }
-        console.log("passed");
-        */
-        socket.broadcast.emit('message',msg);
     });
 
     // 切断時の処理
