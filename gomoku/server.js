@@ -23,15 +23,23 @@ server.listen(PORT,()=>{
 })
 
 //最初の接続の処理
-io.once('connection',socket=>{
+/*io.once('connection',socket=>{
     socket.emit('message',0);
-});
+});*/
 
 //クライアントの処理
 io.on('connection',socket=>{
+  
+    var id=socket.id;
 
-    // 人数の確認
+      // 人数の確認
     iCountUser=iCountUser+1;
+    if(iCountUser==1){
+      io.to(id).emit('message',0);
+    }
+    else if(iCountUser==2){
+      io.to(id).emit('message',1);
+    }
     console.log(iCountUser);
 
     socket.on('message',msg=>{
@@ -62,7 +70,7 @@ io.on('connection',socket=>{
         }
         console.log("passed");
         */
-        io.emit('message',msg);
+        socket.broadcast.emit('message',msg);
     });
 
     // 切断時の処理
