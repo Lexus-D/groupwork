@@ -14,8 +14,8 @@ const io = socketIO(server);
 const PORT = 5500;
 
 // グローバル変数
-let iCountUser=0;
-var idCheck=new Array(2);
+var countUsers=0;
+var roomNumber=1;
 
 server.listen(PORT,()=>{
     console.log('server starts on port: %d',PORT);
@@ -30,38 +30,39 @@ server.listen(PORT,()=>{
 //クライアントの処理
 io.on('connection',socket=>{
 
-    // 人数の確認
-    iCountUser=iCountUser+1;
-    console.log(iCountUser);
-    var userid = socket.id;
-    var info={id: userid, number: iCountUser-1};
+    // 人数の確認と部屋割り
+    countUsers=countUsers+1;
+    console.log(countUsers + "user active");
+    socket.join(roomNumber);
 
-    if(iCountUser<3)
-    {
-        idCheck[iCountUser-1]=userid;
-        io.to(userid).emit('setting',info);
+    // ID割り振り
+    var userID = socket.id;
+    var settingInfo={
+        id: userID,
+        color: countUsers%2,
+        room: roomNumber
+    };
+
+    // アクセスしてきたclientに設定データを送る
+    io.to(userID).emit('setting',settingInfo);
+
+    // 2人入ったら次のルームへ
+    if(countUsers%2==0){
+        roomNumber=roomNumber+1;
     }
-    
+
+    // 石を置いたときの処理
     socket.on('message',msg=>{
-        if(msg.id==idCheck[0])
-        {
-            io.to(idCheck[1]).emit('message',msg.stoneinfo);
-        }
-        else if(msg.id==idCheck[1])
-        {
-            io.to(idCheck[0]).emit('message',msg.stoneinfo);
-        }
-        else
-        {
-            console.log("watch only");
-        }
+        socket.broadcast.to(msg.room).emit('message',msg.stone);
     });
 
     // 切断時の処理
     socket.on('disconnect',()=>{
-    console.log('disconnect');
-    iCountUser=iCountUser-1;
-    console.log(iCountUser);
+        console.log('disconnect');
+
+        // ない方がいいかも
+        countUsers=countUsers-1;
+        console.log(countUsers);
     });
 
 });

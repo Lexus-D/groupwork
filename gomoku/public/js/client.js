@@ -6,7 +6,8 @@ var stoneboard=document.getElementById('stoneboard');
 var turn=document.getElementById("turn");
 var myturn=0;//初期カラーが黒なら1白なら0
 var mycolor=1;//null
-var userid;//サーバから割り当てられるID
+var userID;//サーバから割り当てられるID
+var roomNumber;//サーバから割り当てられる部屋番号
 window.onload=()=>{
     var imgcontext=imageboard.getContext('2d');
     var img=new Image();
@@ -64,7 +65,13 @@ function　drawcircle(x,y,color){
 }
 
 stoneboard.addEventListener('click',(event)=>{
-    var sendinfo = {stoneinfo: stone,id : userid};
+
+    var sendInfo = {
+        stone: stone,
+        id : userID,
+        room: roomNumber
+    };
+
     if(!myturn){
         return;
     }
@@ -78,18 +85,19 @@ stoneboard.addEventListener('click',(event)=>{
     stone[1]=y;
     stone[2]=mycolor;
     console.log('mycolor:'+mycolor);
-    socket.emit('message',sendinfo);
+    socket.emit('message',sendInfo);
     drawcircle(20+x*40,20+y*40,mycolor);
     changeturn(0);
 });
 
 socket.on('setting',(setting)=>{
-    userid = setting.id;
-    if(setting.number==0){   //最初の色決め
+    userID = setting.id;
+    roomNumber = setting.room;
+    if(setting.color==0){   //最初の色決め
         mycolor=0;
         changeturn(1);
     }
-    else if(setting.number==1){
+    else if(setting.color==1){
         mycolor=1;
         changeturn(0);
     }
