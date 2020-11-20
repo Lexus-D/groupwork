@@ -32,10 +32,15 @@
     position: absolute;
     z-index: 3;
 }
-
+#turn
+{
+    text-align: center;
+    font-size: 20px;
+}
 .header{
     text-align: center;
     font-size: 45px;
+    font-family: serif;
 }
 .circle{
     background-color:#ffffff;
@@ -60,101 +65,12 @@
             <canvas id="imageboard"></canvas>
             <canvas id="lineboard"></canvas>
             <canvas id="stoneboard"></canvas>
-            <script type="text/javascript">
-            var socket=window.io();
-            var stone=new Array(3);
-            var imageboard=document.getElementById('imageboard');
-            var lineboard=document.getElementById('lineboard');
-            var stoneboard=document.getElementById('stoneboard');
-            var myturn=0;//初期カラーが黒なら1白なら0
-            var mycolor=1;//null
-            //window.onload=()=>{
-            //}
-            var imgcontext=imageboard.getContext('2d');
-            var img=new Image();
-            img.src="image/boardimg.jpg";
-            img.addEventListener('load',()=>{
-                
-                imgcontext.drawImage(img,0,0);
-            });
-            
-            
-
-            const width=imageboard.clientWidth;
-            const height=imageboard.clientHeight;
-            imageboard.width=600;
-            imageboard.height=600;
-            lineboard.width=600;
-            lineboard.height=600;
-            stoneboard.width=600;
-            stoneboard.height=600;
-
-
-            var context = lineboard.getContext('2d');
-
-            for(let i=0;i<=14;i++){
-                context.beginPath();
-                context.moveTo(20+i*40,20);
-                context.lineTo(20+i*40,580);
-                context.stroke();
-            }
-            for(let i=0;i<=14;i++){
-                context.beginPath();
-                context.moveTo(20,20+i*40);
-                context.lineTo(580,20+i*40);
-                context.stroke();
-            }
-            var stonecontext=stoneboard.getContext('2d');
-            function　drawcircle(x,y,color){
-                if(color){
-                    stonecontext.fillStyle="#ffffff";
-                }else{
-                    stonecontext.fillStyle="#000000"
-                }
-                stonecontext.beginPath();
-                stonecontext.arc(x,y,10,0,2*Math.PI,true);
-                stonecontext.fill();
-                stonecontext.stroke();
-            }
-
-            stoneboard.addEventListener('click',(event)=>{
-                if(!myturn){
-                    return;
-                }
-                myturn=0;
-                var rect=stoneboard.getBoundingClientRect();
-                var x=event.clientX-Math.floor(rect.left);
-                var y=event.clientY-Math.floor(rect.top);
-                x=Math.floor(x/40);
-                y=Math.floor(y/40);
-                console.log(x,y);
-                stone[0]=x;
-                stone[1]=y;
-                stone[2]=mycolor;
-                console.log('mycolor:'+mycolor);
-                socket.emit('message',stone);
-                drawcircle(20+x*40,20+y*40,mycolor);
-            });
-            socket.on('message',(msg)=>{
-                if(msg==0){   //最初の色決め
-                    mycolor=0;
-                    myturn=1;
-                }
-                else{
-                    var x=msg[0];
-                    var y=msg[1];
-                    var color=msg[2];
-                    console.log('color:'+color)
-                    drawcircle(20+x*40,20+y*40,color);
-                    myturn=1;
-                }
-            });
-
-            </script>
         </div>
+        <div id="turn">待機中</div>
         <footer>
             ここに対戦中とか勝ち負けとかあなたの番とか表示しようかな。　
         </footer>
+        <script type="text/javascript" src="js/client.js"></script>
     </body>
 
 </html>
