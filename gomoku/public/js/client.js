@@ -1,31 +1,32 @@
 var socket=window.io();
+
 var stone=new Array(3);
+
 var imageboard=document.getElementById('imageboard');
 var lineboard=document.getElementById('lineboard');
 var stoneboard=document.getElementById('stoneboard');
 var turn=document.getElementById("turn");
+
 var myturn=0;//初期カラーが黒なら1白なら0
 var mycolor=1;//null
 var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
+
 window.onload=()=>{
     var imgcontext=imageboard.getContext('2d');
     var img=new Image();
     img.src="image/boardimg.jpg";
     img.addEventListener('load',()=>{
-
         imgcontext.drawImage(img,0,0);
     });
 };
+
 var imgcontext=imageboard.getContext('2d');
 var img=new Image();
 img.src="image/boardimg.jpg";
 img.addEventListener('load',()=>{
-
     imgcontext.drawImage(img,0,0);
 });
-
-
 
 const width=imageboard.clientWidth;
 const height=imageboard.clientHeight;
@@ -36,9 +37,8 @@ lineboard.height=600;
 stoneboard.width=600;
 stoneboard.height=600;
 
-
 var context = lineboard.getContext('2d');
-
+//draw the checkerboard
 for(let i=0;i<=14;i++){
     context.beginPath();
     context.moveTo(20+i*40,20);
@@ -51,6 +51,8 @@ for(let i=0;i<=14;i++){
     context.lineTo(580,20+i*40);
     context.stroke();
 }
+
+//
 var stonecontext=stoneboard.getContext('2d');
 function　drawcircle(x,y,color){
     if(color){
@@ -64,6 +66,7 @@ function　drawcircle(x,y,color){
     stonecontext.stroke();
 }
 
+
 stoneboard.addEventListener('click',(event)=>{
 
     var sendInfo = {
@@ -75,12 +78,19 @@ stoneboard.addEventListener('click',(event)=>{
     if(!myturn){
         return;
     }
+
     var rect=stoneboard.getBoundingClientRect();
+
     var x=event.clientX-Math.floor(rect.left);
     var y=event.clientY-Math.floor(rect.top);
+
+    //碁盤上の石の座標
     x=Math.floor(x/40);
     y=Math.floor(y/40);
+
     console.log(x,y);
+
+    //石の座標と色をstoneに保存、サーバに送る
     stone[0]=x;
     stone[1]=y;
     stone[2]=mycolor;
@@ -90,6 +100,7 @@ stoneboard.addEventListener('click',(event)=>{
     changeturn(0);
 });
 
+//listen on setting, receive the given id, color and room number 
 socket.on('setting',(setting)=>{
     userID = setting.id;
     roomNumber = setting.room;
@@ -104,22 +115,31 @@ socket.on('setting',(setting)=>{
     console.log(setting);
 })
 
-socket.on('message',(msg)=>{
-    if(msg=="win"){
-        //勝った時の処理
-    }
-    else if(msg=="lose"){
-        //負けた時の処理
-    }
-    else{
-        var x=msg[0];
-        var y=msg[1];
-        var color=msg[2];
-        console.log('color:'+color)
-        drawcircle(20+x*40,20+y*40,color);
-        changeturn(1);
-    }
+//
+socket.on('Broadcast',(msg)=>{
+    
+    var x=msg[0];
+    var y=msg[1];
+    var color=msg[2];
+    console.log('color:'+color)
+    drawcircle(20+x*40,20+y*40,color);
+    changeturn(1);
+    
 });
+
+//勝ち負けの判定が終わったら、勝者を表示し、石を置けなくする
+socket.on('gameover',function (data) {
+    console.log(data);
+    if(data==mycolor){
+        document.getElementById('info').innerText="you win";
+    }else{
+        document.getElementById('info').innerText="you lose";
+    }
+
+    //石を置く権限を外す方法はわからないごめん
+    //stoneboard.removeEventListener('click',function (param) {  });
+})
+
 function changeturn(flag){
     if(flag){
         myturn=1;
