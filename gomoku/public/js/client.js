@@ -12,7 +12,7 @@ var mycolor=1;//null
 var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
 
-var continue_process;
+var isStonePut;
 
 window.onload=()=>{
     var imgcontext=imageboard.getContext('2d');
@@ -100,8 +100,8 @@ stoneboard.addEventListener('click',(event)=>{
     socket.emit('message',sendInfo);
 
     //石がすでに置かれているかサーバに確認
-    socket.on('continue process', function(continue_process){
-        if(!continue_process){
+    socket.on('continue process', function(isStonePut){
+        if(!isStonePut){
             changeturn(0);
         }
     });

@@ -18,7 +18,7 @@ var countUsers=0;
 var roomNumber=1;
 var stoneboard=[];
 
-var continue_process;
+var isStonePut;
 
 //サーバ側で碁盤を保持
 for(var i=-5;i<20;i++){
@@ -76,14 +76,14 @@ io.on('connection',socket=>{
         //update new stone to the stoneboard in server
         //石がすでに置かれている場合はクライアントに知らせる
         if(stoneboard[x][y].state){
-            continue_process = true;
-            socket.emit('continue process', continue_process);
+            isStonePut = true;
+            socket.emit('continue process', isStonePut);
         }
         else{
             stoneboard[x][y].color=color;
             stoneboard[x][y].state=true;
-            continue_process = false;
-            socket.emit('continue process', continue_process);
+            isStonePut = false;
+            socket.emit('continue process', isStonePut);
 
             //broadcast position of stone for every client in one room
             io.sockets.emit('Broadcast',msg.stone);
