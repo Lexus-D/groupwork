@@ -45,7 +45,7 @@ io.on('connection',socket=>{
 
     // 人数の確認と部屋割り
     countUsers=countUsers+1;
-    console.log(countUsers + " user active");
+    // console.log(countUsers + " user active");
     socket.join(roomNumber);
 
     // ID割り振り
@@ -66,7 +66,7 @@ io.on('connection',socket=>{
 
     // 石を置いたときの処理
     socket.on('message',msg=>{
-        
+
         var x=msg.stone[0];
         var y=msg.stone[1];
         var color=msg.stone[2];
@@ -75,24 +75,24 @@ io.on('connection',socket=>{
         //update new stone to the stoneboard in server
         stoneboard[x][y].color=color;
         stoneboard[x][y].state=true;
-        
+
         //judge winlose:
         if(gameover(x,y,stoneboard)==true){
             //send winner's color back to client
-            socket.broadcast.to(msg.room).emit('gameover',stoneboard[x][y].color);
+            io.to(msg.room).emit('gameover',stoneboard[x][y].color);
             console.log(stoneboard[x][y].color+' win');
         }
     });
-    
-    
+
+
 
     // 切断時の処理
     socket.on('disconnect',()=>{
         console.log('disconnect');
 
-        // ない方がいいかも
-        countUsers=countUsers-1;
-        console.log(countUsers);
+        // debug用
+        //countUsers=countUsers-1;
+        //console.log(countUsers);
     });
 
 });
