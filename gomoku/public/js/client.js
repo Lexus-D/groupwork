@@ -100,7 +100,7 @@ stoneboard.addEventListener('click',(event)=>{
     socket.emit('message',sendInfo);
 
     //石がすでに置かれているかサーバに確認
-    socket.on('continue process', function(isStonePut){
+    socket.on('stone put', function(isStonePut){
         if(!isStonePut){
             changeturn(0);
         }
@@ -122,8 +122,6 @@ socket.on('setting',(setting)=>{
     console.log(setting);
 })
 
-//
-
 socket.on('Broadcast',(msg)=>{
     
     var x=msg[0];
@@ -132,7 +130,9 @@ socket.on('Broadcast',(msg)=>{
     console.log('color:'+color)
     drawcircle(20+x*40,20+y*40,color);
     
-    changeturn(1);
+    //受けとった石が相手の石なら次は自分のターン
+    if(color != mycolor)
+        changeturn(1);
     
 });
 

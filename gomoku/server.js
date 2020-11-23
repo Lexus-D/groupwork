@@ -77,13 +77,14 @@ io.on('connection',socket=>{
         //石がすでに置かれている場合はクライアントに知らせる
         if(stoneboard[x][y].state){
             isStonePut = true;
-            socket.emit('continue process', isStonePut);
+            socket.emit('stone put', isStonePut);
         }
+        //空いているマスに石が置かれる場合，石の座標を二人に送信
         else{
             stoneboard[x][y].color=color;
             stoneboard[x][y].state=true;
             isStonePut = false;
-            socket.emit('continue process', isStonePut);
+            socket.emit('stone put', isStonePut);
 
             //broadcast position of stone for every client in one room
             io.sockets.emit('Broadcast',msg.stone);
