@@ -5,7 +5,8 @@ var stone=new Array(3);
 var imageboard=document.getElementById('imageboard');
 var lineboard=document.getElementById('lineboard');
 var stoneboard=document.getElementById('stoneboard');
-var turn=document.getElementById("turn");
+var turn=document.getElementById('turn');
+var reset=document.getElementById('reset');
 
 var myturn=0;//初期カラーが黒なら1白なら0
 var mycolor=1;//null
@@ -61,7 +62,7 @@ function　drawcircle(x,y,color){
         stonecontext.fillStyle="#000000"
     }
     stonecontext.beginPath();
-    stonecontext.arc(x,y,10,0,2*Math.PI,true);
+    stonecontext.arc(x,y,15,0,2*Math.PI,true);
     stonecontext.fill();
     stonecontext.stroke();
 }
@@ -131,14 +132,35 @@ socket.on('Broadcast',(msg)=>{
 socket.on('gameover',function (data) {
     console.log(data);
     if(data==mycolor){
-        document.getElementById('info').innerText="you win";
+        var text="You Win!";
+        drawtext(text);
     }else{
-        document.getElementById('info').innerText="you lose";
+        var text="You Lose";
+        drawtext(text);
     }
 
     //石を置く権限を外す方法はわからないごめん
     //stoneboard.removeEventListener('click',function (param) {  });
+    myturn=0;
+    reset.disabled=false;
+    reset.style.display='inline';
+
 })
+
+function drawtext(str){
+    var stoneboardcontext=stoneboard.getContext('2d');
+    stoneboardcontext.fillStyle="aliceblue";
+    stoneboardcontext.fillRect(200,225,200,130);
+    stoneboardcontext.strokeStyle="black";
+    stoneboardcontext.strokeRect(200,225,200,130);
+    stoneboardcontext.textBaseline='center';
+    stoneboardcontext.textAlign='center';
+    stoneboardcontext.font='40px serif';
+    stoneboardcontext.fillStyle="black";
+    var x=stoneboard.width/2;
+    var y=stoneboard.height/2;
+    stoneboardcontext.fillText(str,x,y);
+}
 
 function changeturn(flag){
     if(flag){
