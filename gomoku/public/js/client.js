@@ -13,6 +13,7 @@ var mycolor=1;//null
 var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
 
+
 window.onload=()=>{
     var imgcontext=imageboard.getContext('2d');
     var img=new Image();
@@ -97,8 +98,7 @@ stoneboard.addEventListener('click',(event)=>{
     stone[2]=mycolor;
     console.log('mycolor:'+mycolor);
     socket.emit('message',sendInfo);
-    drawcircle(20+x*40,20+y*40,mycolor);
-    changeturn(0);
+
 });
 
 //listen on setting, receive the given id, color and room number 
@@ -116,7 +116,6 @@ socket.on('setting',(setting)=>{
     console.log(setting);
 })
 
-//
 socket.on('Broadcast',(msg)=>{
     
     var x=msg[0];
@@ -124,9 +123,15 @@ socket.on('Broadcast',(msg)=>{
     var color=msg[2];
     console.log('color:'+color)
     drawcircle(20+x*40,20+y*40,color);
-    changeturn(1);
+    
+    //相手の石が置かれたら次は自分のターン
+    if(color != mycolor)
+        changeturn(1);
+    else
+        changeturn(0);
     
 });
+
 
 //勝ち負けの判定が終わったら、勝者を表示し、石を置けなくする
 socket.on('gameover',function (data) {

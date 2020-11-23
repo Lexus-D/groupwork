@@ -18,6 +18,7 @@ var countUsers=0;
 var roomNumber=1;
 var stoneboard=[];
 
+
 //サーバ側で碁盤を保持
 for(var i=-5;i<20;i++){
     stoneboard[i]=[];
@@ -70,11 +71,14 @@ io.on('connection',socket=>{
         var x=msg.stone[0];
         var y=msg.stone[1];
         var color=msg.stone[2];
-        //broadcast position of stone for every client in one room
-        socket.broadcast.to(msg.room).emit('Broadcast',msg.stone);
+
         //update new stone to the stoneboard in server
-        stoneboard[x][y].color=color;
-        stoneboard[x][y].state=true;
+        if(!stoneboard[x][y].state){
+            stoneboard[x][y].color=color;
+            stoneboard[x][y].state=true;
+
+            io.sockets.emit('Broadcast',msg.stone);
+        }
 
         //judge winlose:
         if(gameover(x,y,stoneboard)==true){
