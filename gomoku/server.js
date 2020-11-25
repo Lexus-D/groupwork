@@ -16,17 +16,22 @@ const PORT = 5500;
 // グローバル変数
 var countUsers=0;
 var roomNumber=1;
+var checkNumber=0;
 var stoneboard=[];
 
 
 //サーバ側で碁盤を保持
-for(var i=-5;i<20;i++){
-    stoneboard[i]=[];
-    for(var j=-5;j<20;j++){
-        stoneboard[i][j]={
-            state:false,
-            color:2  //2 means no stone on this position
-        };
+//kはroomの数．先に20部屋確保しておく
+for(var k=0;k<20;k++){
+    stoneboard[k]=[];
+    for(var i=-5;i<20;i++){
+        stoneboard[k][i]=[];
+        for(var j=-5;j<20;j++){
+            stoneboard[k][i][j]={
+                state:false,
+                color:2  //2 means no stone on this position
+            };
+        }
     }
 }
 
@@ -71,20 +76,21 @@ io.on('connection',socket=>{
         var x=msg.stone[0];
         var y=msg.stone[1];
         var color=msg.stone[2];
+        checkNumber=msg.room;
 
         //update new stone to the stoneboard in server
-        if(!stoneboard[x][y].state){
-            stoneboard[x][y].color=color;
-            stoneboard[x][y].state=true;
-
-            io.sockets.emit('Broadcast',msg.stone);
+        if(!stoneboard[msg.room][x][y].state){
+            stoneboard[msg.room][x][y].color=color;
+            stoneboard[msg.room][x][y].state=true;
+            console.log(msg.room);
+            io.to(msg.room).emit('Broadcast',msg.stone);
         }
 
         //judge winlose:
         if(gameover(x,y,stoneboard)==true){
             //send winner's color back to client
-            io.to(msg.room).emit('gameover',stoneboard[x][y].color);
-            console.log(stoneboard[x][y].color+' win');
+            io.to(msg.room).emit('gameover',stoneboard[checkNumber][x][y].color);
+            console.log(stoneboard[checkNumber][x][y].color+' win');
         }
     });
 
@@ -105,7 +111,7 @@ io.on('connection',socket=>{
 function checkoneline(tpx,tpy,xplus,yplus,color){
     var count=0;
     for(var i=0;i<10;i++){
-        if(stoneboard[tpx][tpy].color==color&&stoneboard[tpx][tpy].color!=2){
+        if(stoneboard[checkNumber][tpx][tpy].color==color&&stoneboard[checkNumber][tpx][tpy].color!=2){
             count++;
             if(count>=5)return true;
         }else{
@@ -118,13 +124,13 @@ function checkoneline(tpx,tpy,xplus,yplus,color){
 
 function checkalldirection(x,y,stoneboard){
     //check Main diagonal
-    if(checkoneline(x-5,y-5,1,1,stoneboard[x][y].color))return true;
+    if(checkoneline(x-5,y-5,1,1,stoneboard[checkNumber][x][y].color))return true;
     //check column
-    if(checkoneline(x,y-5,0,1,stoneboard[x][y].color))return true;
+    if(checkoneline(x,y-5,0,1,stoneboard[checkNumber][x][y].color))return true;
     //check Antidiagonal
-    if(checkoneline(x+5,y-5,-1,1,stoneboard[x][y].color))return true;
+    if(checkoneline(x+5,y-5,-1,1,stoneboard[checkNumber][x][y].color))return true;
     //check row
-    if(checkoneline(x-5,y,1,0,stoneboard[x][y].color))return true;
+    if(checkoneline(x-5,y,1,0,stoneboard[checkNumber][x][y].color))return true;
 }
 
 function gameover(x,y,stoneboard){
