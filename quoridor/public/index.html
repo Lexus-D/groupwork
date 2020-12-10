@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8" />
+        <style type="text/css">
+#container
+{
+    margin-right: auto;
+    margin-left : auto;
+  height: 600px;
+  position: relative;
+  width: 600px;
+}
+#imageboard
+{
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 1;
+}
+#lineboard
+{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 2;
+}
+#stoneboard
+{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 3;
+}
+#wallboard
+{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 4;
+}
+
+#turn
+{
+    text-align: center;
+    font-size: 20px;
+}
+.header{
+    text-align: center;
+    font-size: 45px;
+    font-family: serif;
+}
+#reset
+{
+    width: 80px;
+    height: 50px;
+    margin-left: 80%;
+    font-size: 40;
+    text-align: center;
+}
+        </style>
+        <title>コリドール</title>
+        <script src="/socket.io/socket.io.js"></script> <!--websocketでsocket.io使うなら-->
+    </head>
+    <body style="background-color:aliceblue;">
+        <header>
+            <h1 class="header">
+                <a>コリドール</a>
+            </h1>
+        </header>
+        <div id="container">
+            <canvas id="imageboard"></canvas>
+            <canvas id="lineboard"></canvas>
+            <canvas id="stoneboard"></canvas>
+            <canvas id="wallboard"></canvas>
+        </div>
+        <div id="turn">待機中</div>
+        <button type="button" onclick="location.reload();" id="reset" style="display: none;" disabled>Next</button>
+        <footer id='info'>　
+        </footer>
+        <script type="text/javascript" src="js/client.js"></script>
+    </body>

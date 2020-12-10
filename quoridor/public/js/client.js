@@ -10,6 +10,8 @@ var wallboard=document.getElementById('wallboard');
 var turn=document.getElementById('turn');
 var reset=document.getElementById('reset');
 
+var length=9; //盤面の大きさ
+
 var myturn=0;//初期カラーが黒なら1白なら0
 var myTurnNum; //自分は何番目か
 var mycolor=1;//null
@@ -41,19 +43,23 @@ lineboard.width=600;
 lineboard.height=600;
 stoneboard.width=600;
 stoneboard.height=600;
+wallboard.width=600;
+wallboard.height=600;
 
 var context = lineboard.getContext('2d');
 //draw the checkerboard
-for(let i=0;i<=14;i++){
+context.lineWidth=10
+context.strokeStyle="#ffffff"
+for(let i=1;i<=length+1;i++){
     context.beginPath();
-    context.moveTo(20+i*40,20);
-    context.lineTo(20+i*40,580);
+    context.moveTo(i*600/(length+2),0);
+    context.lineTo(i*600/(length+2),600);
     context.stroke();
 }
-for(let i=0;i<=14;i++){
+for(let i=1;i<=length+1;i++){
     context.beginPath();
-    context.moveTo(20,20+i*40);
-    context.lineTo(580,20+i*40);
+    context.moveTo(0,i*600/(length+2));
+    context.lineTo(600,i*600/(length+2));
     context.stroke();
 }
 
@@ -71,8 +77,18 @@ function　drawcircle(x,y,color){
     stonecontext.stroke();
 }
 
+wallboard.addEventListener('mousemove',(e)=>{
+    var x=e.clientX-Math.floor(rect.left);
+    var y=e.clientY-Math.floor(rect.top);
+    if((linenum*600/(length+2))-5<=x & x<=(linenum*600/(length+2))+5){
+        //壁
+    }else{
+        //駒
+    }
+})
 
-stoneboard.addEventListener('click',(event)=>{
+
+wallboard.addEventListener('click',(event)=>{
 
     var sendInfo = {
         stone: stone,
@@ -81,19 +97,26 @@ stoneboard.addEventListener('click',(event)=>{
         room: roomNumber
     };
 
-    if(!myturn){
-        return;
-    }
+    //if(!myturn){
+        //return;
+    //}
+
 
     //石を置く，または壁を置くのどちらかを実行するようにする
-
-    //石を置く処理
-    var rect=stoneboard.getBoundingClientRect();
+    var rect=wallboard.getBoundingClientRect();
 
     var x=event.clientX-Math.floor(rect.left);
     var y=event.clientY-Math.floor(rect.top);
-
+    console.log(x,y)
+    var linenum=floor(x/(length+2))
+    if((linenum*600/(length+2))-5<=x & x<=(linenum*600/(length+2))+5){
+        //壁置く
+    }else{
+        //駒移動
+    }
+    //石を置く処理
     //碁盤上の石の座標
+    /*
     x=Math.floor(x/40);
     y=Math.floor(y/40);
 
@@ -124,7 +147,7 @@ stoneboard.addEventListener('click',(event)=>{
     wall[2]=mycolor;
     console.log('mycolor:'+mycolor);
     socket.emit('message',sendInfo);
-
+    */
 });
 
 //listen on setting, receive the given id, color and room number 
