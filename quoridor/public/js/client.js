@@ -1,25 +1,25 @@
-var socket=window.io();
+var socket = window.io();
 
-var stone=new Array(3);
+var stone = new Array(3);
 var wall = new Array(3);
 
-var imageboard=document.getElementById('imageboard');
-var lineboard=document.getElementById('lineboard');
-var stoneboard=document.getElementById('stoneboard');
-var wallboard=document.getElementById('wallboard');
-var turn=document.getElementById('turn');
-var reset=document.getElementById('reset');
+var imageboard = document.getElementById('imageboard');
+var lineboard = document.getElementById('lineboard');
+var stoneboard = document.getElementById('stoneboard');
+var wallboard = document.getElementById('wallboard');
+var turn = document.getElementById('turn');
+var reset = document.getElementById('reset');
 
-var length=9; //盤面の大きさ
+var length = 9; //盤面の大きさ
 
-var myturn=0;//初期カラーが黒なら1白なら0
+var myturn = 0;//初期カラーが黒なら1白なら0
 var myTurnNum; //自分は何番目か
-var mycolor=1;//null
+var mycolor = 1;//null
 var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
 
 
-window.onload=()=>{
+window.onload = () =>{
     var imgcontext=imageboard.getContext('2d');
     var img=new Image();
     img.src="image/boardimg.jpg";
@@ -28,23 +28,23 @@ window.onload=()=>{
     });
 };
 
-var imgcontext=imageboard.getContext('2d');
-var img=new Image();
-img.src="image/boardimg.jpg";
+var imgcontext = imageboard.getContext('2d');
+var img = new Image();
+img.src = "image/boardimg.jpg";
 img.addEventListener('load',()=>{
     imgcontext.drawImage(img,0,0);
 });
 
-const width=imageboard.clientWidth;
-const height=imageboard.clientHeight;
-imageboard.width=600;
-imageboard.height=600;
-lineboard.width=600;
-lineboard.height=600;
-stoneboard.width=600;
-stoneboard.height=600;
-wallboard.width=600;
-wallboard.height=600;
+const width = imageboard.clientWidth;
+const height = imageboard.clientHeight;
+imageboard.width = 600;
+imageboard.height = 600;
+lineboard.width = 600;
+lineboard.height = 600;
+stoneboard.width = 600;
+stoneboard.height = 600;
+wallboard.width = 600;
+wallboard.height = 600;
 
 var context = lineboard.getContext('2d');
 //draw the checkerboard
@@ -63,7 +63,6 @@ for(let i=1;i<=length+1;i++){
     context.stroke();
 }
 
-//
 var stonecontext=stoneboard.getContext('2d');
 function　drawcircle(x,y,color){
     if(color){
@@ -78,11 +77,15 @@ function　drawcircle(x,y,color){
 }
 
 wallboard.addEventListener('mousemove',(e)=>{
+    var rect = wallboard.getBoundingClientRect();
     var x=e.clientX-Math.floor(rect.left);
     var y=e.clientY-Math.floor(rect.top);
-    if((linenum*600/(length+2))-5<=x & x<=(linenum*600/(length+2))+5){
-        //壁
-    }else{
+    var xline = Math.floor(x/(length + 2))
+    var yline = Math.floor(y/(length + 2))
+    var wallcontext = wallboard.getContext('2d')
+    if((xline*600/(length+2))-5<=x & x<=(yline*600/(length+2))+5) {
+        //たて壁
+    } else {
         //駒
     }
 })
@@ -101,18 +104,36 @@ wallboard.addEventListener('click',(event)=>{
         //return;
     //}
 
-
     //石を置く，または壁を置くのどちらかを実行するようにする
-    var rect=wallboard.getBoundingClientRect();
-
-    var x=event.clientX-Math.floor(rect.left);
-    var y=event.clientY-Math.floor(rect.top);
+    var rect = wallboard.getBoundingClientRect();
+    var x = event.clientX-Math.floor(rect.left);
+    var y = event.clientY-Math.floor(rect.top);
     console.log(x,y)
-    var linenum=floor(x/(length+2))
-    if((linenum*600/(length+2))-5<=x & x<=(linenum*600/(length+2))+5){
-        //壁置く
-    }else{
+    var xline = Math.floor((x+5)*(length + 2)/600)
+    var yline = Math.floor((y+5)*(length + 2)/600)
+    console.log(xline,yline)
+    var wallcontext = wallboard.getContext('2d')
+    if ((xline*600/(length+2))-5 <= x & x <= (xline*600/(length+2)) + 5 ){
+        //縦向きの壁置く
+        wallcontext.strokeStyle="#8b0000"
+        wallcontext.lineWidth=8
+        wallcontext.beginPath();
+        wallcontext.moveTo(xline*600/(length + 2),yline*600/(length + 2));
+        wallcontext.lineTo(xline*600/(length + 2),(yline + 2)*600/(length + 2));
+        wallcontext.stroke();
+        console.log('a')
+    } else if ((yline*600/(length+2))-5 <= y & y <= (yline*600/(length+2)) + 5 ) {
+        //横向きの壁置く
+        wallcontext.strokeStyle="#8b0000"
+        wallcontext.lineWidth=8
+        wallcontext.beginPath();
+        wallcontext.moveTo(xline*600/(length + 2),yline*600/(length + 2));
+        wallcontext.lineTo((xline+2)*600/(length + 2),yline*600/(length + 2));
+        wallcontext.stroke();
+    } else {
         //駒移動
+
+
     }
     //石を置く処理
     //碁盤上の石の座標
@@ -154,11 +175,10 @@ wallboard.addEventListener('click',(event)=>{
 socket.on('setting',(setting)=>{
     userID = setting.id;
     roomNumber = setting.room;
-    if(setting.color==0){   //最初の色決め
-        mycolor=0;
+    if (setting.color==0) {   //最初の色決め
+        mycolor = 0;
         changeturn(1);
-    }
-    else{
+    } else {
         mycolor = setting.color;
         changeturn(0);
     }
