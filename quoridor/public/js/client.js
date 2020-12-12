@@ -80,11 +80,13 @@ wallboard.addEventListener('mousemove',(e)=>{
     var rect = wallboard.getBoundingClientRect();
     var x=e.clientX-Math.floor(rect.left);
     var y=e.clientY-Math.floor(rect.top);
-    var xline = Math.floor(x/(length + 2))
-    var yline = Math.floor(y/(length + 2))
+    var xline = Math.floor((x+5)*(length + 2)/600)
+    var yline = Math.floor((y+5)*(length + 2)/600)
     var wallcontext = wallboard.getContext('2d')
     if((xline*600/(length+2))-5<=x & x<=(yline*600/(length+2))+5) {
         //たて壁
+    } else if ((yline*600/(length+2))-5 <= y & y <= (yline*600/(length+2)) + 5) {
+        //横壁
     } else {
         //駒
     }
@@ -114,7 +116,7 @@ wallboard.addEventListener('click',(event)=>{
     console.log(xline,yline)
     var wallcontext = wallboard.getContext('2d')
     if ((xline*600/(length+2))-5 <= x & x <= (xline*600/(length+2)) + 5 ){
-        //縦向きの壁置く
+        //縦向きの壁置 関数化したほういいかも
         wallcontext.strokeStyle="#8b0000"
         wallcontext.lineWidth=8
         wallcontext.beginPath();
@@ -122,8 +124,8 @@ wallboard.addEventListener('click',(event)=>{
         wallcontext.lineTo(xline*600/(length + 2),(yline + 2)*600/(length + 2));
         wallcontext.stroke();
         console.log('a')
-    } else if ((yline*600/(length+2))-5 <= y & y <= (yline*600/(length+2)) + 5 ) {
-        //横向きの壁置く
+    } else if ((yline*600/(length+2))-5 <= y & y <= (yline*600/(length+2)) + 5) {
+        //横向きの壁置く　関数化したほういいかも
         wallcontext.strokeStyle="#8b0000"
         wallcontext.lineWidth=8
         wallcontext.beginPath();
@@ -131,8 +133,7 @@ wallboard.addEventListener('click',(event)=>{
         wallcontext.lineTo((xline+2)*600/(length + 2),yline*600/(length + 2));
         wallcontext.stroke();
     } else {
-        //駒移動
-
+        //駒移動、盤面保持して以前の駒の表示をクリアする必要あるので後回し
 
     }
     //石を置く処理
