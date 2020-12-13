@@ -65,11 +65,11 @@ for(let i=1;i<=length+1;i++){
 
 var stonecontext=stoneboard.getContext('2d');
 function　drawcircle(x,y,color){
-    if(color){
+    if (color == 1) {
         stonecontext.fillStyle="#ffffff";
-    }else{
+    }else if (color==2) {
         stonecontext.fillStyle="#000000"
-    }
+    }//後二種
     stonecontext.beginPath();
     stonecontext.arc(x,y,15,0,2*Math.PI,true);
     stonecontext.fill();
@@ -83,7 +83,7 @@ wallboard.addEventListener('mousemove',(e)=>{
     var xline = Math.floor((x+5)*(length + 2)/600)
     var yline = Math.floor((y+5)*(length + 2)/600)
     var wallcontext = wallboard.getContext('2d')
-    if((xline*600/(length+2))-5<=x & x<=(yline*600/(length+2))+5) {
+    if((xline*600/(length+2))-5<=x & x<=(xline*600/(length+2))+5) {
         //たて壁
     } else if ((yline*600/(length+2))-5 <= y & y <= (yline*600/(length+2)) + 5) {
         //横壁
@@ -117,6 +117,9 @@ wallboard.addEventListener('click',(event)=>{
     var wallcontext = wallboard.getContext('2d')
     if ((xline*600/(length+2))-5 <= x & x <= (xline*600/(length+2)) + 5 ){
         //縦向きの壁置 関数化したほういいかも
+
+        //ここで置けるか判定する関数欲しい
+
         wallcontext.strokeStyle="#8b0000"
         wallcontext.lineWidth=8
         wallcontext.beginPath();
@@ -126,6 +129,9 @@ wallboard.addEventListener('click',(event)=>{
         console.log('a')
     } else if ((yline*600/(length+2))-5 <= y & y <= (yline*600/(length+2)) + 5) {
         //横向きの壁置く　関数化したほういいかも
+
+        //ここで置けるか判定する関数欲しい
+
         wallcontext.strokeStyle="#8b0000"
         wallcontext.lineWidth=8
         wallcontext.beginPath();
@@ -133,8 +139,9 @@ wallboard.addEventListener('click',(event)=>{
         wallcontext.lineTo((xline+2)*600/(length + 2),yline*600/(length + 2));
         wallcontext.stroke();
     } else {
-        //駒移動、盤面保持して以前の駒の表示をクリアする必要あるので後回し
-
+        //盤面情報から移動前の駒の場所を取得
+        //stonecontext.clearRect(x,y,15,15) 移動前の駒消す
+        drawcircle((xline + 0.5)*600/(length + 2),(yline + 0.5)*600/(length + 2),1)
     }
     //石を置く処理
     //碁盤上の石の座標
