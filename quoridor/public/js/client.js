@@ -1,7 +1,7 @@
 var socket = window.io();
 
 var stone = new Array(3);
-var wall = new Array(3);
+var wall = new Array(4);
 
 var imageboard = document.getElementById('imageboard');
 var lineboard = document.getElementById('lineboard');
@@ -10,7 +10,7 @@ var wallboard = document.getElementById('wallboard');
 var turn = document.getElementById('turn');
 var reset = document.getElementById('reset');
 
-var length = 9; //盤面の大きさ
+var LENGTH = 9; //盤面の大きさ
 
 var myturn = 0;//初期カラーが黒なら1白なら0
 var myTurnNum; //自分は何番目か
@@ -18,8 +18,49 @@ var mycolor = 1;//null
 var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
 
+var stoneBoard=[];
+var wallBoardVertical=[];
+var wallBoardHorizontal=[];
+var nowstoneposition=[]
 
-window.onload = () =>{
+
+
+for(var i = 0;i < 5; i++){
+    nowstoneposition[i]={
+        x:0,
+        y:0
+    }
+}
+
+
+// 石用
+for(var i=0;i<LENGTH;i++){
+    stoneBoard[i]=[];
+    for(var j=0;j<9;j++){
+        stoneBoard[i][j]={
+            state:false,
+            color:0
+        }
+    }
+}
+
+// 壁用のボード
+for(var i=0;i<LENGTH-1;i++){
+    wallBoardVertical[i]=[];
+    wallBoardHorizontal[i]=[];
+    for(var j=0;j<LENGTH;j++){
+        wallBoardVertical[i][j]={
+            state:false,
+            color:0
+        }
+        wallBoardHorizontal[i][j]={
+            state:false,
+            color:0
+        }
+    }
+}
+
+/*window.onload = () =>{
     var imgcontext=imageboard.getContext('2d');
     var img=new Image();
     img.src="image/boardimg.jpg";
@@ -27,6 +68,7 @@ window.onload = () =>{
         imgcontext.drawImage(img,0,0);
     });
 };
+*/
 
 var imgcontext = imageboard.getContext('2d');
 var img = new Image();
@@ -50,25 +92,25 @@ var context = lineboard.getContext('2d');
 //draw the checkerboard
 context.lineWidth=10
 context.strokeStyle="#ffffff"
-for(let i=1;i<=length+1;i++){
+for(let i=1;i<=LENGTH + 1;i++){
     context.beginPath();
-    context.moveTo(i*600/(length+2),0);
-    context.lineTo(i*600/(length+2),600);
+    context.moveTo(i*600/(LENGTH + 2),0);
+    context.lineTo(i*600/(LENGTH + 2),600);
     context.stroke();
 }
-for(let i=1;i<=length+1;i++){
+for(let i=1;i<=LENGTH + 1;i++){
     context.beginPath();
-    context.moveTo(0,i*600/(length+2));
-    context.lineTo(600,i*600/(length+2));
+    context.moveTo(0,i*600/(LENGTH + 2));
+    context.lineTo(600,i*600/(LENGTH + 2));
     context.stroke();
 }
 
 var stonecontext=stoneboard.getContext('2d');
 function　drawcircle(x,y,color){
-    if (color == 1) {
-        stonecontext.fillStyle="#ffffff";
-    }else if (color==2) {
-        stonecontext.fillStyle="#000000"
+    if (color == 0) {
+        stonecontext.fillStyle="#000000";
+    }else if (color == 1) {
+        stonecontext.fillStyle="#ffffff"
     }//後二種
     stonecontext.beginPath();
     stonecontext.arc(x,y,15,0,2*Math.PI,true);
@@ -80,12 +122,12 @@ wallboard.addEventListener('mousemove',(e)=>{
     var rect = wallboard.getBoundingClientRect();
     var x=e.clientX-Math.floor(rect.left);
     var y=e.clientY-Math.floor(rect.top);
-    var xline = Math.floor((x+5)*(length + 2)/600)
-    var yline = Math.floor((y+5)*(length + 2)/600)
+    var xline = Math.floor((x+5)*(LENGTH + 2)/600)
+    var yline = Math.floor((y+5)*(LENGTH + 2)/600)
     var wallcontext = wallboard.getContext('2d')
-    if((xline*600/(length+2))-5<=x & x<=(xline*600/(length+2))+5) {
+    if((xline*600/(LENGTH + 2))-5<=x & x<=(xline*600/(LENGTH + 2))+5) {
         //たて壁
-    } else if ((yline*600/(length+2))-5 <= y & y <= (yline*600/(length+2)) + 5) {
+    } else if ((yline*600/(LENGTH + 2))-5 <= y & y <= (yline*600/(LENGTH + 2)) + 5) {
         //横壁
     } else {
         //駒
@@ -102,20 +144,20 @@ wallboard.addEventListener('click',(event)=>{
         room: roomNumber
     };
 
-    //if(!myturn){
-        //return;
-    //}
+    if(!myturn){
+        return;
+    }
 
     //石を置く，または壁を置くのどちらかを実行するようにする
     var rect = wallboard.getBoundingClientRect();
     var x = event.clientX-Math.floor(rect.left);
     var y = event.clientY-Math.floor(rect.top);
-    console.log(x,y)
-    var xline = Math.floor((x+5)*(length + 2)/600)
-    var yline = Math.floor((y+5)*(length + 2)/600)
+    //console.log(x,y)
+    var xline = Math.floor((x+5)*(LENGTH + 2)/600)
+    var yline = Math.floor((y+5)*(LENGTH + 2)/600)
     console.log(xline,yline)
     var wallcontext = wallboard.getContext('2d')
-    if ((xline*600/(length+2))-5 <= x & x <= (xline*600/(length+2)) + 5 ){
+    if ((xline*600/(LENGTH + 2))-5 <= x & x <= (xline*600/(LENGTH + 2)) + 5 ){
         //縦向きの壁置 関数化したほういいかも
 
         //ここで置けるか判定する関数欲しい
@@ -123,11 +165,19 @@ wallboard.addEventListener('click',(event)=>{
         wallcontext.strokeStyle="#8b0000"
         wallcontext.lineWidth=8
         wallcontext.beginPath();
-        wallcontext.moveTo(xline*600/(length + 2),yline*600/(length + 2));
-        wallcontext.lineTo(xline*600/(length + 2),(yline + 2)*600/(length + 2));
+        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
         wallcontext.stroke();
-        console.log('a')
-    } else if ((yline*600/(length+2))-5 <= y & y <= (yline*600/(length+2)) + 5) {
+        //壁の座標と色をwallに保存、サーバに送る
+        wall[0]=xline-1;
+        wall[1]=yline-1;
+        wall[2]=0;
+        wall[3]=mycolor;
+        socket.emit('wall',sendInfo);
+        changeturn(0)
+        wallBoardVertical[xline-1][yline-1].state=true;
+        wallBoardVertical[xline-1][yline-1].color=mycolor;
+    } else if ((yline*600/(LENGTH + 2))-5 <= y & y <= (yline*600/(LENGTH + 2)) + 5) {
         //横向きの壁置く　関数化したほういいかも
 
         //ここで置けるか判定する関数欲しい
@@ -135,48 +185,41 @@ wallboard.addEventListener('click',(event)=>{
         wallcontext.strokeStyle="#8b0000"
         wallcontext.lineWidth=8
         wallcontext.beginPath();
-        wallcontext.moveTo(xline*600/(length + 2),yline*600/(length + 2));
-        wallcontext.lineTo((xline+2)*600/(length + 2),yline*600/(length + 2));
+        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        wallcontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
         wallcontext.stroke();
+        //壁の座標と色をwallに保存、サーバに送る
+        wall[0]=xline-1;
+        wall[1]=yline-1;
+        wall[2]=1;
+        wall[3]=mycolor;
+        socket.emit('wall',sendInfo);
+        changeturn(0);
+        wallBoardHorizontal[xline-1][yline-1].state=true;
+        wallBoardHorizontal[xline-1][yline-1].color=mycolor;
     } else {
-        //盤面情報から移動前の駒の場所を取得
-        //stonecontext.clearRect(x,y,15,15) 移動前の駒消す
-        drawcircle((xline + 0.5)*600/(length + 2),(yline + 0.5)*600/(length + 2),1)
+        //移動前の駒の場所を取得
+        var previousx=nowstoneposition[mycolor].x
+        var previousy=nowstoneposition[mycolor].y
+        // 置けるか判定したい
+        
+        stonecontext.clearRect((previousx+1)*600/(LENGTH + 2),(previousy+1)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+        drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
+        console.log(xline,yline,mycolor)
+        nowstoneposition[mycolor].x=xline-1
+        nowstoneposition[mycolor].y=yline-1
+        changeturn(0);
+        stoneBoard[xline-1][yline-1].state=true;
+        stoneBoard[xline-1][yline-1].color=mycolor;
+        stone[0]=xline - 1;
+        stone[1]=yline - 1;
+        stone[2]=mycolor;
+        console.log(sendInfo.stone);
+        socket.emit('stone',sendInfo);
     }
-    //石を置く処理
-    //碁盤上の石の座標
-    /*
-    x=Math.floor(x/40);
-    y=Math.floor(y/40);
 
-    console.log(x,y);
-
-    //石の座標と色をstoneに保存、サーバに送る
-    stone[0]=x;
-    stone[1]=y;
-    stone[2]=mycolor;
-    console.log('mycolor:'+mycolor);
-    socket.emit('message',sendInfo);
-
-    //壁を置く処理
-    var rect=stoneboard.getBoundingClientRect();
-
-    var x=event.clientX-Math.floor(rect.left);
-    var y=event.clientY-Math.floor(rect.top);
-
-    //碁盤上の壁の座標
-    x=Math.floor(x/40);
-    y=Math.floor(y/40);
-
-    console.log(x,y);
-
-    //壁の座標と色をwallに保存、サーバに送る
-    wall[0]=x;
-    wall[1]=y;
-    wall[2]=mycolor;
-    console.log('mycolor:'+mycolor);
-    socket.emit('message',sendInfo);
-    */
+    
+    
 });
 
 //listen on setting, receive the given id, color and room number 
@@ -194,16 +237,25 @@ socket.on('setting',(setting)=>{
 })
 
 socket.on('Broadcast',(msg)=>{
-    
+    if (msg[2]==mycolor){
+        return;
+    }
     var x=msg[0];
     var y=msg[1];
     var color=msg[2];
     console.log('color:'+color)
-    drawcircle(20+x*40,20+y*40,color);
+    var previousx=nowstoneposition[color].x;
+    var previousy=nowstoneposition[color].y;
+    stonecontext.clearRect((previousx+1)*600/(LENGTH + 2),(previousy+1)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
     
+    drawcircle((x + 1.5)*600/(LENGTH + 2),(y + 1.5)*600/(LENGTH + 2),color)
+    console.log(x,y,color)
+    nowstoneposition[color].x=x;
+    nowstoneposition[color].y=y;
     //ターンを変える処理
     //次のターンは誰かサーバから受け取る
-    changeturn(nextTurn == myTurnNum);
+    //changeturn(nextTurn == myTurnNum); //4人用のとき
+    changeturn(1); //二人用
     
 });
 
