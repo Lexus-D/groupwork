@@ -127,7 +127,7 @@ io.on('connection',socket=>{
         var y=putWall.wall[1];
         // 縦壁か横壁かの情報をwall[2]に入れてほしいです
         var wallDirection=putWall.wall[2];
-        
+        io.to(putWall.room).emit('wallbroadcast',putWall.wall);
         // 横なら
         if(wallDirection){
             wallBoardHorizontal[putWall.room][x][y].state=true;
