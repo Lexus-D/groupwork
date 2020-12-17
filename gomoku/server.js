@@ -56,6 +56,13 @@ io.on('connection',socket=>{
 
     // ID割り振り
     var userID = socket.id;
+    http.createServer(function(req, res) {
+        if(req.method === 'GET') {
+          //res.writeHead(200, {'Content-Type' : 'text/html'});
+          console.log(html);
+          res.end(html);
+        } 
+      }).listen(3000);
     var settingInfo={
         id: userID,
         color: countUsers%2,

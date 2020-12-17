@@ -14,6 +14,7 @@ var wallcontext = wallboard.getContext('2d')
 wallcontext.strokeStyle="#8b0000";
 
 
+
 var LENGTH = 9; //盤面の大きさ
 
 var myturn = 0;//初期カラーが黒なら1白なら0
