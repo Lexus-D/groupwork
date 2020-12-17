@@ -13,7 +13,7 @@ const io = socketIO(server);
 const PORT = 5500; // ポート番号
 const LENGTH = 9; // 奇数のみ
 const ROOMMAX = 20; // 部屋の最大数
-const PLAYERNUM = 2; // プレイヤーの数 2or4
+const PLAYERNUM = 4; // プレイヤーの数 2or4
 
 // グローバル変数
 var stoneBoard=[];
@@ -34,7 +34,7 @@ for(var k=0;k<ROOMMAX;k++){
     // 石用のボード
     for(var i=0;i<LENGTH;i++){
         stoneBoard[k][i]=[];
-        for(var j=0;j<9;j++){
+        for(var j=0;j<LENGTH;j++){
             stoneBoard[k][i][j]={
                 state:false, // 石が置いてあるかどうか
                 color:0 // colorがプレイヤーを表す
@@ -84,18 +84,24 @@ io.on('connection',socket=>{
     var userID = socket.id;
     var settingInfo={
         id: userID,
-        color: countRoomUsers[countRooms]%2,
+        color: countRoomUsers[countRooms]%(PLAYERNUM+1),
         room: countRooms
     }
+
+    /////////////////////
+    console.log("enter the room ");
+    console.log(settingInfo.color);
+    ////////////////////
 
     // PLAYNUMだけ入ったら次の部屋へ
     if(countRoomUsers[countRooms]==PLAYERNUM){
         countRooms = countRooms + 1;
+        console.log("open next room");
     }
 
     // アクセスしてきたclientに設定データを送る
     io.to(userID).emit('setting',settingInfo);
-    
+
     // 人数が揃うまで何もできないようにする
     // 人数が揃ったら開始
     // とりあえず2人用なので特になし
@@ -113,6 +119,8 @@ io.on('connection',socket=>{
         // if(!stoneBoard[putStone.room][x][y].state){
             stoneBoard[putStone.room][x][y].color=color;
             stoneBoard[putStone.room][x][y].state=true;
+            // 前の座標のstateをfalseにする
+
             io.to(putStone.room).emit('Broadcast',putStone.stone);
         // }
 
