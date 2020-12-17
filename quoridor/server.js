@@ -132,13 +132,25 @@ io.on('connection',socket=>{
 
         // ↓勝利条件を満たしているかを判断する関数
         if(checkwinner(stoneBoard[putStone.room])==1){
-            console.log("player 1 win")
+            console.log("player 1 win");
+            io.to(putStone.room).emit('gameover',{
+                winner:1
+            });
         }else if(checkwinner(stoneBoard[putStone.room])==2){
-            console.log("player 2 win")
+            console.log("player 2 win");
+            io.to(putStone.room).emit('gameover',{
+                winner:2
+            });
         }else if(checkwinner(stoneBoard[putStone.room])==3){
-            console.log("player 3 win")
+            console.log("player 3 win");
+            io.to(putStone.room).emit('gameover',{
+                winner:3
+            });
         }else if(checkwinner(stoneBoard[putStone.room])==4){
-            console.log("player 4 win")
+            console.log("player 4 win");
+            io.to(putStone.room).emit('gameover',{
+                winner:4
+            });
         }
     })
 
@@ -179,7 +191,7 @@ e.g.最上行の石が最下行に、あるいは最下行の石が最上行に�
 function checkwinner(stoneBoard){
     for(var i=0;i<LENGTH;i++){
         if(stoneBoard[i][0].state==true&&stoneBoard[i][0].color==1){
-            return 1;//color 1 win(プレイヤー１は一番下の行から動くと、一番上の行に着いたら勝つとなる)
+            return 1;//color 1 win(プレイヤー１は一番下の行から動くから、一番上の行に着いたら勝つとなる)
         }else if(stoneBoard[i][LENGTH-1].state==true&&stoneBoard[i][LENGTH-1].color==3){
             return 3//color 3 win
         }else if(stoneBoard[LENGTH-1][i].state==true&&stoneBoard[0][i].color==2){
