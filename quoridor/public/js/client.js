@@ -203,9 +203,11 @@ wallboard.addEventListener('click',(event)=>{
         //移動前の駒の場所を取得
         var previousx=nowstoneposition[mycolor].x
         var previousy=nowstoneposition[mycolor].y
+        
         // 置けるか判定したい
         
         stonecontext.clearRect((previousx+1)*600/(LENGTH + 2),(previousy+1)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+
         drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
         console.log(xline,yline,mycolor)
         nowstoneposition[mycolor].x=xline-1
@@ -213,21 +215,20 @@ wallboard.addEventListener('click',(event)=>{
         changeturn(0);
         stoneBoard[xline-1][yline-1].state=true;
         stoneBoard[xline-1][yline-1].color=mycolor;
+
         stone[0]=xline - 1;
         stone[1]=yline - 1;
         stone[2]=mycolor;
         console.log(sendInfo.stone);
         socket.emit('stone',sendInfo);
     }
-
-    
-    
 });
 
 //listen on setting, receive the given id, color and room number 
 socket.on('setting',(setting)=>{
     userID = setting.id;
     roomNumber = setting.room;
+    
     if (setting.color==0) {   //最初の色決め
         mycolor = 0;
         changeturn(1);
@@ -235,9 +236,12 @@ socket.on('setting',(setting)=>{
         mycolor = setting.color;
         changeturn(0);
     }
+    //自分の石
     drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),mycolor)
     nowstoneposition[mycolor].x=(LENGTH-1)/2;
     nowstoneposition[mycolor].y=LENGTH-1;
+
+    //相手の石
     enecolor=Math.abs(mycolor-1)
     drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),enecolor)
     nowstoneposition[enecolor].x=(LENGTH-1)/2;
@@ -252,13 +256,17 @@ socket.on('Broadcast',(msg)=>{
     var x=LENGTH - msg[0] - 1;
     var y=LENGTH - msg[1] - 1;
     var color=msg[2];
+
     console.log('color:'+color)
     var previousx=nowstoneposition[color].x;
     var previousy=nowstoneposition[color].y;
+
     stonecontext.clearRect((previousx+1)*600/(LENGTH + 2),(previousy+1)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
     
     drawcircle((x + 1.5)*600/(LENGTH + 2),(y + 1.5)*600/(LENGTH + 2),color)
-    console.log(x,y,color)
+    
+    //console.log(x,y,color)
+
     nowstoneposition[color].x=x;
     nowstoneposition[color].y=y;
     //ターンを変える処理
@@ -282,6 +290,7 @@ socket.on('wallbroadcast',(msg)=>{
         wallcontext.stroke();
         
         changeturn(1); //二人用
+
     } else {
         wallcontext.lineWidth=8;
         wallcontext.beginPath();
@@ -337,3 +346,4 @@ function changeturn(flag){
         turn.innerText="相手の番";
     }
 }
+

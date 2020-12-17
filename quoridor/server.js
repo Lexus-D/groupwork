@@ -131,7 +131,15 @@ io.on('connection',socket=>{
         // }
 
         // ↓勝利条件を満たしているかを判断する関数
-
+        if(checkwinner(stoneBoard[putStone.room])==1){
+            console.log("player 1 win")
+        }else if(checkwinner(stoneBoard[putStone.room])==2){
+            console.log("player 2 win")
+        }else if(checkwinner(stoneBoard[putStone.room])==3){
+            console.log("player 3 win")
+        }else if(checkwinner(stoneBoard[putStone.room])==4){
+            console.log("player 4 win")
+        }
     })
 
     // 壁を置いた場合の処理
@@ -163,3 +171,21 @@ io.on('connection',socket=>{
 })
 
 // 勝敗判定のアルゴリズム
+
+/*
+e.g.最上行の石が最下行に、あるいは最下行の石が最上行にたどり着くと勝敗判定する。
+一番最初に向こうにたどり着いたプレイヤーが勝つ
+*/
+function checkwinner(stoneBoard){
+    for(var i=0;i<LENGTH;i++){
+        if(stoneBoard[i][0].state==true&&stoneBoard[i][0].color==1){
+            return 1;//color 1 win(プレイヤー１は一番下の行から動くと、一番上の行に着いたら勝つとなる)
+        }else if(stoneBoard[i][LENGTH-1].state==true&&stoneBoard[i][LENGTH-1].color==3){
+            return 3//color 3 win
+        }else if(stoneBoard[LENGTH-1][i].state==true&&stoneBoard[0][i].color==2){
+            return 2//color 2 win
+        }else if(stoneBoard[0][LENGTH-1].state==true&&stoneBoard[0][LENGTH-1].color==4){
+            return 4//color 4 win
+        }
+    }
+}
