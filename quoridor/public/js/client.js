@@ -249,11 +249,13 @@ wallboard.addEventListener('click',(event)=>{
         //移動前の駒の場所を取得
         var previousx=nowstoneposition[mycolor].x
         var previousy=nowstoneposition[mycolor].y
+        
         // 置けるか判定したい
         var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor);
         //var previousscreenx=previousscreen[0];
         //var previousscreeny=previousscreen[1];
         stonecontext.clearRect((previousx+1)*600/(LENGTH + 2),(previousy+1)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+
         drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
         console.log(xline,yline,mycolor)
         nowstoneposition[mycolor].x=xline-1
@@ -268,9 +270,6 @@ wallboard.addEventListener('click',(event)=>{
         console.log(sendInfo.stone);
         socket.emit('stone',sendInfo);
     }
-
-    
-    
 });
 
 //listen on setting, receive the given id, color and room number 
@@ -323,6 +322,7 @@ socket.on('Broadcast',(msg)=>{
     var xline=line[0];
     var yline=line[1];
     var color=msg[2];
+
     console.log('color:'+color)
     var i=0;
     var j=0;
@@ -489,3 +489,4 @@ function changeturn(flag){
         turn.innerText="相手の番";
     }
 }
+
