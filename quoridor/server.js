@@ -36,7 +36,6 @@ for(var k=0;k<ROOMMAX;k++){
         stoneBoard[k][i]=[];
         for(var j=0;j<LENGTH;j++){
             stoneBoard[k][i][j]={
-                state:false, // 石が置いてあるかどうか
                 color:0 // colorがプレイヤーを表す
                         // 0は石がない意味
             }
@@ -50,11 +49,9 @@ for(var k=0;k<ROOMMAX;k++){
         for(var j=0;j<LENGTH;j++){
             wallBoardVertical[k][i][j]={
                 state:false,
-                color:0
             },
             wallBoardHorizontal[k][i][j]={
                 state:false,
-                color:0
             }
         }
     }
@@ -116,11 +113,16 @@ io.on('connection',socket=>{
         var y=putStone.stone[1];
         var color=putStone.stone[2];
 
-        // if(!stoneBoard[putStone.room][x][y].state){
+        // if(!stoneBoard[putStone.room][x][y].color){
+            // 前の座標のcolorを0にする
+            for(var i=0;i<LENGTH;i++){
+                for(var j=0;j<LENGTH;j++){
+                    if(stoneBoard[putStone.room][i][j].color==color){
+                        stoneBoard[putStone.room][i][j].color=0;
+                    }
+                }
+            }
             stoneBoard[putStone.room][x][y].color=color;
-            stoneBoard[putStone.room][x][y].state=true;
-            // 前の座標のstateをfalseにする
-
             io.to(putStone.room).emit('Broadcast',putStone.stone);
         // }
 
