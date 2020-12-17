@@ -41,6 +41,10 @@ for(var k=0;k<ROOMMAX;k++){
             }
         }
     }
+    stoneBoard[k][4][8].color=1;
+    stoneBoard[k][0][4].color=2;
+    stoneBoard[k][4][0].color=3;
+    stoneBoard[k][8][4].color=4;
 
     // 壁用のボード
     for(var i=0;i<LENGTH-1;i++){
