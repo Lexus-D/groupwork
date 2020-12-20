@@ -21,6 +21,7 @@ var myTurnNum; //自分は何番目か
 var mycolor = 0;//null
 var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
+var gameStart = 0; // 人数が揃ったら1になる
 
 var stoneBoard=[];
 var wallBoardVertical=[];
@@ -190,7 +191,8 @@ wallboard.addEventListener('click',(event)=>{
         room: roomNumber
     };
 
-    if(!myturn){
+    console.log(myturn,gameStart);
+    if(!(myturn && gameStart)){
         return;
     }
 
@@ -314,7 +316,13 @@ socket.on('setting',(setting)=>{
     console.log(setting);
 })
 
-socket.on('Broadcast',(msg)=>{
+socket.on('Broadcast',(msg,previousStone)=>{
+    // 前の石の座標
+    // previousStone[color-1][c]
+    // 配列数はプレイヤーの人数4 × 座標2 = 8
+    // color:1 の人の前の石のx座標はpreviousStone[0][0]にある
+    console.log(previousStone[msg[2]-1]);
+    //
     if (msg[2]==mycolor){
         return;
     }
@@ -445,6 +453,10 @@ socket.on('wallbroadcast',(msg)=>{
     }
 })
 
+// 人数が揃ったらゲームスタート
+socket.on('gameStart',judge=>{
+    gameStart=judge;
+});
 
 //勝ち負けの判定が終わったら、勝者を表示し、石を置けなくする
 socket.on('gameover',function (data) {
@@ -489,4 +501,3 @@ function changeturn(flag){
         turn.innerText="相手の番";
     }
 }
-
