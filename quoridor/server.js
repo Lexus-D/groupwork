@@ -19,6 +19,7 @@ const PLAYERNUM = 4; // プレイヤーの数 2or4
 var stoneBoard=[];
 var wallBoardVertical=[];
 var wallBoardHorizontal=[];
+var previousStone=[];
 
 var countRoomUsers = Array(ROOMMAX).fill(0);
 var countRooms = 0;
@@ -30,29 +31,39 @@ for(var k=0;k<ROOMMAX;k++){
     stoneBoard[k]=[];
     wallBoardVertical[k]=[];
     wallBoardHorizontal[k]=[];
+    previousStone[k]=[];
+
+    // 前に置いていた石の座標保存用
+    for(var n=0;n<PLAYERNUM;n++){
+        // nはcolor-1
+        previousStone[k][n]=[];
+        for(var c=0;c<2;c++){
+            // x座標はc=0,y座標はc=1
+            previousStone[k][n][c]=0;
+        }
+    }
 
     // 石用のボード
     for(var i=0;i<LENGTH;i++){
         stoneBoard[k][i]=[];
         for(var j=0;j<LENGTH;j++){
-            stoneBoard[k][i][j]={
-                color:0 // colorがプレイヤーを表す
-                        // 0は石がない意味
-            }
+            stoneBoard[k][i][j]=0;
+            // colorがプレイヤーを表す
+            // 0は石がない意味
         }
     }
+    stoneBoard[k][4][8]=1;
+    stoneBoard[k][0][4]=2;
+    stoneBoard[k][4][0]=3;
+    stoneBoard[k][8][4]=4;
 
     // 壁用のボード
     for(var i=0;i<LENGTH-1;i++){
         wallBoardVertical[k][i]=[];
         wallBoardHorizontal[k][i]=[];
         for(var j=0;j<LENGTH;j++){
-            wallBoardVertical[k][i][j]={
-                state:false,
-            },
-            wallBoardHorizontal[k][i][j]={
-                state:false,
-            }
+            wallBoardVertical[k][i][j]=false;
+            wallBoardHorizontal[k][i][j]=false;
         }
     }
 }
@@ -85,24 +96,22 @@ io.on('connection',socket=>{
         room: countRooms
     }
 
-    /////////////////////
+    //
     console.log("enter the room ");
     console.log(settingInfo.color);
-    ////////////////////
+    //
 
     // PLAYNUMだけ入ったら次の部屋へ
-    if(countRoomUsers[countRooms]==PLAYERNUM){
+    if(countRoomUsers[countRooms]==PLAYERNUM){        
+        // 人数が揃ったら開始
+        io.to(countRooms).emit('gameStart',1);
+        
         countRooms = countRooms + 1;
         console.log("open next room");
     }
 
     // アクセスしてきたclientに設定データを送る
     io.to(userID).emit('setting',settingInfo);
-
-    // 人数が揃うまで何もできないようにする
-    // 人数が揃ったら開始
-    // とりあえず2人用なので特になし
-    // io.to().emit('',);
 
     // 石や壁をおけるかどうかの判断はclient側だけでいいかもしれない
 
@@ -113,18 +122,19 @@ io.on('connection',socket=>{
         var y=putStone.stone[1];
         var color=putStone.stone[2];
 
-        // if(!stoneBoard[putStone.room][x][y].color){
-            // 前の座標のcolorを0にする
-            for(var i=0;i<LENGTH;i++){
-                for(var j=0;j<LENGTH;j++){
-                    if(stoneBoard[putStone.room][i][j].color==color){
-                        stoneBoard[putStone.room][i][j].color=0;
-                    }
+        // 前の座標のcolorを0にする
+        for(var i=0;i<LENGTH;i++){
+            for(var j=0;j<LENGTH;j++){
+                if(stoneBoard[putStone.room][i][j]==color){
+                    stoneBoard[putStone.room][i][j]=0;
+                    previousStone[putStone.room][color-1][0]=i;
+                    previousStone[putStone.room][color-1][1]=j;
                 }
             }
-            stoneBoard[putStone.room][x][y].color=color;
-            io.to(putStone.room).emit('Broadcast',putStone.stone);
-        // }
+        }
+        stoneBoard[putStone.room][x][y]=color;
+        io.to(putStone.room).emit('Broadcast',putStone.stone,previousStone[putStone.room]);
+        // 
 
         // ↓勝利条件を満たしているかを判断する関数
 
@@ -140,20 +150,22 @@ io.on('connection',socket=>{
         io.to(putWall.room).emit('wallbroadcast',putWall.wall);
         // 横なら
         if(wallDirection){
-            wallBoardHorizontal[putWall.room][x][y].state=true;
-            wallBoardHorizontal[putWall.room][x+1][y].state=true;
+            wallBoardHorizontal[putWall.room][x][y]=true;
+            wallBoardHorizontal[putWall.room][x+1][y]=true;
         }
         else{
-            wallBoardVertical[putWall.room][x][y].state=true;
-            wallBoardVertical[putWall.room][x][y+1].state=true;
+            wallBoardVertical[putWall.room][x][y]=true;
+            wallBoardVertical[putWall.room][x][y+1]=true;
         }
     })
 
     // 接続が切れた場合，試合中断
     // ボードを初期化して再接続を待つ
     /*
-    socket.on('disconnect',()=>{
+    socket.on('disconnect',function(){
+        var room;
 
+        console.log(room);
     })
     */
 })
