@@ -68,12 +68,23 @@
                 <a>コリドール</a>
             </h1>
         </header>
+        
+        <!---ユーザー名を登録-->
+        <form id="register_name" action="#">
+            <input type="text" id="username" value="">
+            <input type="button" onclick="register_username()" value="送信">
+            <input type="reset" value="リセット">
+          </form>
+          <!--ユーザー名の表示-->
+          <div id="display_username"></div>
+
         <div id="container">
             <canvas id="imageboard"></canvas>
             <canvas id="lineboard"></canvas>
             <canvas id="stoneboard"></canvas>
             <canvas id="wallboard"></canvas>
         </div>
+        
         <div id="turn">待機中</div>
         <button type="button" onclick="location.reload();" id="reset" style="display: none;" disabled>Next</button>
         <footer id='info'>　

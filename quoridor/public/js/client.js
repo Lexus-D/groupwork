@@ -13,7 +13,7 @@ var reset = document.getElementById('reset');
 var wallcontext = wallboard.getContext('2d')
 wallcontext.strokeStyle="#8b0000";
 
-
+var userName; //自分のユーザーネーム
 
 var LENGTH = 9; //盤面の大きさ
 
@@ -501,4 +501,15 @@ function changeturn(flag){
         myturn=0;
         turn.innerText="相手の番";
     }
+}
+
+//TODO:ユーザー名をサーバーに送信
+function register_username() {
+    userName = document.getElementById("username").value;
+    display_username();
+}
+
+//TODO:他のユーザー名を受け取って表示（色とユーザー名が分かるようにする）
+function display_username(){
+    document.getElementById("display_username").innerHTML = userName;
 }
