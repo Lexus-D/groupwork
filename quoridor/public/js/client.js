@@ -142,16 +142,16 @@ function rotatefromscreen(screenx,screeny,color){ //全部1index
         y=screeny;
         return [x,y]
     } else if (color==2) {
+        x=LENGTH + 2 - screeny - 1;
         y=screenx;
-        x=LENGTH + 2 - screeny;
         return [x,y]
     } else if (color==3) {
-        x=LENGTH + 2 - screenx;
-        y=LENGTH + 2 - screeny;
+        x=LENGTH + 2 - screenx - 1;
+        y=LENGTH + 2 - screeny - 1;
         return [x,y]
     } else if (color==4) {
         x=screeny;
-        y=LENGTH + 2 -screenx;
+        y=LENGTH + 2 -screenx - 1;
         return [x,y]
     }
 }
@@ -164,17 +164,96 @@ function rotatetoscreen(x,y,color){
         screeny=y;
         return [screenx,screeny]
     } else if (color==2) {
-        screenx=y;
-        screeny=LENGTH+2-x;
+        screenx= y;
+        screeny=LENGTH+2-x-1;
         return [screenx,screeny]
     } else if (color==3) {
-        screenx=LENGTH + 2 - x;
-        screeny=LENGTH + 2 - y;
+        screenx=LENGTH + 2 - x - 1;
+        screeny=LENGTH + 2 - y - 1;
         return [screenx,screeny]
     } else if (color==4) {
-        screenx=LENGTH+2-y;
+        screenx=LENGTH+2-y - 1;
         screeny=x;
         return [screenx,screeny]
+    }
+}
+
+function rotatewallfromscreen(screenx,screeny,color,wall){ //全部1index
+    var x,y;
+    if (color==1) {
+        x=screenx;
+        y=screeny;
+        return [x,y]
+    } else if (color==2) {
+        if (wall) {
+            x=LENGTH+2-screeny;
+            y=screenx;
+            return [x,y]
+        } else {
+            x=LENGTH+2-screeny-2;
+            y=screenx;
+            return [x,y]
+        }
+    } else if (color==3) {
+        if (wall) {
+            x=LENGTH+2-screenx-2;
+            y=LENGTH+2-screeny;
+            return [x,y]
+        } else {
+            x=LENGTH+2-screenx;
+            y=LENGTH+2-screeny-2;
+            return [x,y]
+        }
+    } else if (color==4) {
+        if (wall) {
+            x=screeny;
+            y=LENGTH+2-screenx-2;
+            return [x,y]
+        } else {
+            x=screeny;
+            y=LENGTH+2-screenx;
+            return [x,y]
+        }
+    }
+}
+
+function rotatewalltoscreen(x,y,color,wall){
+    var screenx,screeny;
+    if (color==1) {
+        screenx=x;
+        screeny=y;
+        return [screenx,screeny]
+    } else if (color==2) {
+        if (wall) {
+            screenx= y;
+            screeny=LENGTH+2-x-2;
+            return [screenx,screeny]
+        } else {
+            screenx= y;
+            screeny=LENGTH+2-x;
+            return [screenx,screeny]
+        }
+        
+    } else if (color==3) {
+        if (wall){
+            screenx=LENGTH+2-x-2;
+            screeny=LENGTH+2-y;
+            return [screenx,screeny]
+        } else {
+            screenx= LENGTH+2-x;
+            screeny=LENGTH+2-y-2;
+            return [screenx,screeny]
+        }
+    } else if (color==4) {
+        if (wall) {
+            screenx=LENGTH+2-y;
+            screeny=x;
+            return [screenx,screeny]
+        } else {
+            screenx=LENGTH+2-y-2;
+            screeny=x;
+            return [screenx,screeny]
+        }
     }
 }
 
@@ -192,7 +271,7 @@ wallboard.addEventListener('click',(event)=>{
         room: roomNumber
     };
 
-    console.log(myturn,gameStart);
+    //console.log(myturn,gameStart);
     if(!(myturn && gameStart)){
         return;
     }
@@ -204,7 +283,7 @@ wallboard.addEventListener('click',(event)=>{
     //console.log(x,y)
     var xline = Math.floor((screenx+5)*(LENGTH + 2)/600)
     var yline = Math.floor((screeny+5)*(LENGTH + 2)/600)
-    console.log(xline,yline)
+    //console.log(xline,yline)
     
     if ((xline*600/(LENGTH + 2))-5 <= screenx & screenx <= (xline*600/(LENGTH + 2)) + 5 ){
         //縦向きの壁置 関数化したほういいかも
@@ -217,14 +296,18 @@ wallboard.addEventListener('click',(event)=>{
         wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
         wallcontext.stroke();
         //壁の座標と色をwallに保存、サーバに送る
-        var xy=rotatefromscreen(xline,yline,mycolor);
-        console.log(xy[0],xy[1])
+        var xy=rotatewallfromscreen(xline,yline,mycolor,0);
+        console.log('壁のグローバル座標:',xy[0],xy[1],'1-indexed')
         wall[0]=xy[0]-1;
         wall[1]=xy[1]-1;
-        wall[2]=0;
+        if (mycolor==2 || mycolor==4){
+            wall[2]=1;
+        } else {
+            wall[2]=0;
+        }
         wall[3]=mycolor;
         socket.emit('wall',sendInfo);
-        changeturn(0)
+        changeturn(0);
         wallBoardVertical[xline-1][yline-1].state=true;
         wallBoardVertical[xline-1][yline-1].color=mycolor;
     } else if ((yline*600/(LENGTH + 2))-5 <= screeny & screeny <= (yline*600/(LENGTH + 2)) + 5) {
@@ -238,11 +321,15 @@ wallboard.addEventListener('click',(event)=>{
         wallcontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
         wallcontext.stroke();
         //壁の座標と色をwallに保存、サーバに送る
-        var xy=rotatefromscreen(xline,yline,mycolor);
-        console.log(xy[0],xy[1])
+        var xy=rotatewallfromscreen(xline,yline,mycolor,1);
+        console.log('壁のグローバル座標:',xy[0],xy[1],'1-indexed')
         wall[0]=xy[0]-1;
         wall[1]=xy[1]-1;
-        wall[2]=1;
+        if (mycolor==2 || mycolor==4){
+            wall[2]=0;
+        } else {
+            wall[2]=1;
+        }
         wall[3]=mycolor;
         socket.emit('wall',sendInfo);
         changeturn(0);
@@ -252,25 +339,30 @@ wallboard.addEventListener('click',(event)=>{
         //移動前の駒の場所を取得
         var previousx=nowstoneposition[mycolor].x
         var previousy=nowstoneposition[mycolor].y
-        
+        console.log('前の駒のグローバル座標:',previousx+1,previousy+1,'1-indexed')
         // 置けるか判定したい
+        
         var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor);
-        //var previousscreenx=previousscreen[0];
-        //var previousscreeny=previousscreen[1];
-        stonecontext.clearRect((previousx+1)*600/(LENGTH + 2),(previousy+1)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+        var previousscreenx=previousscreen[0];
+        var previousscreeny=previousscreen[1];
+        console.log('前の駒のローカル座標:',previousscreenx,previousscreeny,'1-indexed')
+        stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
 
         drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
-        console.log(xline,yline,mycolor)
-        nowstoneposition[mycolor].x=xline-1
-        nowstoneposition[mycolor].y=yline-1
+        console.log('新しく置いた駒のローカル座標',xline,yline,mycolor,'1-indexed')
         changeturn(0);
         stoneBoard[xline-1][yline-1].state=true;
         stoneBoard[xline-1][yline-1].color=mycolor;
-        var xy = rotatefromscreen(xline,yline,mycolor)
-        stone[0]=xy[0]-1;
-        stone[1]=xy[1]-1;
+        var xy = rotatefromscreen(xline,yline,mycolor);
+        var x= xy[0]-1;
+        var y= xy[1]-1;
+        console.log(mycolor,'色の駒を新しく置いたグローバル座標',x,y,'0-indeede');
+        nowstoneposition[mycolor].x=x;
+        nowstoneposition[mycolor].y=y;
+        stone[0]=x;
+        stone[1]=y;
         stone[2]=mycolor;
-        console.log(sendInfo.stone);
+        console.log('send',sendInfo.stone);
         socket.emit('stone',sendInfo);
     }
 });
@@ -311,9 +403,6 @@ socket.on('setting',(setting)=>{
     nowstoneposition[3].y=0;
     nowstoneposition[4].x=LENGTH-1;
     nowstoneposition[4].y=(LENGTH - 1)/2;
-
-    nowstoneposition[mycolor].x=(LENGTH-1)/2;
-    nowstoneposition[mycolor].y=LENGTH-1;
     console.log(setting);
 })
 
@@ -322,7 +411,7 @@ socket.on('Broadcast',(msg,previousStone)=>{
     // previousStone[color-1][c]
     // 配列数はプレイヤーの人数4 × 座標2 = 8
     // color:1 の人の前の石のx座標はpreviousStone[0][0]にある
-    console.log(previousStone[msg[2]-1]);
+    //console.log(previousStone[msg[2]-1]);
     //
     if (msg[2]==mycolor){
         return;
@@ -332,47 +421,20 @@ socket.on('Broadcast',(msg,previousStone)=>{
     var yline=line[1];
     var color=msg[2];
 
-    console.log('color:'+color)
-    var i=0;
-    var j=0;
-    if (mycolor==2) {
-        j=-1;
-    } else if (mycolor==3) {
-        i=-1;
-        j=-1;
-    } else if (mycolor==4) {
-        i=-1;
-    }
+    console.log('recieve color:'+color)
+    
     var previousx=nowstoneposition[color].x;
     var previousy=nowstoneposition[color].y;
     var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor)
     var previousscreenx=previousscreen[0];
     var previousscreeny=previousscreen[1];
-    console.log('presc:',previousscreenx,previousscreeny)
-    stonecontext.clearRect((previousscreenx+i)*600/(LENGTH + 2),(previousscreeny+j)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
-    i=0.5;
-    j=0.5;
-    if (color+1==mycolor) {
-        j=-0.5;
-    }
-    if (color==4 && mycolor==1){
-        j=-0.5;
-    }
-    if (color==mycolor+1) {
-        i=-0.5;
-    }
-    if (color==1 && mycolor==4){
-        i=-0.5;
-    }
-    if (Math.abs(mycolor-color)==2){
-        i=-0.5;
-        j=-0.5;
-    }
+    console.log('色:',color,'の駒の以前のローカル座標',previousscreenx,previousscreeny,'1-indexed')
+    stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
     
-    drawcircle((xline + i)*600/(LENGTH + 2),(yline + j)*600/(LENGTH + 2),color)
-    console.log(xline,yline,color)
-    nowstoneposition[color].x=xline-1;
-    nowstoneposition[color].y=yline-1;
+    drawcircle((xline+0.5)*600/(LENGTH + 2),(yline+0.5)*600/(LENGTH + 2),color)
+    //console.log(xline,yline,color)
+    nowstoneposition[color].x=msg[0];
+    nowstoneposition[color].y=msg[1];
     //ターンを変える処理
     //次のターンは誰かサーバから受け取る
     //changeturn(nextTurn == myTurnNum); //4人用のとき
@@ -388,38 +450,83 @@ socket.on('wallbroadcast',(msg)=>{
     if (msg[3]==mycolor) {
         return;
     }
+    console.log('壁のグローバル座標:',msg[0]+1,msg[1]+1)
+
+    var wallDirection=msg[2];
+    console.log('walld:',wallDirection)
+    var screen=rotatewalltoscreen(msg[0]+1,msg[1]+1,mycolor,wallDirection);
+    var screenx=screen[0];
+    var screeny=screen[1];
+    var xline=screenx;
+    var yline=screeny;
+    
+    console.log('壁のローカル座標:',xline,yline)
+    if (wallDirection){
+        if (mycolor==2 || mycolor==4){
+            wallcontext.lineWidth=8;
+            wallcontext.beginPath();
+            wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+            wallcontext.lineTo(xline*600/(LENGTH + 2),(yline+2)*600/(LENGTH + 2));
+            wallcontext.stroke();
+        } else {
+            wallcontext.lineWidth=8;
+            wallcontext.beginPath();
+            wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+            wallcontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+            wallcontext.stroke();
+        }
+        
+    } else {
+        if (mycolor==2 || mycolor==4) {
+            wallcontext.lineWidth=8;
+            wallcontext.beginPath();
+            wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+            wallcontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+            wallcontext.stroke();
+        } else {
+            wallcontext.lineWidth=8;
+            wallcontext.beginPath();
+            wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+            wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
+            wallcontext.stroke();
+        }
+        
+    }
+    /*
     if((mycolor-msg[3])%2==0){
-        var screen=rotatetoscreen(msg[0]+1,msg[1]+1,mycolor);
+        var screen=rotatewalltoscreen(msg[0]+1,msg[1]+1,mycolor,wallDirection);
         var screenx=screen[0];
         var screeny=screen[1];
         var xline=screenx;
         var yline=screeny;
-        console.log(xline,yline)
+        console.log('壁のローカル座標:',xline,yline)
         var wallDirection=msg[2];
         if (wallDirection){
             wallcontext.lineWidth=8;
             wallcontext.beginPath();
             wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-            wallcontext.lineTo((xline - 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+            wallcontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
             wallcontext.stroke();
         } else {
             wallcontext.lineWidth=8;
             wallcontext.beginPath();
-            wallcontext.moveTo(xline*600/(LENGTH + 2),(yline-2)*600/(LENGTH + 2));
+            wallcontext.moveTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
             wallcontext.lineTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
             wallcontext.stroke();
         }
     } else {
-        var screen=rotatetoscreen(msg[0]+1,msg[1]+1,mycolor);
+        var wallDirection=msg[2];
+        console.log('walld:',wallDirection)
+        var screen=rotatewalltoscreen(msg[0]+1,msg[1]+1,mycolor,wallDirection);
         var screenx=screen[0];
         var screeny=screen[1];
         var xline=screenx;
         var yline=screeny;
         
-        console.log(xline,yline)
-        var wallDirection=msg[2];
+        console.log('壁のローカル座標:',xline,yline)
+        
         var i=2;
-        var j=2;
+        var j=2;/*
         if (msg[3]+1==mycolor) {
             i=-2;
         }
@@ -436,16 +543,16 @@ socket.on('wallbroadcast',(msg)=>{
             wallcontext.lineWidth=8;
             wallcontext.beginPath();
             wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-            wallcontext.lineTo((xline+j)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+            wallcontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
             wallcontext.stroke();
         } else {
             wallcontext.lineWidth=8;
             wallcontext.beginPath();
             wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-            wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + i)*600/(LENGTH + 2));
+            wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
             wallcontext.stroke();
         }
-    }
+    }*/
     if (msg[3]+1==mycolor){
         changeturn(1);
     }
