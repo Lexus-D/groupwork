@@ -271,7 +271,7 @@ wallboard.addEventListener('click',(event)=>{
         room: roomNumber
     };
 
-    //console.log(myturn,gameStart);
+    console.log(myturn,gameStart);
     if(!(myturn && gameStart)){
         return;
     }
@@ -413,7 +413,7 @@ socket.on('Broadcast',(msg,previousStone)=>{
     // previousStone[color-1][c]
     // 配列数はプレイヤーの人数4 × 座標2 = 8
     // color:1 の人の前の石のx座標はpreviousStone[0][0]にある
-    //console.log(previousStone[msg[2]-1]);
+    console.log(previousStone[msg[2]-1]);
     //
     if (msg[2]==mycolor){
         return;
