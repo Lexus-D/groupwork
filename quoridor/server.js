@@ -137,7 +137,17 @@ io.on('connection',socket=>{
         // 
 
         // ↓勝利条件を満たしているかを判断する関数
-
+        
+        if(gameover(stoneBoard[putStone.room])==1){
+            io.to(putStone.room).emit('gameover',1);
+        }else if(gameover(stoneBoard[putStone.room])==2){
+            io.to(putStone.room).emit('gameover',2);
+        }else if(gameover(stoneBoard[putStone.room])==3){
+            io.to(putStone.room).emit('gameover',3);
+        }else if(gameover(stoneBoard[putStone.room])==4){
+            io.to(putStone.room).emit('gameover',4);
+        }
+        
     })
 
     // 壁を置いた場合の処理
@@ -171,3 +181,16 @@ io.on('connection',socket=>{
 })
 
 // 勝敗判定のアルゴリズム
+function gameover(stoneBoard){
+    for(var i=0;i<9;i++){
+        if(stoneBoard[0][i]==1){
+            return 1
+        }else if(stoneBoard[8][i]==3){
+            return 3
+        }else if(stoneBoard[i][8]==2){
+            return 2
+        }else if(stoneBoard[i][0]==4){
+            return 4
+        }
+    }
+}
