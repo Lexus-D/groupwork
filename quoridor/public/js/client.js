@@ -492,67 +492,7 @@ socket.on('wallbroadcast',(msg)=>{
         }
         
     }
-    /*
-    if((mycolor-msg[3])%2==0){
-        var screen=rotatewalltoscreen(msg[0]+1,msg[1]+1,mycolor,wallDirection);
-        var screenx=screen[0];
-        var screeny=screen[1];
-        var xline=screenx;
-        var yline=screeny;
-        console.log('壁のローカル座標:',xline,yline)
-        var wallDirection=msg[2];
-        if (wallDirection){
-            wallcontext.lineWidth=8;
-            wallcontext.beginPath();
-            wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-            wallcontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-            wallcontext.stroke();
-        } else {
-            wallcontext.lineWidth=8;
-            wallcontext.beginPath();
-            wallcontext.moveTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
-            wallcontext.lineTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-            wallcontext.stroke();
-        }
-    } else {
-        var wallDirection=msg[2];
-        console.log('walld:',wallDirection)
-        var screen=rotatewalltoscreen(msg[0]+1,msg[1]+1,mycolor,wallDirection);
-        var screenx=screen[0];
-        var screeny=screen[1];
-        var xline=screenx;
-        var yline=screeny;
-        
-        console.log('壁のローカル座標:',xline,yline)
-        
-        var i=2;
-        var j=2;/*
-        if (msg[3]+1==mycolor) {
-            i=-2;
-        }
-        if (msg[3]==4 && mycolor==1){
-            i=-2;
-        }
-        if (msg[3]==mycolor+1) {
-            j=-2;
-        }
-        if (msg[3]==1 && mycolor==4){
-            j=-2;
-        }
-        if (!wallDirection){
-            wallcontext.lineWidth=8;
-            wallcontext.beginPath();
-            wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-            wallcontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-            wallcontext.stroke();
-        } else {
-            wallcontext.lineWidth=8;
-            wallcontext.beginPath();
-            wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-            wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
-            wallcontext.stroke();
-        }
-    }*/
+    
     if (msg[3]+1==mycolor){
         changeturn(1);
     }
