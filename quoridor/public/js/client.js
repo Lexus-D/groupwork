@@ -351,6 +351,8 @@ wallboard.addEventListener('click',(event)=>{
         drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
         console.log('新しく置いた駒のローカル座標',xline,yline,mycolor,'1-indexed')
         changeturn(0);
+        stoneBoard[nowstoneposition[mycolor].x][nowstoneposition[mycolor].y].state=false;
+        stoneBoard[nowstoneposition[mycolor].x][nowstoneposition[mycolor].y].color=0;
         stoneBoard[xline-1][yline-1].state=true;
         stoneBoard[xline-1][yline-1].color=mycolor;
         var xy = rotatefromscreen(xline,yline,mycolor);
@@ -433,6 +435,8 @@ socket.on('Broadcast',(msg,previousStone)=>{
     
     drawcircle((xline+0.5)*600/(LENGTH + 2),(yline+0.5)*600/(LENGTH + 2),color)
     //console.log(xline,yline,color)
+    stoneBoard[nowstoneposition[color].x][nowstoneposition[color].y].state=false;
+    stoneBoard[nowstoneposition[color].x][nowstoneposition[color].y].color=0;
     nowstoneposition[color].x=msg[0];
     nowstoneposition[color].y=msg[1];
     //ターンを変える処理
