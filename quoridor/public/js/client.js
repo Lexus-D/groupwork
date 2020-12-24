@@ -308,8 +308,7 @@ wallboard.addEventListener('click',(event)=>{
         wall[3]=mycolor;
         socket.emit('wall',sendInfo);
         changeturn(0);
-        wallBoardVertical[xline-1][yline-1].state=true;
-        wallBoardVertical[xline-1][yline-1].color=mycolor;
+        wallBoardVertical[xline-1][yline-1]=true;
     } else if ((yline*600/(LENGTH + 2))-5 <= screeny & screeny <= (yline*600/(LENGTH + 2)) + 5) {
         //横向きの壁置く　関数化したほういいかも
 
@@ -333,8 +332,7 @@ wallboard.addEventListener('click',(event)=>{
         wall[3]=mycolor;
         socket.emit('wall',sendInfo);
         changeturn(0);
-        wallBoardHorizontal[xline-1][yline-1].state=true;
-        wallBoardHorizontal[xline-1][yline-1].color=mycolor;
+        wallBoardHorizontal[xline-1][yline-1]=true;
     } else {
         //移動前の駒の場所を取得
         var previousx=nowstoneposition[mycolor].x
@@ -351,10 +349,8 @@ wallboard.addEventListener('click',(event)=>{
         drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
         console.log('新しく置いた駒のローカル座標',xline,yline,mycolor,'1-indexed')
         changeturn(0);
-        stoneBoard[nowstoneposition[mycolor].x][nowstoneposition[mycolor].y].state=false;
-        stoneBoard[nowstoneposition[mycolor].x][nowstoneposition[mycolor].y].color=0;
-        stoneBoard[xline-1][yline-1].state=true;
-        stoneBoard[xline-1][yline-1].color=mycolor;
+        stoneBoard[nowstoneposition[mycolor].x][nowstoneposition[mycolor].y]=0;
+        stoneBoard[xline-1][yline-1]=mycolor;
         var xy = rotatefromscreen(xline,yline,mycolor);
         var x= xy[0]-1;
         var y= xy[1]-1;
@@ -435,8 +431,7 @@ socket.on('Broadcast',(msg,previousStone)=>{
     
     drawcircle((xline+0.5)*600/(LENGTH + 2),(yline+0.5)*600/(LENGTH + 2),color)
     //console.log(xline,yline,color)
-    stoneBoard[nowstoneposition[color].x][nowstoneposition[color].y].state=false;
-    stoneBoard[nowstoneposition[color].x][nowstoneposition[color].y].color=0;
+    stoneBoard[nowstoneposition[color].x][nowstoneposition[color].y]=color;
     nowstoneposition[color].x=msg[0];
     nowstoneposition[color].y=msg[1];
     //ターンを変える処理
@@ -463,7 +458,11 @@ socket.on('wallbroadcast',(msg)=>{
     var screeny=screen[1];
     var xline=screenx;
     var yline=screeny;
-    
+    if (wallDirection) {
+        wallBoardHorizontal[msg[0]][msg[1]]=true;
+    } else {
+        wallBoardVertical[msg[0]][msg[1]]=true;
+    }
     console.log('壁のローカル座標:',xline,yline)
     if (wallDirection){
         if (mycolor==2 || mycolor==4){
