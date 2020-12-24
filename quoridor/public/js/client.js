@@ -402,6 +402,10 @@ socket.on('setting',(setting)=>{
     nowstoneposition[4].x=LENGTH-1;
     nowstoneposition[4].y=(LENGTH - 1)/2;
     console.log(setting);
+    stoneBoard[(LENGTH - 1)/2][LENGTH-1]=1;
+    stoneBoard[0][(LENGTH - 1)/2]=2;
+    stoneBoard[(LENGTH - 1)/2][(LENGTH - 1)/2]=3;
+    stoneBoard[LENGTH-1][(LENGTH - 1)/2]=4;
 })
 
 socket.on('Broadcast',(msg,previousStone)=>{
@@ -431,7 +435,8 @@ socket.on('Broadcast',(msg,previousStone)=>{
     
     drawcircle((xline+0.5)*600/(LENGTH + 2),(yline+0.5)*600/(LENGTH + 2),color)
     //console.log(xline,yline,color)
-    stoneBoard[nowstoneposition[color].x][nowstoneposition[color].y]=color;
+    stoneBoard[msg[0]][msg[1]]=color;
+    stoneBoard[nowstoneposition[color].x][nowstoneposition[color].y]=0;
     nowstoneposition[color].x=msg[0];
     nowstoneposition[color].y=msg[1];
     //ターンを変える処理
