@@ -404,7 +404,7 @@ socket.on('setting',(setting)=>{
     console.log(setting);
     stoneBoard[(LENGTH - 1)/2][LENGTH-1]=1;
     stoneBoard[0][(LENGTH - 1)/2]=2;
-    stoneBoard[(LENGTH - 1)/2][(LENGTH - 1)/2]=3;
+    stoneBoard[(LENGTH - 1)/2][0]=3;
     stoneBoard[LENGTH-1][(LENGTH - 1)/2]=4;
 })
 
