@@ -133,9 +133,9 @@ io.on('connection',socket=>{
             }
         }
         stoneBoard[putStone.room][x][y]=color;
+        console.log(stoneBoard[putStone.room]);
         io.to(putStone.room).emit('Broadcast',putStone.stone,previousStone[putStone.room]);
         // 
-
         // ↓勝利条件を満たしているかを判断する関数
         
         if(gameover(stoneBoard[putStone.room])==1){
@@ -183,13 +183,13 @@ io.on('connection',socket=>{
 // 勝敗判定のアルゴリズム
 function gameover(stoneBoard){
     for(var i=0;i<9;i++){
-        if(stoneBoard[0][i]==1){
+        if(stoneBoard[i][0]==1){
             return 1
-        }else if(stoneBoard[8][i]==3){
+        }else if(stoneBoard[i][8]==3){
             return 3
-        }else if(stoneBoard[i][8]==2){
+        }else if(stoneBoard[8][i]==2){
             return 2
-        }else if(stoneBoard[i][0]==4){
+        }else if(stoneBoard[0][i]==4){
             return 4
         }
     }
