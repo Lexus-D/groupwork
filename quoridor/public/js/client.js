@@ -566,7 +566,7 @@ function changeturn(flag){
 function register_username() {
     var username;
     username = document.getElementById("username").value;
-    registerName = {"color":mycolor,"username":username};
+    registerName = {"roomNumber":roomNumber,"color":mycolor,"username":username};
     socket.emit("register_username",registerName);
     //display_username();
 }
