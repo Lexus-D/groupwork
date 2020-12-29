@@ -20,11 +20,11 @@ var stoneBoard=[];
 var wallBoardVertical=[];
 var wallBoardHorizontal=[];
 var previousStone=[];
-var username = {}; //ユーザーネームを格納
 
 var countRoomUsers = Array(ROOMMAX).fill(0);
 var countRooms = 0;
 
+var username = {}; //ユーザーネームを格納
 
 // kはroomの数．上限はとりあえず20にしておく
 for(var k=0;k<ROOMMAX;k++){
@@ -67,6 +67,8 @@ for(var k=0;k<ROOMMAX;k++){
             wallBoardHorizontal[k][i][j]=false;
         }
     }
+
+    username[k] = {}; //ユーザーネーム
 }
 
 server.listen(PORT,()=>{
@@ -96,12 +98,14 @@ io.on('connection',socket=>{
         color: countRoomUsers[countRooms]%(PLAYERNUM+1),
         room: countRooms
     }
-    username[userID] = "ユーザー" + userID; //デフォルトのユーザーネーム
-    socket.emit("display_username",username);
+    
     //
     console.log("enter the room ");
     console.log(settingInfo.color);
     //
+    username[settingInfo.room][settingInfo.color] = "ユーザー" + settingInfo.color; //デフォルトのユーザーネーム
+    //socket.emit("display_username",username);
+    console.log(username);
 
     // PLAYNUMだけ入ったら次の部屋へ
     if(countRoomUsers[countRooms]==PLAYERNUM){        
@@ -114,6 +118,8 @@ io.on('connection',socket=>{
 
     // アクセスしてきたclientに設定データを送る
     io.to(userID).emit('setting',settingInfo);
+
+
 
     // 石や壁をおけるかどうかの判断はclient側だけでいいかもしれない
 
@@ -171,10 +177,11 @@ io.on('connection',socket=>{
         }
     })
 
-    socket.on("register_username",(register_username) =>{
-        username[register_username["userID"]] = register_username["username"];
-        socket.emit("display_username",username);
-    })
+    //socket.on("register_username",(register_username) =>{
+        //username[register_username["userID"]] = register_username["username"];
+        //socket.emit("display_username",username);
+    //})
+    
     // 接続が切れた場合，試合中断
     // ボードを初期化して再接続を待つ
     /*
