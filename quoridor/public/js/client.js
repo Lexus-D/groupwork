@@ -13,7 +13,7 @@ var reset = document.getElementById('reset');
 var wallcontext = wallboard.getContext('2d')
 wallcontext.strokeStyle="#8b0000";
 
-var userName; //自分のユーザーネーム
+//var userName; //自分のユーザーネーム
 
 var LENGTH = 9; //盤面の大きさ
 
@@ -532,6 +532,10 @@ socket.on('gameover',function (data) {
 
 })
 
+socket.on("display_username",function(username){
+    document.getElementById("display_username").innerHTML = userName;
+})
+
 function drawtext(str){
     var stoneboardcontext=stoneboard.getContext('2d');
     stoneboardcontext.fillStyle="aliceblue";
@@ -560,11 +564,16 @@ function changeturn(flag){
 
 //TODO:ユーザー名をサーバーに送信
 function register_username() {
-    userName = document.getElementById("username").value;
-    display_username();
+    var username;
+    username = document.getElementById("username").value;
+    registerName = {"userID":userID,"username":username};
+    socket.emit("register_username",registerName);
+    //display_username();
 }
 
 //TODO:他のユーザー名を受け取って表示（色とユーザー名が分かるようにする）
 function display_username(){
+    var displayName;
+    
     document.getElementById("display_username").innerHTML = userName;
 }
