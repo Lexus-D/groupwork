@@ -52,10 +52,10 @@ for(var k=0;k<ROOMMAX;k++){
             // 0は石がない意味
         }
     }
-    stoneBoard[k][4][8]=1;
-    stoneBoard[k][0][4]=2;
-    stoneBoard[k][4][0]=3;
-    stoneBoard[k][8][4]=4;
+    stoneBoard[k][4][8]=4;
+    stoneBoard[k][0][4]=3;
+    stoneBoard[k][4][0]=2;
+    stoneBoard[k][8][4]=1;
 
     // 壁用のボード
     for(var i=0;i<LENGTH-1;i++){
@@ -122,20 +122,24 @@ io.on('connection',socket=>{
         var y=putStone.stone[1];
         var color=putStone.stone[2];
 
-        // 前の座標のcolorを0にする
-        for(var i=0;i<LENGTH;i++){
-            for(var j=0;j<LENGTH;j++){
-                if(stoneBoard[putStone.room][i][j]==color){
-                    stoneBoard[putStone.room][i][j]=0;
-                    previousStone[putStone.room][color-1][0]=i;
-                    previousStone[putStone.room][color-1][1]=j;
+        if(stoneBoard[putStone.room][x][y]==0){
+            // 前の座標のcolorを0にする
+            for(var i=0;i<LENGTH;i++){
+                for(var j=0;j<LENGTH;j++){
+                    if(stoneBoard[putStone.room][i][j]==color){
+                        stoneBoard[putStone.room][i][j]=0;
+                        previousStone[putStone.room][color-1][0]=i;
+                        previousStone[putStone.room][color-1][1]=j;
+                    }
                 }
             }
+            stoneBoard[putStone.room][x][y]=color;
+
+            console.log(stoneBoard[putStone.room]);
+            
+            io.to(putStone.room).emit('Broadcast',putStone.stone,previousStone[putStone.room]);
         }
-        stoneBoard[putStone.room][x][y]=color;
-        console.log(stoneBoard[putStone.room]);
-        io.to(putStone.room).emit('Broadcast',putStone.stone,previousStone[putStone.room]);
-        // 
+        
         // ↓勝利条件を満たしているかを判断する関数
         
         if(gameover(stoneBoard[putStone.room])==1){
@@ -183,14 +187,14 @@ io.on('connection',socket=>{
 // 勝敗判定のアルゴリズム
 function gameover(stoneBoard){
     for(var i=0;i<9;i++){
-        if(stoneBoard[i][0]==1){
-            return 1
-        }else if(stoneBoard[i][8]==3){
-            return 3
-        }else if(stoneBoard[8][i]==2){
-            return 2
-        }else if(stoneBoard[0][i]==4){
+        if(stoneBoard[i][0]==4){
             return 4
+        }else if(stoneBoard[i][8]==2){
+            return 2
+        }else if(stoneBoard[8][i]==3){
+            return 3
+        }else if(stoneBoard[0][i]==1){
+            return 1
         }
     }
 }
