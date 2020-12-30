@@ -68,7 +68,7 @@ for(var k=0;k<ROOMMAX;k++){
         }
     }
 
-    username[k] = {}; //ユーザーネーム
+    username[k] = {}; //ユーザーネームを格納する変数の初期化
 }
 
 server.listen(PORT,()=>{
@@ -104,7 +104,7 @@ io.on('connection',socket=>{
     console.log(settingInfo.color);
     //
     username[settingInfo.room][settingInfo.color] = "ユーザー" + settingInfo.color; //デフォルトのユーザーネーム
-    //socket.emit("display_username",username);
+    socket.emit("display_username",username);
     console.log(username);
 
     // PLAYNUMだけ入ったら次の部屋へ
@@ -177,11 +177,14 @@ io.on('connection',socket=>{
         }
     })
 
-    //socket.on("register_username",(register_username) =>{
-        //username[register_username["userID"]] = register_username["username"];
+    //ユーザーネームの登録
+    socket.on("register_username",(register_username) =>{
+        username[register_username["roomNumber"]][register_username["color"]] = register_username["username"];
+        console.log(username);
         //socket.emit("display_username",username);
-    //})
+    })
     
+
     // 接続が切れた場合，試合中断
     // ボードを初期化して再接続を待つ
     /*

@@ -532,9 +532,17 @@ socket.on('gameover',function (data) {
 
 })
 
+/*
 socket.on("display_username",function(username){
-    document.getElementById("display_username").innerHTML = userName;
+    var displayName = "";
+    for(var i = 1; i <= 4; i++){
+        if(username[str(roomNumber)][str(i)]){
+            displayName += username[str(roomNumber)][str(i)] + "<br>";
+        }
+    }
+    document.getElementById("display_username").innerHTML = displayName;
 })
+*/
 
 function drawtext(str){
     var stoneboardcontext=stoneboard.getContext('2d');
@@ -572,8 +580,10 @@ function register_username() {
 }
 
 //TODO:他のユーザー名を受け取って表示（色とユーザー名が分かるようにする）
+/*
 function display_username(){
     var displayName;
     
     document.getElementById("display_username").innerHTML = userName;
 }
+*/
