@@ -135,7 +135,8 @@ wallboard.addEventListener('mousemove',(e)=>{
     }
 })
 
-function rotatefromscreen(screenx,screeny,color){ //全部1index
+//ローカル座標からグローバル座標に変換
+function rotatefromscreen(screenx,screeny,color){ //全部1index(1~9)
     var x,y;
     if (color==1) {
         x=screenx;
@@ -156,6 +157,7 @@ function rotatefromscreen(screenx,screeny,color){ //全部1index
     }
 }
 
+//グローバル座標からローカル座標に変換
 function rotatetoscreen(x,y,color){
     var screenx,screeny;
 
@@ -178,7 +180,7 @@ function rotatetoscreen(x,y,color){
     }
 }
 
-function rotatewallfromscreen(screenx,screeny,color,wall){ //全部1index
+function rotatewallfromscreen(screenx,screeny,color,wall){ //全部1index(1~9)
     var x,y;
     if (color==1) {
         x=screenx;
@@ -270,8 +272,6 @@ wallboard.addEventListener('click',(event)=>{
         id : userID,
         room: roomNumber
     };
-
-    console.log(myturn,gameStart);
     if(!(myturn && gameStart)){
         return;
     }
@@ -283,7 +283,12 @@ wallboard.addEventListener('click',(event)=>{
     //console.log(x,y)
     var xline = Math.floor((screenx+5)*(LENGTH + 2)/600)
     var yline = Math.floor((screeny+5)*(LENGTH + 2)/600)
-    //console.log(xline,yline)
+    console.log('(棋盘local坐标)鼠标点在棋盘上的 ',xline-1,yline-1)//index starts from 0
+    
+    //client保存的棋盘和server的相同，此处是计算global坐标用于更新client和server的棋盘
+    var xy = rotatefromscreen(xline,yline,mycolor);
+    var x= xy[0]-1;
+    var y= xy[1]-1;
     
     if ((xline*600/(LENGTH + 2))-5 <= screenx & screenx <= (xline*600/(LENGTH + 2)) + 5 ){
         //縦向きの壁置 関数化したほういいかも
@@ -296,8 +301,10 @@ wallboard.addEventListener('click',(event)=>{
         wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
         wallcontext.stroke();
         //壁の座標と色をwallに保存、サーバに送る
+        
         var xy=rotatewallfromscreen(xline,yline,mycolor,0);
-        console.log('壁のグローバル座標:',xy[0],xy[1],'1-indexed')
+        
+        console.log('壁のグローバル座標:',xy[0]-1,xy[1]-1)
         wall[0]=xy[0]-1;
         wall[1]=xy[1]-1;
         if (mycolor==2 || mycolor==4){
@@ -321,7 +328,7 @@ wallboard.addEventListener('click',(event)=>{
         wallcontext.stroke();
         //壁の座標と色をwallに保存、サーバに送る
         var xy=rotatewallfromscreen(xline,yline,mycolor,1);
-        console.log('壁のグローバル座標:',xy[0],xy[1],'1-indexed')
+        console.log('壁のグローバル座標:',xy[0]-1,xy[1]-1)
         wall[0]=xy[0]-1;
         wall[1]=xy[1]-1;
         if (mycolor==2 || mycolor==4){
@@ -334,29 +341,35 @@ wallboard.addEventListener('click',(event)=>{
         changeturn(0);
         wallBoardHorizontal[xline-1][yline-1]=true;
     } else {
+        //置けるかを判定する
+        //石のあるところに置けないようにする
+        if(stoneBoard[x][y]!=0)return;
+        
+
+
+
         //移動前の駒の場所を取得
         var previousx=nowstoneposition[mycolor].x
         var previousy=nowstoneposition[mycolor].y
-        console.log('前の駒のグローバル座標:',previousx+1,previousy+1,'1-indexed')
-        // 置けるか判定したい
         
-        var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor);
+        var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor);//index starts from 1
         var previousscreenx=previousscreen[0];
         var previousscreeny=previousscreen[1];
-        console.log('前の駒のローカル座標:',previousscreenx,previousscreeny,'1-indexed')
-        stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+        console.log('前の駒のローカル座標:',previousscreenx-1,previousscreeny-1)//index starts from 0
 
+        stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
         drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
-        console.log('新しく置いた駒のローカル座標',xline,yline,mycolor,'1-indexed')
+
+        console.log('新しく置いた駒のローカル座標',xline-1,yline-1)//index starts from 0
         changeturn(0);
-        stoneBoard[nowstoneposition[mycolor].x][nowstoneposition[mycolor].y]=0;
-        stoneBoard[xline-1][yline-1]=mycolor;
-        var xy = rotatefromscreen(xline,yline,mycolor);
-        var x= xy[0]-1;
-        var y= xy[1]-1;
-        console.log(mycolor,'色の駒を新しく置いたグローバル座標',x,y,'0-indeede');
-        nowstoneposition[mycolor].x=x;
+
+        console.log(mycolor,'色の駒を新しく置いたグローバル座標',x,y);//index starts from 0
+        console.log('前の駒のグローバル座標:',previousx,previousy)//index starts from 0
+        stoneBoard[previousx][previousy]=0;//以前の位置を0に
+        stoneBoard[x][y]=mycolor;//新しく置かれた位置に色を書き込む
+        nowstoneposition[mycolor].x=x;//受け取った色の現在位置を更新
         nowstoneposition[mycolor].y=y;
+        //新しく置かれた石の情報を送る
         stone[0]=x;
         stone[1]=y;
         stone[2]=mycolor;
@@ -383,11 +396,13 @@ socket.on('setting',(setting)=>{
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1)
         drawcircle(1.5*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),3)
     } else if (setting.color==3) {
+        changeturn(0);
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),3)
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),1)
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),2)
         drawcircle(1.5*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),4)
     } else if (setting.color==4) {
+        changeturn(0);
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),4)
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),2)
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),3)
@@ -402,6 +417,7 @@ socket.on('setting',(setting)=>{
     nowstoneposition[4].x=LENGTH-1;
     nowstoneposition[4].y=(LENGTH - 1)/2;
     console.log(setting);
+
     stoneBoard[(LENGTH - 1)/2][LENGTH-1]=1;
     stoneBoard[0][(LENGTH - 1)/2]=2;
     stoneBoard[(LENGTH - 1)/2][0]=3;
@@ -413,34 +429,38 @@ socket.on('Broadcast',(msg,previousStone)=>{
     // previousStone[color-1][c]
     // 配列数はプレイヤーの人数4 × 座標2 = 8
     // color:1 の人の前の石のx座標はpreviousStone[0][0]にある
-    console.log(previousStone[msg[2]-1]);
+    //console.log(previousStone[msg[2]-1]);
     //
     if (msg[2]==mycolor){
         return;
     }
+    //接收global坐标，转换成local坐标
     var line=rotatetoscreen(msg[0]+1,msg[1]+1,mycolor);
     var xline=line[0];
     var yline=line[1];
     var color=msg[2];
 
-    console.log('recieve color:'+color)
-    
+    //计算接收到的棋子的前一步的local坐标
     var previousx=nowstoneposition[color].x;
     var previousy=nowstoneposition[color].y;
-    var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor)
+    var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor)//index starts from 1
     var previousscreenx=previousscreen[0];
     var previousscreeny=previousscreen[1];
-    console.log('色:',color,'の駒の以前のローカル座標',previousscreenx,previousscreeny,'1-indexed')
-    stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+    console.log('色:',color,'の駒の以前のglobal座標',previousx,previousy)//index starts from 0
+    console.log('色:',color,'の駒の現在のglobal座標',msg[0],msg[1])//index starts from 0
+    console.log('色:',color,'の駒の以前のlocal座標',previousscreenx-1,previousscreeny-1)//index starts from 0
+    console.log('色:',color,'の駒の現在のlocal座標',xline-1,yline-1)//index starts from 0
     
-    drawcircle((xline+0.5)*600/(LENGTH + 2),(yline+0.5)*600/(LENGTH + 2),color)
-    //console.log(xline,yline,color)
-    stoneBoard[msg[0]][msg[1]]=color;
-    stoneBoard[nowstoneposition[color].x][nowstoneposition[color].y]=0;
-    nowstoneposition[color].x=msg[0];
+
+    //消去该棋子前一步位置上的棋子，然后画到新的位置上
+    stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+    drawcircle((xline+0.5)*600/(LENGTH + 2),(yline+0.5)*600/(LENGTH + 2),color);
+
+    stoneBoard[msg[0]][msg[1]]=color;//新しく置かれた位置に色を書き込む
+    stoneBoard[previousx][previousy]=0;//以前の位置を0に
+    nowstoneposition[color].x=msg[0];//受け取った色の現在位置を更新
     nowstoneposition[color].y=msg[1];
-    //ターンを変える処理
-    //次のターンは誰かサーバから受け取る
+    
     //changeturn(nextTurn == myTurnNum); //4人用のとき
     if (color+1==mycolor){
         changeturn(1);
