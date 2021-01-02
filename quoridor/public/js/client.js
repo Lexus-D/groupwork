@@ -30,14 +30,13 @@ var wallBoardHorizontal=[];
 var nowstoneposition=[];
 
 
-
+//石の現在位置
 for(var i = 0;i < 5; i++){
     nowstoneposition[i]={
         x:0,
         y:0
     }
 }
-
 
 // 石用 基準
 for(var i=0;i<LENGTH;i++){
@@ -85,8 +84,8 @@ stoneboard.height = 600;
 wallboard.width = 600;
 wallboard.height = 600;
 
-var context = lineboard.getContext('2d');
 //draw the checkerboard
+var context = lineboard.getContext('2d');
 context.lineWidth=10
 context.strokeStyle="#ffffff"
 for(let i=1;i<=LENGTH + 1;i++){
@@ -102,6 +101,7 @@ for(let i=1;i<=LENGTH + 1;i++){
     context.stroke();
 }
 
+//draw stone
 var stonecontext=stoneboard.getContext('2d');
 function　drawcircle(x,y,color){
     if (color == 1) {
@@ -259,11 +259,6 @@ function rotatewalltoscreen(x,y,color,wall){
     }
 }
 
-
-
-
-
-
 wallboard.addEventListener('click',(event)=>{
 
     var sendInfo = {
@@ -280,105 +275,207 @@ wallboard.addEventListener('click',(event)=>{
     var rect = wallboard.getBoundingClientRect();
     var screenx = event.clientX-Math.floor(rect.left);
     var screeny = event.clientY-Math.floor(rect.top);
-    //console.log(x,y)
+ 
+    //ローカル座標
     var xline = Math.floor((screenx+5)*(LENGTH + 2)/600)
     var yline = Math.floor((screeny+5)*(LENGTH + 2)/600)
-    console.log('(棋盘local坐标)鼠标点在棋盘上的 ',xline-1,yline-1)//index starts from 0
+    console.log('ボード上にクリックした座標 ',xline-1,yline-1)//index starts from 0
     
-    //client保存的棋盘和server的相同，此处是计算global坐标用于更新client和server的棋盘
+    //石のローカル座標を用いてグローバル座標を計算し、serverとclientの盤面を更新
     var xy = rotatefromscreen(xline,yline,mycolor);
     var x= xy[0]-1;
     var y= xy[1]-1;
     
+    
     if ((xline*600/(LENGTH + 2))-5 <= screenx & screenx <= (xline*600/(LENGTH + 2)) + 5 ){
-        //縦向きの壁置 関数化したほういいかも
-
-        //ここで置けるか判定する関数欲しい
+        //縦向きの壁置 walldirection=0
+        
+        //クリックのローカル座標を用いて縦壁のグローバル座標を計算
+        var wxy=rotatewallfromscreen(xline,yline,mycolor,0);
+        var wx=wxy[0]-1;
+        var wy=wxy[1]-1;
+        console.log('縦壁のグローバル座標:(',wx,wy,')(',wx,wy+1,')');
+        
+        //既に壁があるところに置けない
+        if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]){
+            console.log('illegal placement');
+            return;
+        }
+        //壁を十字に置けない
+        //石を囲むように置けない
 
         wallcontext.lineWidth=8;
         wallcontext.beginPath();
         wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
         wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
         wallcontext.stroke();
-        //壁の座標と色をwallに保存、サーバに送る
         
-        var xy=rotatewallfromscreen(xline,yline,mycolor,0);
-        
-        console.log('壁のグローバル座標:',xy[0]-1,xy[1]-1)
-        wall[0]=xy[0]-1;
-        wall[1]=xy[1]-1;
+        //置かれた壁のグローバル向きを計算し、wallboardを更新する
         if (mycolor==2 || mycolor==4){
-            wall[2]=1;
+            wall[2]=1;//player 2が置いた縦壁はグローバル上では横壁
+            wallBoardHorizontal[wx][wy]=true;
+            wallBoardHorizontal[wx+1][wy]=true;
         } else {
             wall[2]=0;
+            
         }
+        wall[0]=wx;
+        wall[1]=wy;
         wall[3]=mycolor;
         socket.emit('wall',sendInfo);
         changeturn(0);
-        wallBoardVertical[xline-1][yline-1]=true;
-    } else if ((yline*600/(LENGTH + 2))-5 <= screeny & screeny <= (yline*600/(LENGTH + 2)) + 5) {
-        //横向きの壁置く　関数化したほういいかも
+        
 
-        //ここで置けるか判定する関数欲しい
+        
+    } else if ((yline*600/(LENGTH + 2))-5 <= screeny & screeny <= (yline*600/(LENGTH + 2)) + 5) {
+    //横向きの壁置く　walldirection=1
+
+        //クリックのローカル座標を用いて横壁のグローバル座標を計算
+        var wxy=rotatewallfromscreen(xline,yline,mycolor,1);
+        var wx=wxy[0]-1;
+        var wy=wxy[1]-1;
+        console.log('横壁のグローバル座標(with rotatewall method):(',wx,wy,')(',wx+1,wy,')');
+        
+        //既に壁があるところに置けない
+        if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]){
+            console.log('illegal placement');
+            return;
+        }
+        //壁を十字に置けない
+        //石を囲むように置けない
 
         wallcontext.lineWidth=8;
         wallcontext.beginPath();
         wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
         wallcontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
         wallcontext.stroke();
+
         //壁の座標と色をwallに保存、サーバに送る
         var xy=rotatewallfromscreen(xline,yline,mycolor,1);
-        console.log('壁のグローバル座標:',xy[0]-1,xy[1]-1)
-        wall[0]=xy[0]-1;
-        wall[1]=xy[1]-1;
+        console.log('壁のグローバル座標(with):',xy[0]-1,xy[1]-1)
+        wall[0]=wx;
+        wall[1]=wy;
         if (mycolor==2 || mycolor==4){
-            wall[2]=0;
+            wall[2]=0;//player 2が置いた横壁はグローバル上では縦壁
+            wallBoardVertical[wx][wy]=true;
+            wallBoardVertical[wx][wy+1]=true;
         } else {
             wall[2]=1;
+            wallBoardHorizontal[wx][wy]=true;
+            wallBoardHorizontal[wx+1][wy]=true;
         }
         wall[3]=mycolor;
         socket.emit('wall',sendInfo);
         changeturn(0);
-        wallBoardHorizontal[xline-1][yline-1]=true;
+        
     } else {
-        //置けるかを判定する
-        //石のあるところに置けないようにする
-        if(stoneBoard[x][y]!=0)return;
+        //石を置く
         
-
-
-
-        //移動前の駒の場所を取得
-        var previousx=nowstoneposition[mycolor].x
-        var previousy=nowstoneposition[mycolor].y
         
-        var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor);//index starts from 1
-        var previousscreenx=previousscreen[0];
-        var previousscreeny=previousscreen[1];
-        console.log('前の駒のローカル座標:',previousscreenx-1,previousscreeny-1)//index starts from 0
+        if(stoneBoard[x][y]!=0){
+            //石のあるところに置けないようにする
+            console.log('occupied position');
+            return;
+        }else if(Math.abs(x-nowstoneposition[mycolor].x)>2||Math.abs(y-nowstoneposition[mycolor].y)>2){           
+            //遠すぎるところに置けない
+            console.log('too far away');
+            return;
+        }//壁を越えてはいけない
+       
+        //相手の石をジャンプ
+        if(y-nowstoneposition[mycolor].y==2){
+            if(stoneBoard[x][y-1]!=0){
+                //下にある相手の駒をジャンプして移動する
+                stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
+                //新しく置かれた石の情報を送る
+                stone[0]=x;
+                stone[1]=y;
+                stone[2]=mycolor;
+                console.log('send',sendInfo.stone);
+                socket.emit('stone',sendInfo);
+            }
+        }else if(y-nowstoneposition[mycolor].y==-2){
+            if(stoneBoard[x][y+1]!=0){
+                //上にある相手の駒をジャンプして移動する
+                stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
+                
+                stone[0]=x;
+                stone[1]=y;
+                stone[2]=mycolor;
+                console.log('send',sendInfo.stone);
+                socket.emit('stone',sendInfo);
+            }
+        }else if(x-nowstoneposition[mycolor].x==2){
+            if(stoneBoard[x-1][y]!=0){
+                //右にある相手の駒をジャンプして移動する
+                stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
+                
+                stone[0]=x;
+                stone[1]=y;
+                stone[2]=mycolor;
+                console.log('send',sendInfo.stone);
+                socket.emit('stone',sendInfo);
+            }
+        }else if(x-nowstoneposition[mycolor].x==-2){
+            if(stoneBoard[x+1][y]!=0){
+                //左にある相手の駒をジャンプして移動する
+                stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
+                
+                stone[0]=x;
+                stone[1]=y;
+                stone[2]=mycolor;
+                console.log('send',sendInfo.stone);
+                socket.emit('stone',sendInfo);
+            }
+        }  
 
-        stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
-        drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
-
-        console.log('新しく置いた駒のローカル座標',xline-1,yline-1)//index starts from 0
-        changeturn(0);
-
-        console.log(mycolor,'色の駒を新しく置いたグローバル座標',x,y);//index starts from 0
-        console.log('前の駒のグローバル座標:',previousx,previousy)//index starts from 0
-        stoneBoard[previousx][previousy]=0;//以前の位置を0に
-        stoneBoard[x][y]=mycolor;//新しく置かれた位置に色を書き込む
-        nowstoneposition[mycolor].x=x;//受け取った色の現在位置を更新
-        nowstoneposition[mycolor].y=y;
-        //新しく置かれた石の情報を送る
-        stone[0]=x;
-        stone[1]=y;
-        stone[2]=mycolor;
-        console.log('send',sendInfo.stone);
-        socket.emit('stone',sendInfo);
+        //上下左右一歩
+        if(Math.abs(x-nowstoneposition[mycolor].x)==1&&y==nowstoneposition[mycolor].y){
+            stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
+            
+            stone[0]=x;
+            stone[1]=y;
+            stone[2]=mycolor;
+            console.log('send',sendInfo.stone);
+            socket.emit('stone',sendInfo);
+        }else if(Math.abs(y-nowstoneposition[mycolor].y)==1&&x==nowstoneposition[mycolor].x){
+            stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
+            
+            stone[0]=x;
+            stone[1]=y;
+            stone[2]=mycolor;
+            console.log('send',sendInfo.stone);
+            socket.emit('stone',sendInfo);
+        }
     }
 });
 
-//listen on setting, receive the given id, color and room number 
+function stoneUpdate(xline,yline,x,y,nowpositionx,nowpositiony,mycolor){
+    //移動前の駒の場所を取得
+    var previousx=nowpositionx
+    var previousy=nowpositiony
+    
+    var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor);//index starts from 1
+    var previousscreenx=previousscreen[0];
+    var previousscreeny=previousscreen[1];
+    console.log('前の駒のローカル座標:',previousscreenx-1,previousscreeny-1)//index starts from 0
+
+    stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+    drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
+
+    console.log('新しく置いた駒のローカル座標',xline-1,yline-1)//index starts from 0
+    changeturn(0);
+
+    console.log('前の駒のグローバル座標:',previousx,previousy)//index starts from 0
+    console.log(mycolor,'色の駒を新しく置いたグローバル座標',x,y);//index starts from 0
+    
+    stoneBoard[previousx][previousy]=0;//以前の位置を0に
+    stoneBoard[x][y]=mycolor;//新しく置かれた位置に色を書き込む
+    nowstoneposition[mycolor].x=x;//受け取った色の現在位置を更新
+    nowstoneposition[mycolor].y=y;
+}
+
+//ローカル盤面初期化 
 socket.on('setting',(setting)=>{
     userID = setting.id;
     roomNumber = setting.room;
@@ -474,21 +571,30 @@ socket.on('wallbroadcast',(msg)=>{
     if (msg[3]==mycolor) {
         return;
     }
-    console.log('壁のグローバル座標:',msg[0]+1,msg[1]+1)
-
+    
     var wallDirection=msg[2];
-    console.log('walld:',wallDirection)
+    console.log('壁の向き:',wallDirection)
+
+    //ローカル盤面に壁を描く
     var screen=rotatewalltoscreen(msg[0]+1,msg[1]+1,mycolor,wallDirection);
     var screenx=screen[0];
     var screeny=screen[1];
     var xline=screenx;
     var yline=screeny;
-    if (wallDirection) {
+
+    if (wallDirection) {  
+        //横壁
+        console.log('受け取った横壁のグローバル座標(with rotatewall method):(',msg[0],msg[1],')(',msg[0]+1,msg[1],')');
         wallBoardHorizontal[msg[0]][msg[1]]=true;
+        wallBoardHorizontal[msg[0]+1][msg[1]]=true;
     } else {
+        //縦壁
+        console.log('受け取った縦壁のグローバル座標:(',msg[0],msg[1],')(',msg[0],msg[1]+1,')');
         wallBoardVertical[msg[0]][msg[1]]=true;
+        wallBoardVertical[msg[0]][msg[1]+1]=true;
     }
-    console.log('壁のローカル座標:',xline,yline)
+
+    console.log('壁のローカル座標:',xline-1,yline-1)//index starts from 0
     if (wallDirection){
         if (mycolor==2 || mycolor==4){
             wallcontext.lineWidth=8;
