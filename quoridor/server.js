@@ -103,10 +103,7 @@ io.on('connection',socket=>{
     console.log("enter the room ");
     console.log(settingInfo.color);
     //
-    username[settingInfo.room][settingInfo.color] = "ユーザー" + settingInfo.color; //デフォルトのユーザーネーム
-    socket.emit("display_username",username);
-    console.log(username);
-
+    
     // PLAYNUMだけ入ったら次の部屋へ
     if(countRoomUsers[countRooms]==PLAYERNUM){        
         // 人数が揃ったら開始
@@ -115,11 +112,14 @@ io.on('connection',socket=>{
         countRooms = countRooms + 1;
         console.log("open next room");
     }
-
+    
     // アクセスしてきたclientに設定データを送る
     io.to(userID).emit('setting',settingInfo);
-
-
+    
+    
+    username[settingInfo.room][settingInfo.color] = "ユーザー" + settingInfo.color; //デフォルトのユーザーネーム
+    io.emit("display_username",username);
+    // console.log(username);
 
     // 石や壁をおけるかどうかの判断はclient側だけでいいかもしれない
 
@@ -181,7 +181,7 @@ io.on('connection',socket=>{
     socket.on("register_username",(register_username) =>{
         username[register_username["roomNumber"]][register_username["color"]] = register_username["username"];
         console.log(username);
-        //socket.emit("display_username",username);
+        // socket.emit("display_username",username);
     })
     
 
