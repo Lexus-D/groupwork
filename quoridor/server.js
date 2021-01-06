@@ -59,10 +59,10 @@ for(var k=0;k<ROOMMAX;k++){
     stoneBoard[k][8][4]=4;
 
     // 壁用のボード
-    for(var i=0;i<LENGTH-1;i++){
+    for(var i=0;i<=LENGTH;i++){
         wallBoardVertical[k][i]=[];
         wallBoardHorizontal[k][i]=[];
-        for(var j=0;j<LENGTH;j++){
+        for(var j=0;j<=LENGTH;j++){
             wallBoardVertical[k][i][j]=false;
             wallBoardHorizontal[k][i][j]=false;
         }

@@ -41,16 +41,16 @@ for(var i = 0;i < 5; i++){
 // 石用 基準
 for(var i=0;i<LENGTH;i++){
     stoneBoard[i]=[];
-    for(var j=0;j<9;j++){
+    for(var j=0;j<LENGTH;j++){
         stoneBoard[i][j]=0
     }
 }
 
 // 壁用のボード  基準
-for(var i=0;i<LENGTH-1;i++){
+for(var i=0;i<=LENGTH;i++){
     wallBoardVertical[i]=[];
     wallBoardHorizontal[i]=[];
-    for(var j=0;j<LENGTH;j++){
+    for(var j=0;j<=LENGTH;j++){
         wallBoardVertical[i][j]=false;
         wallBoardHorizontal[i][j]=false;
     }
@@ -279,7 +279,7 @@ wallboard.addEventListener('click',(event)=>{
     //ローカル座標
     var xline = Math.floor((screenx+5)*(LENGTH + 2)/600)
     var yline = Math.floor((screeny+5)*(LENGTH + 2)/600)
-    console.log('ボード上にクリックした座標 ',xline-1,yline-1)//index starts from 0
+    console.log('ボード上にクリックしたローカル座標 ',xline-1,yline-1)//index starts from 0
     
     //石のローカル座標を用いてグローバル座標を計算し、serverとclientの盤面を更新
     var xy = rotatefromscreen(xline,yline,mycolor);
@@ -294,12 +294,18 @@ wallboard.addEventListener('click',(event)=>{
         var wxy=rotatewallfromscreen(xline,yline,mycolor,0);
         var wx=wxy[0]-1;
         var wy=wxy[1]-1;
-        console.log('縦壁のグローバル座標:(',wx,wy,')(',wx,wy+1,')');
         
         //既に壁があるところに置けない
-        if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]){
-            console.log('illegal placement');
-            return;
+        if(mycolor==2||mycolor==4){//player 2と4が置いた壁の向きは逆だから、逆方向のwallBoardをチェック
+            if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7){
+                console.log('illegal placement');
+                return;
+            }
+        }else{
+            if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7){
+                console.log('illegal placement');
+                return;
+            }
         }
         //壁を十字に置けない
         //石を囲むように置けない
@@ -312,12 +318,15 @@ wallboard.addEventListener('click',(event)=>{
         
         //置かれた壁のグローバル向きを計算し、wallboardを更新する
         if (mycolor==2 || mycolor==4){
-            wall[2]=1;//player 2が置いた縦壁はグローバル上では横壁
+            wall[2]=1;//player 2,4が置いた縦壁はグローバル上では横壁
+            console.log('壁のグローバル座標:(',wx,wy,')(',wx+1,wy,')','global direction:横');
             wallBoardHorizontal[wx][wy]=true;
             wallBoardHorizontal[wx+1][wy]=true;
         } else {
             wall[2]=0;
-            
+            console.log('壁のグローバル座標:(',wx,wy,')(',wx,wy+1,')','global direction:縦');
+            wallBoardVertical[wx][wy]=true;
+            wallBoardVertical[wx][wy+1]=true;
         }
         wall[0]=wx;
         wall[1]=wy;
@@ -329,17 +338,22 @@ wallboard.addEventListener('click',(event)=>{
         
     } else if ((yline*600/(LENGTH + 2))-5 <= screeny & screeny <= (yline*600/(LENGTH + 2)) + 5) {
     //横向きの壁置く　walldirection=1
-
         //クリックのローカル座標を用いて横壁のグローバル座標を計算
         var wxy=rotatewallfromscreen(xline,yline,mycolor,1);
         var wx=wxy[0]-1;
         var wy=wxy[1]-1;
-        console.log('横壁のグローバル座標(with rotatewall method):(',wx,wy,')(',wx+1,wy,')');
         
         //既に壁があるところに置けない
-        if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]){
-            console.log('illegal placement');
-            return;
+        if(mycolor==2||mycolor==4){
+            if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7){
+                console.log('illegal placement');
+                return;
+            }
+        }else{
+            if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7){
+                console.log('illegal placement');
+                return;
+            }       
         }
         //壁を十字に置けない
         //石を囲むように置けない
@@ -351,16 +365,16 @@ wallboard.addEventListener('click',(event)=>{
         wallcontext.stroke();
 
         //壁の座標と色をwallに保存、サーバに送る
-        var xy=rotatewallfromscreen(xline,yline,mycolor,1);
-        console.log('壁のグローバル座標(with):',xy[0]-1,xy[1]-1)
         wall[0]=wx;
         wall[1]=wy;
         if (mycolor==2 || mycolor==4){
-            wall[2]=0;//player 2が置いた横壁はグローバル上では縦壁
+            wall[2]=0;//player 2,4が置いた横壁はグローバル上では縦壁
+            console.log('壁のグローバル座標:(',wx,wy,')(',wx,wy+1,')','global direction:縦');
             wallBoardVertical[wx][wy]=true;
             wallBoardVertical[wx][wy+1]=true;
         } else {
             wall[2]=1;
+            console.log('壁のグローバル座標:(',wx,wy,')(',wx+1,wy,')','global direction:横');
             wallBoardHorizontal[wx][wy]=true;
             wallBoardHorizontal[wx+1][wy]=true;
         }
@@ -370,8 +384,7 @@ wallboard.addEventListener('click',(event)=>{
         
     } else {
         //石を置く
-        
-        
+              
         if(stoneBoard[x][y]!=0){
             //石のあるところに置けないようにする
             console.log('occupied position');
@@ -381,6 +394,7 @@ wallboard.addEventListener('click',(event)=>{
             console.log('too far away');
             return;
         }//壁を越えてはいけない
+
        
         //相手の石をジャンプ
         if(y-nowstoneposition[mycolor].y==2){
@@ -427,6 +441,8 @@ wallboard.addEventListener('click',(event)=>{
                 console.log('send',sendInfo.stone);
                 socket.emit('stone',sendInfo);
             }
+        }else{
+            console.log('illegal placement');
         }  
 
         //上下左右一歩
@@ -446,10 +462,13 @@ wallboard.addEventListener('click',(event)=>{
             stone[2]=mycolor;
             console.log('send',sendInfo.stone);
             socket.emit('stone',sendInfo);
+        }else{
+            console.log('illegal placement');
         }
     }
 });
 
+//駒を更新する関数
 function stoneUpdate(xline,yline,x,y,nowpositionx,nowpositiony,mycolor){
     //移動前の駒の場所を取得
     var previousx=nowpositionx
@@ -573,7 +592,7 @@ socket.on('wallbroadcast',(msg)=>{
     }
     
     var wallDirection=msg[2];
-    console.log('壁の向き:',wallDirection)
+    console.log('壁のglobal向き:',wallDirection==0?'縦':'横')
 
     //ローカル盤面に壁を描く
     var screen=rotatewalltoscreen(msg[0]+1,msg[1]+1,mycolor,wallDirection);
@@ -584,7 +603,7 @@ socket.on('wallbroadcast',(msg)=>{
 
     if (wallDirection) {  
         //横壁
-        console.log('受け取った横壁のグローバル座標(with rotatewall method):(',msg[0],msg[1],')(',msg[0]+1,msg[1],')');
+        console.log('受け取った横壁のグローバル座標:(',msg[0],msg[1],')(',msg[0]+1,msg[1],')');
         wallBoardHorizontal[msg[0]][msg[1]]=true;
         wallBoardHorizontal[msg[0]+1][msg[1]]=true;
     } else {
@@ -594,15 +613,17 @@ socket.on('wallbroadcast',(msg)=>{
         wallBoardVertical[msg[0]][msg[1]+1]=true;
     }
 
-    console.log('壁のローカル座標:',xline-1,yline-1)//index starts from 0
+    
     if (wallDirection){
         if (mycolor==2 || mycolor==4){
+            console.log('縦壁のローカル座標:(',xline-1,yline-1,')(',xline-1,yline,')')//index starts from 0
             wallcontext.lineWidth=8;
             wallcontext.beginPath();
             wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
             wallcontext.lineTo(xline*600/(LENGTH + 2),(yline+2)*600/(LENGTH + 2));
             wallcontext.stroke();
         } else {
+            console.log('横壁のローカル座標:(',xline-1,yline-1,')(',xline,yline-1,')')//index starts from 0
             wallcontext.lineWidth=8;
             wallcontext.beginPath();
             wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
@@ -612,6 +633,7 @@ socket.on('wallbroadcast',(msg)=>{
         
     } else {
         if (mycolor==2 || mycolor==4) {
+            console.log('横壁のローカル座標:(',xline-1,yline-1,')(',xline,yline-1,')')//index starts from 0
             wallcontext.lineWidth=8;
             wallcontext.beginPath();
             wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
@@ -619,6 +641,7 @@ socket.on('wallbroadcast',(msg)=>{
             wallcontext.stroke();
         } else {
             wallcontext.lineWidth=8;
+            console.log('縦壁のローカル座標:(',xline-1,yline-1,')(',xline-1,yline,')')//index starts from 0
             wallcontext.beginPath();
             wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
             wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
