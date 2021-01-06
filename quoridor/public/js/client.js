@@ -657,7 +657,7 @@ socket.on('gameover',function (data) {
 
 })
 
-// ユーザーネームの表示（ほかのユーザーが登録したときにリアルタイムで反映されないため修正する必要がある）
+// ユーザーネームの表示（ユーザー名を登録したときに反映されないため修正する必要がある）
 socket.on("display_username",(username)=>{
     var displayName = "";
     for(var i = 1; i <= 4; i++){
