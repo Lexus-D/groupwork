@@ -11,9 +11,8 @@ var turn = document.getElementById('turn');
 var reset = document.getElementById('reset');
 
 var wallcontext = wallboard.getContext('2d')
-wallcontext.strokeStyle="#8b0000";
 
-//var userName; //自分のユーザーネーム
+
 
 var LENGTH = 9; //盤面の大きさ
 
@@ -29,7 +28,9 @@ var wallBoardVertical=[];
 var wallBoardHorizontal=[];
 var nowstoneposition=[];
 
-
+var premousex = 0;
+var premousey = 0;
+var premousedirection = 0; //駒は0,横壁は1,縦壁は2
 //石の現在位置
 for(var i = 0;i < 5; i++){
     nowstoneposition[i]={
@@ -56,22 +57,30 @@ for(var i=0;i<=LENGTH;i++){
     }
 }
 
-/*window.onload = () =>{
+window.onload = () =>{
     var imgcontext=imageboard.getContext('2d');
-    var img=new Image();
-    img.src="image/boardimg.jpg";
-    img.addEventListener('load',()=>{
-        imgcontext.drawImage(img,0,0);
-    });
+    var ix = 0;
+    var iy = 0;
+    var w = 600;
+    var h = 600;
+    var r = 30;
+    var col = 'rgb(129,177,181)'
+    imgcontext.beginPath();
+    imgcontext.lineWidth = 1;
+    imgcontext.strokeStyle = col;
+    imgcontext.fillStyle = col;
+    imgcontext.moveTo(ix,iy + r);
+    imgcontext.arc(ix+r,iy+h-r,r,Math.PI,Math.PI*0.5,true);
+    imgcontext.arc(ix+w-r,iy+h-r,r,Math.PI*0.5,0,1);
+    imgcontext.arc(ix+w-r,iy+r,r,0,Math.PI*1.5,1);
+    imgcontext.arc(ix+r,iy+r,r,Math.PI*1.5,Math.PI,1);
+    imgcontext.closePath();
+    imgcontext.stroke();
+    imgcontext.fill();
 };
-*/
 
-var imgcontext = imageboard.getContext('2d');
-var img = new Image();
-img.src = "image/boardimg.jpg";
-img.addEventListener('load',()=>{
-    imgcontext.drawImage(img,0,0);
-});
+
+
 
 const width = imageboard.clientWidth;
 const height = imageboard.clientHeight;
@@ -87,7 +96,8 @@ wallboard.height = 600;
 //draw the checkerboard
 var context = lineboard.getContext('2d');
 context.lineWidth=10
-context.strokeStyle="#ffffff"
+context.strokeStyle="rgb(170,211,214)"
+
 for(let i=1;i<=LENGTH + 1;i++){
     context.beginPath();
     context.moveTo(i*600/(LENGTH + 2),0);
@@ -105,13 +115,13 @@ for(let i=1;i<=LENGTH + 1;i++){
 var stonecontext=stoneboard.getContext('2d');
 function　drawcircle(x,y,color){
     if (color == 1) {
-        stonecontext.fillStyle="#FF0000";// 赤
+        stonecontext.fillStyle="rgb(245,128,120)";// 赤
     } else if (color == 2) {
-        stonecontext.fillStyle="#0000FF";// 青
+        stonecontext.fillStyle="rgb(120,130,245)";// 青
     } else if (color == 3) {
-        stonecontext.fillStyle="#008000";// 緑
+        stonecontext.fillStyle="rgb(120,245,143)";// 緑
     } else if (color == 4) {
-        stonecontext.fillStyle="#FFFF00"; // 黄
+        stonecontext.fillStyle="rgb(245,234,120)"; // 黄
     }
     stonecontext.beginPath();
     stonecontext.arc(x,y,15,0,2*Math.PI,true);
@@ -119,22 +129,53 @@ function　drawcircle(x,y,color){
     stonecontext.stroke();
 }
 
-wallboard.addEventListener('mousemove',(e)=>{
-    var rect = wallboard.getBoundingClientRect();
-    var x= e.clientX-Math.floor(rect.left);
-    var y=e.clientY-Math.floor(rect.top);
-    var xline = Math.floor((x+5)*(LENGTH + 2)/600);
-    var yline = Math.floor((y+5)*(LENGTH + 2)/600);
-    var wallcontext = wallboard.getContext('2d');
-    if((xline*600/(LENGTH + 2))-5<=x & x<=(xline*600/(LENGTH + 2))+5) {
-        //たて壁
-    } else if ((yline*600/(LENGTH + 2))-5 <= y & y <= (yline*600/(LENGTH + 2)) + 5) {
-        //横壁
-    } else {
-        //駒
-    }
-})
+function drawuprect(color) {
+    var imgcontext=imageboard.getContext('2d');
+    imgcontext.fillStyle = color;
+    imgcontext.lineWidth = 1;
+    imgcontext.strokeStyle = color;
+    imgcontext.strokeRect(600 / (LENGTH + 2) + 5, 0, 600 - 2 * (600 / (LENGTH + 2)) - 10, 600 / (LENGTH + 2)) - 5;
+    imgcontext.fillRect(600 / (LENGTH + 2) + 5, 0, 600 - 2 * (600 / (LENGTH + 2)) - 10, 600 / (LENGTH + 2)) - 5;
+}
 
+function drawleftrect(color) {
+    var imgcontext=imageboard.getContext('2d');
+    imgcontext.fillStyle = color;
+    imgcontext.lineWidth = 1;
+    imgcontext.strokeStyle = color;
+    imgcontext.strokeRect(0, 600 / (LENGTH + 2) + 5, 600 / (LENGTH + 2) - 5, 600 - 2 * (600 / (LENGTH + 2)) - 10);
+    imgcontext.fillRect(0, 600 / (LENGTH + 2) + 5, 600 / (LENGTH + 2) - 5, 600 - 2 * (600 / (LENGTH + 2)) - 10);
+}
+
+function drawdownrect(color) {
+    var imgcontext=imageboard.getContext('2d');
+    imgcontext.fillStyle = color;
+    imgcontext.lineWidth = 1;
+    imgcontext.strokeStyle = color;
+    imgcontext.strokeRect(600 / (LENGTH + 2) + 5, 600 - (600 / (LENGTH + 2)) + 5, 600 - 2 * (600 / (LENGTH + 2)) - 10, 600 / (LENGTH + 2)) - 5;
+    imgcontext.fillRect(600 / (LENGTH + 2) + 5, 600 - (600 / (LENGTH + 2)) + 5, 600 - 2 * (600 / (LENGTH + 2)) - 10, 600 / (LENGTH + 2)) - 5;
+}
+
+function drawrightrect(color) {
+    var imgcontext=imageboard.getContext('2d');
+    imgcontext.fillStyle = color;
+    imgcontext.lineWidth = 1;
+    imgcontext.strokeStyle = color;
+    imgcontext.strokeRect(600 - (600 / (LENGTH + 2)) + 5, 600 / (LENGTH + 2) + 5, 600 / (LENGTH + 2) - 5, 600 - 2 * (600 / (LENGTH + 2)) - 10);
+    imgcontext.fillRect(600 - (600 / (LENGTH + 2)) + 5, 600 / (LENGTH + 2) + 5, 600 / (LENGTH + 2) - 5, 600 - 2 * (600 / (LENGTH + 2)) - 10);
+}
+
+/*
+function preclear(premousex,premousey,premousedirection) {
+    if (premousedirection == 0) {
+        wallcontext.clearRect(premousex, premousey,600 / (LENGTH + 2), 600 / (LENGTH + 2))
+    } else if (premousedirection == 1) {
+        wallcontext.clearRect(premousex, premousey - 8, 1200 / (LENGTH + 2), 16)
+    } else if (premousedirection == 2) {
+        wallcontext.clearRect(premousex - 8, premousey, 16, 1200 / (LENGTH + 2))
+    }
+}
+*/
 //ローカル座標からグローバル座標に変換
 function rotatefromscreen(screenx,screeny,color){ //全部1index(1~9)
     var x,y;
@@ -259,6 +300,58 @@ function rotatewalltoscreen(x,y,color,wall){
     }
 }
 
+
+wallboard.addEventListener('mousemove',(e)=>{
+    if(!(myturn && gameStart)){
+        return;
+    }
+    var rect = wallboard.getBoundingClientRect();
+    var x = e.clientX-Math.floor(rect.left);
+    var y = e.clientY-Math.floor(rect.top);
+    var xline = Math.floor((x+5)*(LENGTH + 2)/600);
+    var yline = Math.floor((y+5)*(LENGTH + 2)/600);
+    var wallcontext = wallboard.getContext('2d');
+    if((xline*600/(LENGTH + 2))-5<=x & x<=(xline*600/(LENGTH + 2))+5) {
+        wallcontext.strokeStyle = 'rgb(26,65,69)';
+        wallcontext.lineWidth = 8;
+        //preclear(premousex,premousey,premousedirection)
+        wallcontext.clearRect(0,0,600,600);
+        wallcontext.beginPath();
+        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2))
+        wallcontext.stroke();
+        premousex = xline * 600 / (LENGTH + 2);
+        premousey = yline * 600 / (LENGTH + 2);
+        premousedirection = 1;
+    } else if ((yline*600/(LENGTH + 2))-5 <= y & y <= (yline*600/(LENGTH + 2)) + 5) {
+        //横壁
+        wallcontext.strokeStyle = 'rgb(26,65,69)';
+        wallcontext.lineWidth = 8;
+        wallcontext.clearRect(0,0,600,600);
+        //preclear(premousex,premousey,premousedirection)
+        wallcontext.beginPath();
+        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        wallcontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2))
+        wallcontext.stroke();
+        premousex = xline * 600 / (LENGTH + 2);
+        premousey = yline * 600 / (LENGTH + 2);
+        premousedirection = 2;
+    } else {
+        //駒
+        wallcontext.strokeStyle = 'rgb(26,65,69)';
+        wallcontext.lineWidth = 8;
+        wallcontext.clearRect(0,0,600,600);
+        //preclear(premousex,premousey,premousedirection)
+        wallcontext.beginPath();
+        wallcontext.arc((xline + 0.5) * 600 / (LENGTH + 2),(yline + 0.5) * 600 / (LENGTH + 2),15,0,2*Math.PI,true);
+        wallcontext.fill();
+        wallcontext.stroke();
+        premousex = xline * 600 / (LENGTH + 2);
+        premousey = yline * 600 / (LENGTH + 2);
+        premousedirection = 0;
+    }
+})
+
 wallboard.addEventListener('click',(event)=>{
 
     var sendInfo = {
@@ -310,11 +403,12 @@ wallboard.addEventListener('click',(event)=>{
         //壁を十字に置けない
         //石を囲むように置けない
 
-        wallcontext.lineWidth=8;
-        wallcontext.beginPath();
-        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
-        wallcontext.stroke();
+        stonecontext.lineWidth=8;
+        stonecontext.strokeStyle='rgb(18,51,54)';
+        stonecontext.beginPath();
+        stonecontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        stonecontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
+        stonecontext.stroke();
         
         //置かれた壁のグローバル向きを計算し、wallboardを更新する
         if (mycolor==2 || mycolor==4){
@@ -332,7 +426,11 @@ wallboard.addEventListener('click',(event)=>{
         wall[1]=wy;
         wall[3]=mycolor;
         socket.emit('wall',sendInfo);
-        changeturn(0);
+        if (mycolor == 4) {
+            changeturn(1);
+        } else {
+            changeturn(mycolor + 1);
+        }
         
 
         
@@ -358,11 +456,12 @@ wallboard.addEventListener('click',(event)=>{
         //壁を十字に置けない
         //石を囲むように置けない
 
-        wallcontext.lineWidth=8;
-        wallcontext.beginPath();
-        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        wallcontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        wallcontext.stroke();
+        stonecontext.lineWidth=8;
+        stonecontext.strokeStyle='rgb(18,51,54)';
+        stonecontext.beginPath();
+        stonecontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        stonecontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        stonecontext.stroke();
 
         //壁の座標と色をwallに保存、サーバに送る
         wall[0]=wx;
@@ -380,7 +479,12 @@ wallboard.addEventListener('click',(event)=>{
         }
         wall[3]=mycolor;
         socket.emit('wall',sendInfo);
-        changeturn(0);
+        if (mycolor == 4) {
+            changeturn(1);
+        } else {
+            changeturn(mycolor + 1);
+        } 
+        
         
     } else {
         //石を置く
@@ -483,7 +587,11 @@ function stoneUpdate(xline,yline,x,y,nowpositionx,nowpositiony,mycolor){
     drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
 
     console.log('新しく置いた駒のローカル座標',xline-1,yline-1)//index starts from 0
-    changeturn(0);
+    if (mycolor == 4) {
+        changeturn(1);
+    } else {
+        changeturn(mycolor + 1)
+    }
 
     console.log('前の駒のグローバル座標:',previousx,previousy)//index starts from 0
     console.log(mycolor,'色の駒を新しく置いたグローバル座標',x,y);//index starts from 0
@@ -499,30 +607,48 @@ socket.on('setting',(setting)=>{
     userID = setting.id;
     roomNumber = setting.room;
     mycolor=setting.color;
+    
     if (setting.color==1) {
-        changeturn(1);
+        
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),1)// した
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),3)// 上
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),4)//右
         drawcircle(1.5*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),2)//左
+        
+        drawuprect("rgb(245,128,120)")
+        drawrightrect("rgb(120,130,245)")
+        drawdownrect("rgb(120,245,143)")
+        drawleftrect("rgb(245,234,120)")
     } else if (setting.color==2) {
-        changeturn(0);
+        
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),2)
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),4)
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1)
         drawcircle(1.5*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),3)
+        drawleftrect("rgb(245,128,120)")
+        drawuprect("rgb(120,130,245)")
+        drawrightrect("rgb(120,245,143)")
+        drawdownrect("rgb(245,234,120)")
     } else if (setting.color==3) {
-        changeturn(0);
+        
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),3)
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),1)
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),2)
         drawcircle(1.5*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),4)
+        drawdownrect("rgb(245,128,120)")
+        drawleftrect("rgb(120,130,245)")
+        drawuprect("rgb(120,245,143)")
+        drawrightrect("rgb(245,234,120)")
     } else if (setting.color==4) {
-        changeturn(0);
+        
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),4)
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),2)
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),3)
         drawcircle(1.5*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1)
+        drawrightrect("rgb(245,128,120)")
+        drawdownrect("rgb(120,130,245)")
+        drawleftrect("rgb(120,245,143)")
+        drawuprect("rgb(245,234,120)")
     }
     nowstoneposition[1].x=(LENGTH - 1)/2;
     nowstoneposition[1].y=LENGTH-1;
@@ -578,11 +704,10 @@ socket.on('Broadcast',(msg,previousStone)=>{
     nowstoneposition[color].y=msg[1];
     
     //changeturn(nextTurn == myTurnNum); //4人用のとき
-    if (color+1==mycolor){
+    if (color == 4){
         changeturn(1);
-    }
-    if (color==4 && mycolor==1){
-        changeturn(1);
+    } else {
+        changeturn(color + 1);
     }
 });
 
@@ -650,17 +775,17 @@ socket.on('wallbroadcast',(msg)=>{
         
     }
     
-    if (msg[3]+1==mycolor){
+    if (color == 4){
         changeturn(1);
-    }
-    if (msg[3]==4 && mycolor==1){
-        changeturn(1);
+    } else {
+        changeturn(color + 1);
     }
 })
 
 // 人数が揃ったらゲームスタート
 socket.on('gameStart',judge=>{
     gameStart=judge;
+    changeturn(1);
 });
 
 //勝ち負けの判定が終わったら、勝者を表示し、石を置けなくする
@@ -681,17 +806,18 @@ socket.on('gameover',function (data) {
 
 })
 
-/*
-socket.on("display_username",function(username){
+// ユーザーネームの表示
+// TODO: どの色がどのユーザーか分かるようにする
+socket.on("display_username",(username)=>{
     var displayName = "";
     for(var i = 1; i <= 4; i++){
-        if(username[str(roomNumber)][str(i)]){
-            displayName += username[str(roomNumber)][str(i)] + "<br>";
+        if(username[roomNumber][i]){
+            displayName += username[roomNumber][i] + "<br>";
         }
     }
     document.getElementById("display_username").innerHTML = displayName;
 })
-*/
+
 
 function drawtext(str){
     var stoneboardcontext=stoneboard.getContext('2d');
@@ -708,31 +834,29 @@ function drawtext(str){
     stoneboardcontext.fillText(str,x,y);
 }
 
-function changeturn(flag){
-    if(flag){
+function changeturn(player){
+    if (player == mycolor) {
         myturn=1;
         turn.innerText="あなたの番";
     }
-    else{
+    else {
         myturn=0;
-        turn.innerText="相手の番";
+        if (player == 1) {
+            turn.innerText="プレイヤー1の番";
+        } else if (player == 2) {
+            turn.innerText="プレイヤー2の番";
+        } else if (player == 3) {
+            turn.innerText="プレイヤー3の番";
+        } else if (player == 4) {
+            turn.innerText="プレイヤー4の番";
+        }
     }
 }
 
-//TODO:ユーザー名をサーバーに送信
+
 function register_username() {
     var username;
     username = document.getElementById("username").value;
     registerName = {"roomNumber":roomNumber,"color":mycolor,"username":username};
     socket.emit("register_username",registerName);
-    //display_username();
 }
-
-//TODO:他のユーザー名を受け取って表示（色とユーザー名が分かるようにする）
-/*
-function display_username(){
-    var displayName;
-    
-    document.getElementById("display_username").innerHTML = userName;
-}
-*/

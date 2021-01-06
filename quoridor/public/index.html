@@ -7,16 +7,17 @@
 {
     margin-right: auto;
     margin-left : auto;
-  height: 600px;
-  position: relative;
-  width: 600px;
+    height: 600px;
+    position: relative;
+    width: 600px;
 }
 #imageboard
 {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  z-index: 1;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 1;
+    /*background-color: rgb(129,177,181);*/
 }
 #lineboard
 {
@@ -42,13 +43,27 @@
 
 #turn
 {
+    margin: 0 auto;
     text-align: center;
     font-size: 20px;
+    padding: 0.5em 1em;
+    font-weight: bold;
+    color: rgb(18,42,43);
+    background: #FFF;
+    border: solid 3px #6091d3;
+    border-radius: 10px;
+    /*display: inline-block;*/
+    display: table;
+    position: relative;
+    top: 15px;
 }
 .header{
+    font-weight: bold;
     text-align: center;
-    font-size: 45px;
-    font-family: serif;
+    font-size: 40px;
+    font-family: "Hiragino Maru Gothic ProN";
+    border-bottom: double 5px rgb(114,169,173);
+    color: rgb(18,42,43);
 }
 #reset
 {
@@ -62,7 +77,7 @@
         <title>コリドール</title>
         <script src="/socket.io/socket.io.js"></script> <!--websocketでsocket.io使うなら-->
     </head>
-    <body style="background-color:aliceblue;">
+    <body style="background-color: rgb(201,242,245);">
         <header>
             <h1 class="header">
                 <a>コリドール</a>
