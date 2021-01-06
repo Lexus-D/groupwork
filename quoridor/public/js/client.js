@@ -657,7 +657,8 @@ socket.on('gameover',function (data) {
 
 })
 
-// ユーザーネームの表示（ほかのユーザー名が登録したときにリアルタイムで反映されないため修正する必要がある）
+// ユーザーネームの表示
+// TODO: どの色がどのユーザーか分かるようにする
 socket.on("display_username",(username)=>{
     var displayName = "";
     for(var i = 1; i <= 4; i++){
