@@ -357,7 +357,7 @@ wallboard.addEventListener('click',(event)=>{
     if(!(myturn && gameStart)){
         return;
     }
-
+    wallcontext.clearRect(0,0,600,600);
     //石を置く，または壁を置くのどちらかを実行するようにする
     var rect = wallboard.getBoundingClientRect();
     var screenx = event.clientX-Math.floor(rect.left);
@@ -790,10 +790,10 @@ socket.on('wallbroadcast',(msg)=>{
         
     }
     
-    if (color == 4){
+    if (msg[3] == 4){
         changeturn(1);
     } else {
-        changeturn(color + 1);
+        changeturn(msg[3] + 1);
     }
 })
 
