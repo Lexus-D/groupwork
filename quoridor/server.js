@@ -180,7 +180,7 @@ io.on('connection',socket=>{
     //ユーザーネームの登録
     socket.on("register_username",(register_username) =>{
         username[register_username["roomNumber"]][register_username["color"]] = register_username["username"];
-        console.log(username);
+        // console.log(username);
         io.emit("display_username",username);
     })
     
