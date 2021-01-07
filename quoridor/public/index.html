@@ -5,8 +5,8 @@
         <style type="text/css">
 #container
 {
-    margin-right: auto;
-    margin-left : auto;
+    /*margin-right: auto;
+    margin-left : auto;*/
     height: 600px;
     position: relative;
     width: 600px;
@@ -73,6 +73,13 @@
     font-size: 40;
     text-align: center;
 }
+#box{
+    display: flex;
+    justify-content: center;
+}
+#results{
+    
+}
         </style>
         <title>コリドール</title>
         <script src="/socket.io/socket.io.js"></script> <!--websocketでsocket.io使うなら-->
@@ -83,7 +90,7 @@
                 <a>コリドール</a>
             </h1>
         </header>
-        
+
         <!---ユーザー名を登録-->
         <form id="register_name" action="#">
             <input type="text" id="username" value="">
@@ -92,12 +99,16 @@
           </form>
           <!--ユーザー名の表示-->
           <div id="display_username"></div>
-
-        <div id="container">
-            <canvas id="imageboard"></canvas>
-            <canvas id="lineboard"></canvas>
-            <canvas id="stoneboard"></canvas>
-            <canvas id="wallboard"></canvas>
+        <div id="box">
+            <div id="results">
+                ルーム1
+            </div>
+            <div id="container">
+                <canvas id="imageboard"></canvas>
+                <canvas id="lineboard"></canvas>
+                <canvas id="stoneboard"></canvas>
+                <canvas id="wallboard"></canvas>
+            </div>
         </div>
         
         <div id="turn">待機中</div>
