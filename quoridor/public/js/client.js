@@ -21,6 +21,7 @@ var mycolor = 0;//null
 var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
 var gameStart = 0; // 人数が揃ったら1になる
+var wallNumMyroom;
 
 var stoneBoard=[];
 var wallBoardVertical=[];
@@ -353,7 +354,8 @@ wallboard.addEventListener('click',(event)=>{
         stone: stone,
         wall: wall,
         id : userID,
-        room: roomNumber
+        room: roomNumber,
+        color: mycolor
     };
     if(!(myturn && gameStart)){
         return;
@@ -872,6 +874,9 @@ socket.on("display_username",(username)=>{
     document.getElementById("display_username").innerHTML = displayName;
 })
 
+socket.on("wallNum",wallNum=>{
+    wallNumMyroom = wallNum;
+})
 
 function drawtext(str){
     var stoneboardcontext=stoneboard.getContext('2d');

@@ -14,6 +14,7 @@ const PORT = 5500; // ポート番号
 const LENGTH = 9; // 奇数のみ
 const ROOMMAX = 20; // 部屋の最大数
 const PLAYERNUM = 4; // プレイヤーの数 2or4
+const TOTALWALL = 20; // 合計の壁の枚数
 
 // グローバル変数
 var stoneBoard=[];
@@ -25,6 +26,7 @@ var countRoomUsers = Array(ROOMMAX).fill(0);
 var countRooms = 0;
 
 var username = {}; //ユーザーネームを格納
+var wallNum = {}; //壁を置くことのできる残りの枚数
 
 // kはroomの数．上限はとりあえず20にしておく
 for(var k=0;k<ROOMMAX;k++){
@@ -69,6 +71,12 @@ for(var k=0;k<ROOMMAX;k++){
     }
 
     username[k] = {}; //ユーザーネームを格納する変数の初期化
+
+    // 壁をおける残りの枚数を初期化
+    wallNum[k] = {};
+    for(var i = 1; i <= PLAYERNUM;i++){
+        wallNum[k][i] = TOTALWALL / PLAYERNUM;
+    }
 }
 
 server.listen(process.env.PORT || PORT,()=>{
@@ -120,6 +128,9 @@ io.on('connection',socket=>{
     username[settingInfo.room][settingInfo.color] = "ユーザー" + settingInfo.color; //デフォルトのユーザーネーム
     io.emit("display_username",username);
     // console.log(username);
+    io.emit('wallNum',wallNum);
+    console.log(wallNum);
+    
 
     // 石や壁をおけるかどうかの判断はclient側だけでいいかもしれない
 
@@ -175,6 +186,9 @@ io.on('connection',socket=>{
             wallBoardVertical[putWall.room][x][y]=true;
             wallBoardVertical[putWall.room][x][y+1]=true;
         }
+        wallNum[putWall.room][putWall.color] -= 1;
+        io.emit('wallNum',wallNum);
+        console.log(wallNum);
     })
 
     //ユーザーネームの登録
