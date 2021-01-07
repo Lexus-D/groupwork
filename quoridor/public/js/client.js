@@ -294,7 +294,6 @@ function rotatewalltoscreen(x,y,color,wall){
     }
 }
 
-
 wallboard.addEventListener('mousemove',(e)=>{
     if(!(myturn && gameStart)){
         return;
@@ -382,20 +381,38 @@ wallboard.addEventListener('click',(event)=>{
         var wx=wxy[0]-1;
         var wy=wxy[1]-1;
         
-        //既に壁があるところに置けない
+        //置けない判定
         if(mycolor==2||mycolor==4){//player 2と4が置いた壁の向きは逆だから、逆方向のwallBoardをチェック
-            if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7){
+            //横の上下2行に横壁は置けない
+            if(wy==0||wy==9){
+                console.log('cannot place on the border')
+                return;
+            }else
+            if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7||wx<0){
                 console.log('illegal placement');
+                return;
+            }else
+            //横壁が縦壁に重なる場合
+            if(wallBoardVertical[wx+1][wy-1]&&wallBoardVertical[wx+1][wy]){
+                console.log('illegal crossing placement');
                 return;
             }
         }else{
-            if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7){
+            //縦の左右2列に縦壁は置けない
+            if(wx==0||wx==9){
+                console.log('cannot place on the border');
+                return;
+            }else 
+            if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7||wy<0){
                 console.log('illegal placement');
+                return;
+            }else
+            //縦壁が横壁に重なる場合
+            if(wallBoardHorizontal[wx-1][wy+1]&&wallBoardHorizontal[wx][wy+1]){
+                console.log('illegal crossing placement');
                 return;
             }
         }
-        //壁を十字に置けない
-
         //石を囲むように置けない
 
         stonecontext.lineWidth=8;
@@ -434,19 +451,40 @@ wallboard.addEventListener('click',(event)=>{
         var wx=wxy[0]-1;
         var wy=wxy[1]-1;
         
-        //既に壁があるところに置けない
+        //置けない判定
         if(mycolor==2||mycolor==4){
+            //縦の左右2列に縦壁は置けない
+            if(wx==0||wx==9){
+                console.log('cannot place on the border');
+                return;
+            }else
+            //既に壁があるところに置けない 
             if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7){
                 console.log('illegal placement');
                 return;
+            }else
+            //縦壁が横壁に重なる場合
+            if(wallBoardHorizontal[wx-1][wy+1]&&wallBoardHorizontal[wx][wy+1]){
+                console.log('illegal crossing placement');
+                return;
             }
         }else{
+            //横の上下2行に横壁は置けない
+            if(wy==0||wy==9){
+                console.log('cannot place on the border')
+                return;
+            }else
+            //既に壁があるところに置けない
             if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7){
                 console.log('illegal placement');
                 return;
-            }       
+            }else
+            //横壁が縦壁に重なる場合
+            if(wallBoardVertical[wx+1][wy-1]&&wallBoardVertical[wx+1][wy]){
+                console.log('illegal　crossing placement');
+                return;
+            }
         }
-        //壁を十字に置けない
         //石を囲むように置けない
 
         stonecontext.lineWidth=8;
