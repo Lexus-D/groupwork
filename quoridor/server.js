@@ -71,7 +71,7 @@ for(var k=0;k<ROOMMAX;k++){
     username[k] = {}; //ユーザーネームを格納する変数の初期化
 }
 
-server.listen(PORT,()=>{
+server.listen(process.env.PORT || PORT,()=>{
     console.log('server starts on port: %d',PORT);
     app.use(express.static(__dirname+'/public'));
 })
@@ -98,25 +98,25 @@ io.on('connection',socket=>{
         color: countRoomUsers[countRooms]%(PLAYERNUM+1),
         room: countRooms
     }
-    
+
     //
     console.log("enter the room ");
     console.log(settingInfo.color);
     //
-    
+
     // PLAYNUMだけ入ったら次の部屋へ
-    if(countRoomUsers[countRooms]==PLAYERNUM){        
+    if(countRoomUsers[countRooms]==PLAYERNUM){
         // 人数が揃ったら開始
         io.to(countRooms).emit('gameStart',1);
-        
+
         countRooms = countRooms + 1;
         console.log("open next room");
     }
-    
+
     // アクセスしてきたclientに設定データを送る
     io.to(userID).emit('setting',settingInfo);
-    
-    
+
+
     username[settingInfo.room][settingInfo.color] = "ユーザー" + settingInfo.color; //デフォルトのユーザーネーム
     io.emit("display_username",username);
     // console.log(username);
@@ -141,11 +141,11 @@ io.on('connection',socket=>{
             }
         }
         stoneBoard[putStone.room][x][y]=color;
-        console.log(stoneBoard[putStone.room]);
+        //console.log(stoneBoard[putStone.room]);
         io.to(putStone.room).emit('Broadcast',putStone.stone,previousStone[putStone.room]);
 
         // ↓勝利条件を満たしているかを判断する関数
-        
+
         if(gameover(stoneBoard[putStone.room])==1){
             io.to(putStone.room).emit('gameover',1);
         }else if(gameover(stoneBoard[putStone.room])==2){
@@ -155,7 +155,7 @@ io.on('connection',socket=>{
         }else if(gameover(stoneBoard[putStone.room])==4){
             io.to(putStone.room).emit('gameover',4);
         }
-        
+
     })
 
     // 壁を置いた場合の処理
@@ -183,7 +183,7 @@ io.on('connection',socket=>{
         // console.log(username);
         io.emit("display_username",username);
     })
-    
+
 
     // 接続が切れた場合，試合中断
     // ボードを初期化して再接続を待つ

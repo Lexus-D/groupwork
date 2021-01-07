@@ -9,7 +9,6 @@ var stoneboard = document.getElementById('stoneboard');
 var wallboard = document.getElementById('wallboard');
 var turn = document.getElementById('turn');
 var reset = document.getElementById('reset');
-
 var wallcontext = wallboard.getContext('2d')
 
 var stoneColor = {1:"rgb(245,128,120)",2:"rgb(120,130,245)",3:"rgb(120,245,143)",4:"rgb(245,234,120)"};
@@ -79,9 +78,6 @@ window.onload = () =>{
     imgcontext.fill();
 };
 
-
-
-
 const width = imageboard.clientWidth;
 const height = imageboard.clientHeight;
 imageboard.width = 600;
@@ -115,18 +111,18 @@ for(let i=1;i<=LENGTH + 1;i++){
 var stonecontext=stoneboard.getContext('2d');
 function　drawcircle(x,y,color){
     if (color == 1) {
-        stonecontext.fillStyle="rgb(245,128,120)";// 赤
+        wallcontext.fillStyle="rgb(245,128,120)";// 赤
     } else if (color == 2) {
-        stonecontext.fillStyle="rgb(120,130,245)";// 青
+        wallcontext.fillStyle="rgb(120,130,245)";// 青
     } else if (color == 3) {
-        stonecontext.fillStyle="rgb(120,245,143)";// 緑
+        wallcontext.fillStyle="rgb(120,245,143)";// 緑
     } else if (color == 4) {
-        stonecontext.fillStyle="rgb(245,234,120)"; // 黄
+        wallcontext.fillStyle="rgb(245,234,120)"; // 黄
     }
-    stonecontext.beginPath();
-    stonecontext.arc(x,y,15,0,2*Math.PI,true);
-    stonecontext.fill();
-    stonecontext.stroke();
+    wallcontext.beginPath();
+    wallcontext.arc(x,y,15,0,2*Math.PI,true);
+    wallcontext.fill();
+    wallcontext.stroke();
 }
 
 function drawuprect(color) {
@@ -300,7 +296,6 @@ function rotatewalltoscreen(x,y,color,wall){
     }
 }
 
-
 wallboard.addEventListener('mousemove',(e)=>{
     if(!(myturn && gameStart)){
         return;
@@ -312,40 +307,40 @@ wallboard.addEventListener('mousemove',(e)=>{
     var yline = Math.floor((y+5)*(LENGTH + 2)/600);
     var wallcontext = wallboard.getContext('2d');
     if((xline*600/(LENGTH + 2))-5<=x & x<=(xline*600/(LENGTH + 2))+5) {
-        wallcontext.strokeStyle = 'rgb(26,65,69)';
-        wallcontext.lineWidth = 8;
+        stonecontext.strokeStyle = 'rgb(26,65,69)';
+        stonecontext.lineWidth = 8;
         //preclear(premousex,premousey,premousedirection)
-        wallcontext.clearRect(0,0,600,600);
-        wallcontext.beginPath();
-        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2))
-        wallcontext.stroke();
+        stonecontext.clearRect(0,0,600,600);
+        stonecontext.beginPath();
+        stonecontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        stonecontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2))
+        stonecontext.stroke();
         premousex = xline * 600 / (LENGTH + 2);
         premousey = yline * 600 / (LENGTH + 2);
         premousedirection = 1;
     } else if ((yline*600/(LENGTH + 2))-5 <= y & y <= (yline*600/(LENGTH + 2)) + 5) {
         //横壁
-        wallcontext.strokeStyle = 'rgb(26,65,69)';
-        wallcontext.lineWidth = 8;
-        wallcontext.clearRect(0,0,600,600);
+        stonecontext.strokeStyle = 'rgb(26,65,69)';
+        stonecontext.lineWidth = 8;
+        stonecontext.clearRect(0,0,600,600);
         //preclear(premousex,premousey,premousedirection)
-        wallcontext.beginPath();
-        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        wallcontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2))
-        wallcontext.stroke();
+        stonecontext.beginPath();
+        stonecontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        stonecontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2))
+        stonecontext.stroke();
         premousex = xline * 600 / (LENGTH + 2);
         premousey = yline * 600 / (LENGTH + 2);
         premousedirection = 2;
     } else {
         //駒
-        wallcontext.strokeStyle = 'rgb(26,65,69)';
-        wallcontext.lineWidth = 8;
-        wallcontext.clearRect(0,0,600,600);
+        stonecontext.fillStyle = 'rgb(26,65,69)';
+        stonecontext.lineWidth = 8;
+        stonecontext.clearRect(0,0,600,600);
         //preclear(premousex,premousey,premousedirection)
-        wallcontext.beginPath();
-        wallcontext.arc((xline + 0.5) * 600 / (LENGTH + 2),(yline + 0.5) * 600 / (LENGTH + 2),15,0,2*Math.PI,true);
-        wallcontext.fill();
-        wallcontext.stroke();
+        stonecontext.beginPath();
+        stonecontext.arc((xline + 0.5) * 600 / (LENGTH + 2),(yline + 0.5) * 600 / (LENGTH + 2),15,0,2*Math.PI,true);
+        stonecontext.fill();
+        stonecontext.stroke();
         premousex = xline * 600 / (LENGTH + 2);
         premousey = yline * 600 / (LENGTH + 2);
         premousedirection = 0;
@@ -363,7 +358,7 @@ wallboard.addEventListener('click',(event)=>{
     if(!(myturn && gameStart)){
         return;
     }
-
+    stonecontext.clearRect(0,0,600,600);
     //石を置く，または壁を置くのどちらかを実行するようにする
     var rect = wallboard.getBoundingClientRect();
     var screenx = event.clientX-Math.floor(rect.left);
@@ -388,27 +383,46 @@ wallboard.addEventListener('click',(event)=>{
         var wx=wxy[0]-1;
         var wy=wxy[1]-1;
         
-        //既に壁があるところに置けない
+        //置けない判定
         if(mycolor==2||mycolor==4){//player 2と4が置いた壁の向きは逆だから、逆方向のwallBoardをチェック
-            if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7){
+            //横の上下2行に横壁は置けない
+            if(wy==0||wy==9){
+                console.log('cannot place on the border')
+                return;
+            }else
+            if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7||wx<0){
                 console.log('illegal placement');
+                return;
+            }else
+            //横壁が縦壁に重なる場合
+            if(wallBoardVertical[wx+1][wy-1]&&wallBoardVertical[wx+1][wy]){
+                console.log('illegal crossing placement');
                 return;
             }
         }else{
-            if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7){
+            //縦の左右2列に縦壁は置けない
+            if(wx==0||wx==9){
+                console.log('cannot place on the border');
+                return;
+            }else 
+            if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7||wy<0){
                 console.log('illegal placement');
+                return;
+            }else
+            //縦壁が横壁に重なる場合
+            if(wallBoardHorizontal[wx-1][wy+1]&&wallBoardHorizontal[wx][wy+1]){
+                console.log('illegal crossing placement');
                 return;
             }
         }
-        //壁を十字に置けない
         //石を囲むように置けない
 
-        stonecontext.lineWidth=8;
-        stonecontext.strokeStyle='rgb(18,51,54)';
-        stonecontext.beginPath();
-        stonecontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        stonecontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
-        stonecontext.stroke();
+        wallcontext.lineWidth=8;
+        wallcontext.strokeStyle='rgb(18,51,54)';
+        wallcontext.beginPath();
+        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
+        wallcontext.stroke();
         
         //置かれた壁のグローバル向きを計算し、wallboardを更新する
         if (mycolor==2 || mycolor==4){
@@ -431,9 +445,7 @@ wallboard.addEventListener('click',(event)=>{
         } else {
             changeturn(mycolor + 1);
         }
-        
-
-        
+           
     } else if ((yline*600/(LENGTH + 2))-5 <= screeny & screeny <= (yline*600/(LENGTH + 2)) + 5) {
     //横向きの壁置く　walldirection=1
         //クリックのローカル座標を用いて横壁のグローバル座標を計算
@@ -441,27 +453,48 @@ wallboard.addEventListener('click',(event)=>{
         var wx=wxy[0]-1;
         var wy=wxy[1]-1;
         
-        //既に壁があるところに置けない
+        //置けない判定
         if(mycolor==2||mycolor==4){
+            //縦の左右2列に縦壁は置けない
+            if(wx==0||wx==9){
+                console.log('cannot place on the border');
+                return;
+            }else
+            //既に壁があるところに置けない 
             if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7){
                 console.log('illegal placement');
                 return;
+            }else
+            //縦壁が横壁に重なる場合
+            if(wallBoardHorizontal[wx-1][wy+1]&&wallBoardHorizontal[wx][wy+1]){
+                console.log('illegal crossing placement');
+                return;
             }
         }else{
+            //横の上下2行に横壁は置けない
+            if(wy==0||wy==9){
+                console.log('cannot place on the border')
+                return;
+            }else
+            //既に壁があるところに置けない
             if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7){
                 console.log('illegal placement');
                 return;
-            }       
+            }else
+            //横壁が縦壁に重なる場合
+            if(wallBoardVertical[wx+1][wy-1]&&wallBoardVertical[wx+1][wy]){
+                console.log('illegal　crossing placement');
+                return;
+            }
         }
-        //壁を十字に置けない
         //石を囲むように置けない
 
-        stonecontext.lineWidth=8;
-        stonecontext.strokeStyle='rgb(18,51,54)';
-        stonecontext.beginPath();
-        stonecontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        stonecontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        stonecontext.stroke();
+        wallcontext.lineWidth=8;
+        wallcontext.strokeStyle='rgb(18,51,54)';
+        wallcontext.beginPath();
+        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        wallcontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        wallcontext.stroke();
 
         //壁の座標と色をwallに保存、サーバに送る
         wall[0]=wx;
@@ -497,9 +530,32 @@ wallboard.addEventListener('click',(event)=>{
             //遠すぎるところに置けない
             console.log('too far away');
             return;
-        }//壁を越えてはいけない
+        }
+        
+        //壁を越えてはいけない
+        if(y-nowstoneposition[mycolor].y==1){//down
+            if(wallBoardHorizontal[x][y]){
+                console.log('cannot go across the wall');
+                return;
+            }
+        }else if(y-nowstoneposition[mycolor].y==-1){//up
+            if(wallBoardHorizontal[x][y+1]){
+                console.log('cannot go across the wall');
+                return;
+            }
+        }else if(x-nowstoneposition[mycolor].x==1){//right
+            if(wallBoardVertical[x][y]){
+                console.log('cannot go across the wall');
+                return;
+            }
+        }else if(x-nowstoneposition[mycolor].x==-1){//left
+            if(wallBoardVertical[x+1][y]){
+                console.log('cannot go across the wall');
+                return;
+            }
+        }
 
-       
+
         //相手の石をジャンプ
         if(y-nowstoneposition[mycolor].y==2){
             if(stoneBoard[x][y-1]!=0){
@@ -552,7 +608,6 @@ wallboard.addEventListener('click',(event)=>{
         //上下左右一歩
         if(Math.abs(x-nowstoneposition[mycolor].x)==1&&y==nowstoneposition[mycolor].y){
             stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
-            
             stone[0]=x;
             stone[1]=y;
             stone[2]=mycolor;
@@ -560,7 +615,6 @@ wallboard.addEventListener('click',(event)=>{
             socket.emit('stone',sendInfo);
         }else if(Math.abs(y-nowstoneposition[mycolor].y)==1&&x==nowstoneposition[mycolor].x){
             stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
-            
             stone[0]=x;
             stone[1]=y;
             stone[2]=mycolor;
@@ -583,7 +637,7 @@ function stoneUpdate(xline,yline,x,y,nowpositionx,nowpositiony,mycolor){
     var previousscreeny=previousscreen[1];
     console.log('前の駒のローカル座標:',previousscreenx-1,previousscreeny-1)//index starts from 0
 
-    stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+    wallcontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
     drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
 
     console.log('新しく置いた駒のローカル座標',xline-1,yline-1)//index starts from 0
@@ -676,13 +730,13 @@ socket.on('Broadcast',(msg,previousStone)=>{
     if (msg[2]==mycolor){
         return;
     }
-    //接收global坐标，转换成local坐标
+    //グローバル座標を用いてローカル座標を計算
     var line=rotatetoscreen(msg[0]+1,msg[1]+1,mycolor);
     var xline=line[0];
     var yline=line[1];
     var color=msg[2];
 
-    //计算接收到的棋子的前一步的local坐标
+    //受け取った駒の前のローカル座標
     var previousx=nowstoneposition[color].x;
     var previousy=nowstoneposition[color].y;
     var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor)//index starts from 1
@@ -695,7 +749,7 @@ socket.on('Broadcast',(msg,previousStone)=>{
     
 
     //消去该棋子前一步位置上的棋子，然后画到新的位置上
-    stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+    wallcontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
     drawcircle((xline+0.5)*600/(LENGTH + 2),(yline+0.5)*600/(LENGTH + 2),color);
 
     stoneBoard[msg[0]][msg[1]]=color;//新しく置かれた位置に色を書き込む
@@ -775,10 +829,10 @@ socket.on('wallbroadcast',(msg)=>{
         
     }
     
-    if (color == 4){
+    if (msg[3] == 4){
         changeturn(1);
     } else {
-        changeturn(color + 1);
+        changeturn(msg[3] + 1);
     }
 })
 
@@ -852,7 +906,6 @@ function changeturn(player){
         }
     }
 }
-
 
 function register_username() {
     var username;
