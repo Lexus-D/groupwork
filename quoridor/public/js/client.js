@@ -298,6 +298,7 @@ function rotatewalltoscreen(x,y,color,wall){
     }
 }
 
+//予測位置を表示
 wallboard.addEventListener('mousemove',(e)=>{
     if(!(myturn && gameStart)){
         return;
@@ -690,23 +691,23 @@ wallboard.addEventListener('click',(event)=>{
             return;
         }
         
-        //壁を越えてはいけない判定
-        if(y-nowstoneposition[mycolor].y==1){//down
+        //壁を越えてはいけない判定(斜めに壁を超える場合はある)
+        if(y-nowstoneposition[mycolor].y==1&&x==nowstoneposition[mycolor].x){//down
             if(wallBoardHorizontal[x][y]){
                 console.log('cannot go across the wall');
                 return;
             }
-        }else if(y-nowstoneposition[mycolor].y==-1){//up
+        }else if(y-nowstoneposition[mycolor].y==-1&&x==nowstoneposition[mycolor].x){//up
             if(wallBoardHorizontal[x][y+1]){
                 console.log('cannot go across the wall');
                 return;
             }
-        }else if(x-nowstoneposition[mycolor].x==1){//right
+        }else if(x-nowstoneposition[mycolor].x==1&&y==nowstoneposition[mycolor].y){//right
             if(wallBoardVertical[x][y]){
                 console.log('cannot go across the wall');
                 return;
             }
-        }else if(x-nowstoneposition[mycolor].x==-1){//left
+        }else if(x-nowstoneposition[mycolor].x==-1&&y==nowstoneposition[mycolor].y){//left
             if(wallBoardVertical[x+1][y]){
                 console.log('cannot go across the wall');
                 return;
@@ -759,8 +760,50 @@ wallboard.addEventListener('click',(event)=>{
             console.log('illegal placement');
         }  
 
-        //斜めにいくようにする
-
+        //斜めにいく判定
+        if(x-nowstoneposition[mycolor].x==1&&y-nowstoneposition[mycolor].y==-1){
+            //右上
+            if((wallBoardHorizontal[x-1][y]&&!wallBoardVertical[x][y]&&stoneBoard[x-1][y]!=0)||(wallBoardVertical[x+1][y+1]&&!wallBoardHorizontal[x][y+1]&&stoneBoard[x][y+1]!=0)){
+                stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
+                stone[0]=x;
+                stone[1]=y;
+                stone[2]=mycolor;
+                console.log('send',sendInfo.stone);
+                socket.emit('stone',sendInfo);
+            }
+        }else if(x-nowstoneposition[mycolor].x==1&&y-nowstoneposition[mycolor].y==1){
+            //右下
+            if((wallBoardHorizontal[x-1][y+1]&&!wallBoardVertical[x][y]&&stoneBoard[x-1][y]!=0)||(wallBoardVertical[x+1][y-1]&&!wallBoardHorizontal[x][y]&&stoneBoard[x][y-1]!=0)){
+                stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
+                stone[0]=x;
+                stone[1]=y;
+                stone[2]=mycolor;
+                console.log('send',sendInfo.stone);
+                socket.emit('stone',sendInfo);
+            }
+        }else if(x-nowstoneposition[mycolor].x==-1&&y-nowstoneposition[mycolor].y==1){
+            //左下
+            if((wallBoardHorizontal[x+1][y+1]&&!wallBoardVertical[x+1][y]&&stoneBoard[x+1][y]!=0)||(wallBoardVertical[x][y-1]&&!wallBoardHorizontal[x][y]&&stoneBoard[x][y-1]!=0)){
+                stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
+                stone[0]=x;
+                stone[1]=y;
+                stone[2]=mycolor;
+                console.log('send',sendInfo.stone);
+                socket.emit('stone',sendInfo);
+            }
+        }else if(x-nowstoneposition[mycolor].x==-1&&y-nowstoneposition[mycolor].y==-1){
+            //左上
+            if((wallBoardHorizontal[x+1][y]&&!wallBoardVertical[x+1][y]&&stoneBoard[x+1][y]!=0)||(wallBoardVertical[x][y+1]&&!wallBoardHorizontal[x][y+1]&&stoneBoard[x][y+1]!=0)){
+                stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
+                stone[0]=x;
+                stone[1]=y;
+                stone[2]=mycolor;
+                console.log('send',sendInfo.stone);
+                socket.emit('stone',sendInfo);
+            }
+        }else{
+            console.log('illegal diagonal placement')
+        }
         
         //上下左右一歩
         if(Math.abs(x-nowstoneposition[mycolor].x)==1&&y==nowstoneposition[mycolor].y){
@@ -777,8 +820,6 @@ wallboard.addEventListener('click',(event)=>{
             stone[2]=mycolor;
             console.log('send',sendInfo.stone);
             socket.emit('stone',sendInfo);
-        }else{
-            console.log('illegal placement');
         }
     }
 });
