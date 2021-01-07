@@ -11,6 +11,8 @@ var turn = document.getElementById('turn');
 var reset = document.getElementById('reset');
 var wallcontext = wallboard.getContext('2d')
 
+var stoneColor = {1:"rgb(245,128,120)",2:"rgb(120,130,245)",3:"rgb(120,245,143)",4:"rgb(245,234,120)"};
+
 var LENGTH = 9; //盤面の大きさ
 
 var myturn = 0;//初期カラーが黒なら1白なら0
@@ -492,10 +494,8 @@ wallboard.addEventListener('click',(event)=>{
     var x= xy[0]-1;
     var y= xy[1]-1;
     
-    
+    //縦向きの壁置 walldirection=0
     if ((xline*600/(LENGTH + 2))-5 <= screenx & screenx <= (xline*600/(LENGTH + 2)) + 5 ){
-        //縦向きの壁置 walldirection=0
-        
         //クリックのローカル座標を用いて縦壁のグローバル座標を計算
         var wxy=rotatewallfromscreen(xline,yline,mycolor,0);
         var wx=wxy[0]-1;
@@ -564,8 +564,10 @@ wallboard.addEventListener('click',(event)=>{
             changeturn(mycolor + 1);
         }
            
-    } else if ((yline*600/(LENGTH + 2))-5 <= screeny & screeny <= (yline*600/(LENGTH + 2)) + 5) {
+    } else 
     //横向きの壁置く　walldirection=1
+    if ((yline*600/(LENGTH + 2))-5 <= screeny & screeny <= (yline*600/(LENGTH + 2)) + 5) {
+    
         //クリックのローカル座標を用いて横壁のグローバル座標を計算
         var wxy=rotatewallfromscreen(xline,yline,mycolor,1);
         var wx=wxy[0]-1;
@@ -637,9 +639,8 @@ wallboard.addEventListener('click',(event)=>{
         } 
         
         
-    } else {
-        //石を置く
-              
+    } else //石を置く  
+     {     
         if(stoneBoard[x][y]!=0){
             //石のあるところに置けないようにする
             console.log('occupied position');
@@ -650,7 +651,7 @@ wallboard.addEventListener('click',(event)=>{
             return;
         }
         
-        //壁を越えてはいけない
+        //壁を越えてはいけない判定
         if(y-nowstoneposition[mycolor].y==1){//down
             if(wallBoardHorizontal[x][y]){
                 console.log('cannot go across the wall');
@@ -673,10 +674,9 @@ wallboard.addEventListener('click',(event)=>{
             }
         }
 
-
         //相手の石をジャンプ
         if(y-nowstoneposition[mycolor].y==2){
-            if(stoneBoard[x][y-1]!=0){
+            if(stoneBoard[x][y-1]!=0&&!wallBoardHorizontal[x][y]){
                 //下にある相手の駒をジャンプして移動する
                 stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
                 //新しく置かれた石の情報を送る
@@ -687,10 +687,9 @@ wallboard.addEventListener('click',(event)=>{
                 socket.emit('stone',sendInfo);
             }
         }else if(y-nowstoneposition[mycolor].y==-2){
-            if(stoneBoard[x][y+1]!=0){
+            if(stoneBoard[x][y+1]!=0&&!wallBoardHorizontal[x][y+1]){
                 //上にある相手の駒をジャンプして移動する
                 stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
-                
                 stone[0]=x;
                 stone[1]=y;
                 stone[2]=mycolor;
@@ -698,10 +697,9 @@ wallboard.addEventListener('click',(event)=>{
                 socket.emit('stone',sendInfo);
             }
         }else if(x-nowstoneposition[mycolor].x==2){
-            if(stoneBoard[x-1][y]!=0){
+            if(stoneBoard[x-1][y]!=0&&!wallBoardVertical[x][y]){
                 //右にある相手の駒をジャンプして移動する
                 stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
-                
                 stone[0]=x;
                 stone[1]=y;
                 stone[2]=mycolor;
@@ -709,10 +707,9 @@ wallboard.addEventListener('click',(event)=>{
                 socket.emit('stone',sendInfo);
             }
         }else if(x-nowstoneposition[mycolor].x==-2){
-            if(stoneBoard[x+1][y]!=0){
+            if(stoneBoard[x+1][y]!=0&&!wallBoardVertical[x+1][y]){
                 //左にある相手の駒をジャンプして移動する
                 stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
-                
                 stone[0]=x;
                 stone[1]=y;
                 stone[2]=mycolor;
@@ -723,6 +720,9 @@ wallboard.addEventListener('click',(event)=>{
             console.log('illegal placement');
         }  
 
+        //斜めにいくようにする
+
+        
         //上下左右一歩
         if(Math.abs(x-nowstoneposition[mycolor].x)==1&&y==nowstoneposition[mycolor].y){
             stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
@@ -979,12 +979,12 @@ socket.on('gameover',function (data) {
 })
 
 // ユーザーネームの表示
-// TODO: どの色がどのユーザーか分かるようにする
+// TODO: 文字の色と背景の色によって文字が見づらいため色の調整をする．残りの壁の枚数の表示．
 socket.on("display_username",(username)=>{
     var displayName = "";
     for(var i = 1; i <= 4; i++){
         if(username[roomNumber][i]){
-            displayName += username[roomNumber][i] + "<br>";
+            displayName +=  "<span style=color:" +stoneColor[i]+ ">" + username[roomNumber][i] + "</span>"+"<br>";
         }
     }
     document.getElementById("display_username").innerHTML = displayName;
@@ -1030,4 +1030,5 @@ function register_username() {
     username = document.getElementById("username").value;
     registerName = {"roomNumber":roomNumber,"color":mycolor,"username":username};
     socket.emit("register_username",registerName);
+    return false;
 }
