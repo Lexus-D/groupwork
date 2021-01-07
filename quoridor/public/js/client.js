@@ -454,19 +454,56 @@ wallboard.addEventListener('mousemove',(e)=>{
                 return;
             }
         }
-        stonecontext.fillStyle = 'rgb(26,65,69)';
-        stonecontext.lineWidth = 1;
-        stonecontext.clearRect(0,0,600,600);
-        //preclear(premousex,premousey,premousedirection)
-        stonecontext.beginPath();
-        stonecontext.arc((xline + 0.5) * 600 / (LENGTH + 2),(yline + 0.5) * 600 / (LENGTH + 2),15,0,2*Math.PI,true);
-        stonecontext.fill();
-        stonecontext.stroke();
-        premousex = xline * 600 / (LENGTH + 2);
-        premousey = yline * 600 / (LENGTH + 2);
-        premousedirection = 0;
+
+        //相手の石をジャンプ
+        if(y-nowstoneposition[mycolor].y==2){
+            if(stoneBoard[x][y-1]!=0&&!wallBoardHorizontal[x][y]){
+                //下にある相手の駒をジャンプして移動する
+                predictStone(xline,yline)
+            }
+        }else if(y-nowstoneposition[mycolor].y==-2){
+            if(stoneBoard[x][y+1]!=0&&!wallBoardHorizontal[x][y+1]){
+                //上にある相手の駒をジャンプして移動する
+                predictStone(xline,yline)
+            }
+        }else if(x-nowstoneposition[mycolor].x==2){
+            if(stoneBoard[x-1][y]!=0&&!wallBoardVertical[x][y]){
+                //右にある相手の駒をジャンプして移動する
+                predictStone(xline,yline)
+            }
+        }else if(x-nowstoneposition[mycolor].x==-2){
+            if(stoneBoard[x+1][y]!=0&&!wallBoardVertical[x+1][y]){
+                //左にある相手の駒をジャンプして移動する
+                predictStone(xline,yline)
+            }
+        }else{
+            console.log('illegal placement');
+        }
+        
+        //上下左右一歩
+        if(Math.abs(x-nowstoneposition[mycolor].x)==1&&y==nowstoneposition[mycolor].y){
+            predictStone(xline,yline)
+        }else if(Math.abs(y-nowstoneposition[mycolor].y)==1&&x==nowstoneposition[mycolor].x){
+            predictStone(xline,yline)
+        }else{
+            console.log('illegal placement');
+        }
     }
 })
+
+function predictStone(xline,yline){
+    stonecontext.fillStyle = 'rgb(26,65,69)';
+    stonecontext.lineWidth = 1;
+    stonecontext.clearRect(0,0,600,600);
+    //preclear(premousex,premousey,premousedirection)
+    stonecontext.beginPath();
+    stonecontext.arc((xline + 0.5) * 600 / (LENGTH + 2),(yline + 0.5) * 600 / (LENGTH + 2),15,0,2*Math.PI,true);
+    stonecontext.fill();
+    stonecontext.stroke();
+    premousex = xline * 600 / (LENGTH + 2);
+    premousey = yline * 600 / (LENGTH + 2);
+    premousedirection = 0;
+}
 
 wallboard.addEventListener('click',(event)=>{
 
