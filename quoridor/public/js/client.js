@@ -11,6 +11,8 @@ var turn = document.getElementById('turn');
 var reset = document.getElementById('reset');
 var wallcontext = wallboard.getContext('2d')
 
+var stoneColor = {1:"rgb(245,128,120)",2:"rgb(120,130,245)",3:"rgb(120,245,143)",4:"rgb(245,234,120)"};
+
 var LENGTH = 9; //盤面の大きさ
 
 var myturn = 0;//初期カラーが黒なら1白なら0
@@ -857,12 +859,12 @@ socket.on('gameover',function (data) {
 })
 
 // ユーザーネームの表示
-// TODO: どの色がどのユーザーか分かるようにする
+// TODO: 文字の色と背景の色によって文字が見づらいため色の調整をする．残りの壁の枚数の表示．
 socket.on("display_username",(username)=>{
     var displayName = "";
     for(var i = 1; i <= 4; i++){
         if(username[roomNumber][i]){
-            displayName += username[roomNumber][i] + "<br>";
+            displayName +=  "<span style=color:" +stoneColor[i]+ ">" + username[roomNumber][i] + "</span>"+"<br>";
         }
     }
     document.getElementById("display_username").innerHTML = displayName;
@@ -908,4 +910,5 @@ function register_username() {
     username = document.getElementById("username").value;
     registerName = {"roomNumber":roomNumber,"color":mycolor,"username":username};
     socket.emit("register_username",registerName);
+    return false;
 }
