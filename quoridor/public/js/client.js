@@ -493,30 +493,29 @@ wallboard.addEventListener('click',(event)=>{
         }
         
         //壁を越えてはいけない
-        if(y-nowstoneposition[mycolor].y==1){
-            if(wallBoardHorizontal[x][y+1]){
-                console.log('cannot go across the wall');
-                return;
-            }
-        }else if(y-nowstoneposition[mycolor].y==-1){
+        if(y-nowstoneposition[mycolor].y==1){//down
             if(wallBoardHorizontal[x][y]){
                 console.log('cannot go across the wall');
                 return;
             }
-        }else if(x-nowstoneposition[mycolor].x==1){
-            if(wallBoardVertical[x+1][y]){
+        }else if(y-nowstoneposition[mycolor].y==-1){//up
+            if(wallBoardHorizontal[x][y+1]){
                 console.log('cannot go across the wall');
                 return;
             }
-        }else if(x-nowstoneposition[mycolor].x==-1){
+        }else if(x-nowstoneposition[mycolor].x==1){//right
             if(wallBoardVertical[x][y]){
+                console.log('cannot go across the wall');
+                return;
+            }
+        }else if(x-nowstoneposition[mycolor].x==-1){//left
+            if(wallBoardVertical[x+1][y]){
                 console.log('cannot go across the wall');
                 return;
             }
         }
 
 
-       
         //相手の石をジャンプ
         if(y-nowstoneposition[mycolor].y==2){
             if(stoneBoard[x][y-1]!=0){
