@@ -310,7 +310,7 @@ wallboard.addEventListener('mousemove',(e)=>{
     
     var wallcontext = wallboard.getContext('2d');
     if((xline*600/(LENGTH + 2))-5<=x & x<=(xline*600/(LENGTH + 2))+5) {
-        if (premousex == xline * 600 / (LENGTH + 2) & premousey == yline * 600 / (LENGTH + 2) & premousedirection != 1) {
+        if (premousex == xline * 600 / (LENGTH + 2) & premousey == yline * 600 / (LENGTH + 2) & premousedirection == 1) {
             return;
         }
         var wxy=rotatewallfromscreen(xline,yline,mycolor,0);
@@ -362,7 +362,7 @@ wallboard.addEventListener('mousemove',(e)=>{
         premousedirection = 1;
     } else if ((yline*600/(LENGTH + 2))-5 <= y & y <= (yline*600/(LENGTH + 2)) + 5) {
         //横壁
-        if (premousex == xline * 600 / (LENGTH + 2) & premousey == yline * 600 / (LENGTH + 2) & premousedirection != 2) {
+        if (premousex == xline * 600 / (LENGTH + 2) & premousey == yline * 600 / (LENGTH + 2) & premousedirection == 2) {
             return;
         }
         var wxy=rotatewallfromscreen(xline,yline,mycolor,1);
@@ -416,7 +416,7 @@ wallboard.addEventListener('mousemove',(e)=>{
         premousedirection = 2;
     } else {
         //駒
-        if (premousex == xline * 600 / (LENGTH + 2) & premousey == yline * 600 / (LENGTH + 2) & premousedirection != 0) {
+        if (premousex == xline * 600 / (LENGTH + 2) & premousey == yline * 600 / (LENGTH + 2) & premousedirection == 0) {
             return;
         }
         var xy = rotatefromscreen(xline,yline,mycolor);
