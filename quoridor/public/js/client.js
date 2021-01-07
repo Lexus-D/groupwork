@@ -109,18 +109,18 @@ for(let i=1;i<=LENGTH + 1;i++){
 var stonecontext=stoneboard.getContext('2d');
 function　drawcircle(x,y,color){
     if (color == 1) {
-        stonecontext.fillStyle="rgb(245,128,120)";// 赤
+        wallcontext.fillStyle="rgb(245,128,120)";// 赤
     } else if (color == 2) {
-        stonecontext.fillStyle="rgb(120,130,245)";// 青
+        wallcontext.fillStyle="rgb(120,130,245)";// 青
     } else if (color == 3) {
-        stonecontext.fillStyle="rgb(120,245,143)";// 緑
+        wallcontext.fillStyle="rgb(120,245,143)";// 緑
     } else if (color == 4) {
-        stonecontext.fillStyle="rgb(245,234,120)"; // 黄
+        wallcontext.fillStyle="rgb(245,234,120)"; // 黄
     }
-    stonecontext.beginPath();
-    stonecontext.arc(x,y,15,0,2*Math.PI,true);
-    stonecontext.fill();
-    stonecontext.stroke();
+    wallcontext.beginPath();
+    wallcontext.arc(x,y,15,0,2*Math.PI,true);
+    wallcontext.fill();
+    wallcontext.stroke();
 }
 
 function drawuprect(color) {
@@ -305,40 +305,40 @@ wallboard.addEventListener('mousemove',(e)=>{
     var yline = Math.floor((y+5)*(LENGTH + 2)/600);
     var wallcontext = wallboard.getContext('2d');
     if((xline*600/(LENGTH + 2))-5<=x & x<=(xline*600/(LENGTH + 2))+5) {
-        wallcontext.strokeStyle = 'rgb(26,65,69)';
-        wallcontext.lineWidth = 8;
+        stonecontext.strokeStyle = 'rgb(26,65,69)';
+        stonecontext.lineWidth = 8;
         //preclear(premousex,premousey,premousedirection)
-        wallcontext.clearRect(0,0,600,600);
-        wallcontext.beginPath();
-        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2))
-        wallcontext.stroke();
+        stonecontext.clearRect(0,0,600,600);
+        stonecontext.beginPath();
+        stonecontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        stonecontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2))
+        stonecontext.stroke();
         premousex = xline * 600 / (LENGTH + 2);
         premousey = yline * 600 / (LENGTH + 2);
         premousedirection = 1;
     } else if ((yline*600/(LENGTH + 2))-5 <= y & y <= (yline*600/(LENGTH + 2)) + 5) {
         //横壁
-        wallcontext.strokeStyle = 'rgb(26,65,69)';
-        wallcontext.lineWidth = 8;
-        wallcontext.clearRect(0,0,600,600);
+        stonecontext.strokeStyle = 'rgb(26,65,69)';
+        stonecontext.lineWidth = 8;
+        stonecontext.clearRect(0,0,600,600);
         //preclear(premousex,premousey,premousedirection)
-        wallcontext.beginPath();
-        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        wallcontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2))
-        wallcontext.stroke();
+        stonecontext.beginPath();
+        stonecontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        stonecontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2))
+        stonecontext.stroke();
         premousex = xline * 600 / (LENGTH + 2);
         premousey = yline * 600 / (LENGTH + 2);
         premousedirection = 2;
     } else {
         //駒
-        wallcontext.strokeStyle = 'rgb(26,65,69)';
-        wallcontext.lineWidth = 8;
-        wallcontext.clearRect(0,0,600,600);
+        stonecontext.fillStyle = 'rgb(26,65,69)';
+        stonecontext.lineWidth = 8;
+        stonecontext.clearRect(0,0,600,600);
         //preclear(premousex,premousey,premousedirection)
-        wallcontext.beginPath();
-        wallcontext.arc((xline + 0.5) * 600 / (LENGTH + 2),(yline + 0.5) * 600 / (LENGTH + 2),15,0,2*Math.PI,true);
-        wallcontext.fill();
-        wallcontext.stroke();
+        stonecontext.beginPath();
+        stonecontext.arc((xline + 0.5) * 600 / (LENGTH + 2),(yline + 0.5) * 600 / (LENGTH + 2),15,0,2*Math.PI,true);
+        stonecontext.fill();
+        stonecontext.stroke();
         premousex = xline * 600 / (LENGTH + 2);
         premousey = yline * 600 / (LENGTH + 2);
         premousedirection = 0;
@@ -356,7 +356,7 @@ wallboard.addEventListener('click',(event)=>{
     if(!(myturn && gameStart)){
         return;
     }
-    wallcontext.clearRect(0,0,600,600);
+    stonecontext.clearRect(0,0,600,600);
     //石を置く，または壁を置くのどちらかを実行するようにする
     var rect = wallboard.getBoundingClientRect();
     var screenx = event.clientX-Math.floor(rect.left);
@@ -415,12 +415,12 @@ wallboard.addEventListener('click',(event)=>{
         }
         //石を囲むように置けない
 
-        stonecontext.lineWidth=8;
-        stonecontext.strokeStyle='rgb(18,51,54)';
-        stonecontext.beginPath();
-        stonecontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        stonecontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
-        stonecontext.stroke();
+        wallcontext.lineWidth=8;
+        wallcontext.strokeStyle='rgb(18,51,54)';
+        wallcontext.beginPath();
+        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
+        wallcontext.stroke();
         
         //置かれた壁のグローバル向きを計算し、wallboardを更新する
         if (mycolor==2 || mycolor==4){
@@ -487,12 +487,12 @@ wallboard.addEventListener('click',(event)=>{
         }
         //石を囲むように置けない
 
-        stonecontext.lineWidth=8;
-        stonecontext.strokeStyle='rgb(18,51,54)';
-        stonecontext.beginPath();
-        stonecontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        stonecontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
-        stonecontext.stroke();
+        wallcontext.lineWidth=8;
+        wallcontext.strokeStyle='rgb(18,51,54)';
+        wallcontext.beginPath();
+        wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        wallcontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
+        wallcontext.stroke();
 
         //壁の座標と色をwallに保存、サーバに送る
         wall[0]=wx;
@@ -635,7 +635,7 @@ function stoneUpdate(xline,yline,x,y,nowpositionx,nowpositiony,mycolor){
     var previousscreeny=previousscreen[1];
     console.log('前の駒のローカル座標:',previousscreenx-1,previousscreeny-1)//index starts from 0
 
-    stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+    wallcontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
     drawcircle((xline + 0.5)*600/(LENGTH + 2),(yline + 0.5)*600/(LENGTH + 2),mycolor)
 
     console.log('新しく置いた駒のローカル座標',xline-1,yline-1)//index starts from 0
@@ -746,8 +746,8 @@ socket.on('Broadcast',(msg,previousStone)=>{
     console.log('色:',color,'の駒の現在のlocal座標',xline-1,yline-1)//index starts from 0
     
 
-    //前の位置にある駒を消し、新しい位置に置く
-    stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
+    //消去该棋子前一步位置上的棋子，然后画到新的位置上
+    wallcontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
     drawcircle((xline+0.5)*600/(LENGTH + 2),(yline+0.5)*600/(LENGTH + 2),color);
 
     stoneBoard[msg[0]][msg[1]]=color;//新しく置かれた位置に色を書き込む
