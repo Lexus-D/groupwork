@@ -9,10 +9,7 @@ var stoneboard = document.getElementById('stoneboard');
 var wallboard = document.getElementById('wallboard');
 var turn = document.getElementById('turn');
 var reset = document.getElementById('reset');
-
 var wallcontext = wallboard.getContext('2d')
-
-
 
 var LENGTH = 9; //盤面の大きさ
 
@@ -78,9 +75,6 @@ window.onload = () =>{
     imgcontext.stroke();
     imgcontext.fill();
 };
-
-
-
 
 const width = imageboard.clientWidth;
 const height = imageboard.clientHeight;
@@ -401,6 +395,7 @@ wallboard.addEventListener('click',(event)=>{
             }
         }
         //壁を十字に置けない
+
         //石を囲むように置けない
 
         stonecontext.lineWidth=8;
@@ -431,9 +426,7 @@ wallboard.addEventListener('click',(event)=>{
         } else {
             changeturn(mycolor + 1);
         }
-        
-
-        
+           
     } else if ((yline*600/(LENGTH + 2))-5 <= screeny & screeny <= (yline*600/(LENGTH + 2)) + 5) {
     //横向きの壁置く　walldirection=1
         //クリックのローカル座標を用いて横壁のグローバル座標を計算
@@ -497,7 +490,31 @@ wallboard.addEventListener('click',(event)=>{
             //遠すぎるところに置けない
             console.log('too far away');
             return;
-        }//壁を越えてはいけない
+        }
+        
+        //壁を越えてはいけない
+        if(y-nowstoneposition[mycolor].y==1){
+            if(wallBoardHorizontal[x][y+1]){
+                console.log('cannot go across the wall');
+                return;
+            }
+        }else if(y-nowstoneposition[mycolor].y==-1){
+            if(wallBoardHorizontal[x][y]){
+                console.log('cannot go across the wall');
+                return;
+            }
+        }else if(x-nowstoneposition[mycolor].x==1){
+            if(wallBoardVertical[x+1][y]){
+                console.log('cannot go across the wall');
+                return;
+            }
+        }else if(x-nowstoneposition[mycolor].x==-1){
+            if(wallBoardVertical[x][y]){
+                console.log('cannot go across the wall');
+                return;
+            }
+        }
+
 
        
         //相手の石をジャンプ
@@ -552,7 +569,6 @@ wallboard.addEventListener('click',(event)=>{
         //上下左右一歩
         if(Math.abs(x-nowstoneposition[mycolor].x)==1&&y==nowstoneposition[mycolor].y){
             stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
-            
             stone[0]=x;
             stone[1]=y;
             stone[2]=mycolor;
@@ -560,7 +576,6 @@ wallboard.addEventListener('click',(event)=>{
             socket.emit('stone',sendInfo);
         }else if(Math.abs(y-nowstoneposition[mycolor].y)==1&&x==nowstoneposition[mycolor].x){
             stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
-            
             stone[0]=x;
             stone[1]=y;
             stone[2]=mycolor;
@@ -676,13 +691,13 @@ socket.on('Broadcast',(msg,previousStone)=>{
     if (msg[2]==mycolor){
         return;
     }
-    //接收global坐标，转换成local坐标
+    //グローバル座標を用いてローカル座標を計算
     var line=rotatetoscreen(msg[0]+1,msg[1]+1,mycolor);
     var xline=line[0];
     var yline=line[1];
     var color=msg[2];
 
-    //计算接收到的棋子的前一步的local坐标
+    //受け取った駒の前のローカル座標
     var previousx=nowstoneposition[color].x;
     var previousy=nowstoneposition[color].y;
     var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor)//index starts from 1
@@ -694,7 +709,7 @@ socket.on('Broadcast',(msg,previousStone)=>{
     console.log('色:',color,'の駒の現在のlocal座標',xline-1,yline-1)//index starts from 0
     
 
-    //消去该棋子前一步位置上的棋子，然后画到新的位置上
+    //前の位置にある駒を消し、新しい位置に置く
     stonecontext.clearRect((previousscreenx)*600/(LENGTH + 2),(previousscreeny)*600/(LENGTH + 2),600/(LENGTH + 2),600/(LENGTH +2))
     drawcircle((xline+0.5)*600/(LENGTH + 2),(yline+0.5)*600/(LENGTH + 2),color);
 
@@ -852,7 +867,6 @@ function changeturn(player){
         }
     }
 }
-
 
 function register_username() {
     var username;

@@ -141,7 +141,7 @@ io.on('connection',socket=>{
             }
         }
         stoneBoard[putStone.room][x][y]=color;
-        console.log(stoneBoard[putStone.room]);
+        //console.log(stoneBoard[putStone.room]);
         io.to(putStone.room).emit('Broadcast',putStone.stone,previousStone[putStone.room]);
 
         // ↓勝利条件を満たしているかを判断する関数
