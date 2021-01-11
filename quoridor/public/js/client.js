@@ -300,7 +300,6 @@ function rotatewalltoscreen(x,y,color,wall){
     }
 }
 
-/*
 function searchDepthFirst(color,x,y,routeFind){
     roadSign[x][y]=1;
     // x,yが範囲外に出たら行き止まり
@@ -336,7 +335,7 @@ function searchDepthFirst(color,x,y,routeFind){
         return 0;
     }
 }
-*/
+
 
 //予測位置を表示
 wallboard.addEventListener('mousemove',(e)=>{
