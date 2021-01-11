@@ -576,7 +576,7 @@ wallboard.addEventListener('click',(event)=>{
         //石を囲むように置けない
 
         wallcontext.lineWidth=8;
-        wallcontext.strokeStyle='rgb(18,51,54)';
+        wallcontext.strokeStyle='rgb(115, 52, 33)';
         wallcontext.beginPath();
         wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
         wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
@@ -650,7 +650,7 @@ wallboard.addEventListener('click',(event)=>{
         //石を囲むように置けない
 
         wallcontext.lineWidth=8;
-        wallcontext.strokeStyle='rgb(18,51,54)';
+        wallcontext.strokeStyle='rgb(115, 52, 33)';
         wallcontext.beginPath();
         wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
         wallcontext.lineTo((xline+2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
@@ -990,7 +990,7 @@ socket.on('wallbroadcast',(msg)=>{
         wallBoardVertical[msg[0]][msg[1]+1]=true;
     }
 
-    
+    wallcontext.strokeStyle="rgb(115, 52, 33)"
     if (wallDirection){
         if (mycolor==2 || mycolor==4){
             console.log('縦壁のローカル座標:(',xline-1,yline-1,')(',xline-1,yline,')')//index starts from 0
