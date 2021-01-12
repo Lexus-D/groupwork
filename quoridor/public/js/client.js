@@ -50,10 +50,10 @@ for(var i=0;i<LENGTH;i++){
 }
 
 // 壁用のボード  基準
-for(var i=0;i<=LENGTH;i++){
+for(var i=0;i<LENGTH;i++){
     wallBoardVertical[i]=[];
     wallBoardHorizontal[i]=[];
-    for(var j=0;j<=LENGTH;j++){
+    for(var j=0;j<LENGTH;j++){
         wallBoardVertical[i][j]=false;
         wallBoardHorizontal[i][j]=false;
     }
@@ -299,6 +299,7 @@ function rotatewalltoscreen(x,y,color,wall){
         }
     }
 }
+
 function searchDepthFirst(color,x,y,routeFind){
     roadSign[x][y]=1;
     // x,yが範囲外に出たら行き止まり
@@ -335,6 +336,7 @@ function searchDepthFirst(color,x,y,routeFind){
     }
 }
 
+
 //予測位置を表示
 wallboard.addEventListener('mousemove',(e)=>{
     if(!(myturn && gameStart)){
@@ -359,31 +361,31 @@ wallboard.addEventListener('mousemove',(e)=>{
         if(mycolor==2||mycolor==4){//player 2と4が置いた壁の向きは逆だから、逆方向のwallBoardをチェック
             //横の上下2行に横壁は置けない
             if(wy==0||wy==9){
-                console.log('cannot place on the border')
+                //console.log('cannot place on the border')
                 return;
             }else
             if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7||wx<0){
-                console.log('illegal placement');
+                //console.log('illegal placement');
                 return;
             }else
             //横壁が縦壁に重なる場合
             if(wallBoardVertical[wx+1][wy-1]&&wallBoardVertical[wx+1][wy]){
-                console.log('illegal crossing placement');
+                //.log('illegal crossing placement');
                 return;
             }
         }else{
             //縦の左右2列に縦壁は置けない
             if(wx==0||wx==9){
-                console.log('cannot place on the border');
+                //console.log('cannot place on the border');
                 return;
             }else 
             if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7||wy<0){
-                console.log('illegal placement');
+                //console.log('illegal placement');
                 return;
             }else
             //縦壁が横壁に重なる場合
             if(wallBoardHorizontal[wx-1][wy+1]&&wallBoardHorizontal[wx][wy+1]){
-                console.log('illegal crossing placement');
+                //console.log('illegal crossing placement');
                 return;
             }
         }
@@ -411,33 +413,33 @@ wallboard.addEventListener('mousemove',(e)=>{
         if(mycolor==2||mycolor==4){
             //縦の左右2列に縦壁は置けない
             if(wx==0||wx==9){
-                console.log('cannot place on the border');
+                //console.log('cannot place on the border');
                 return;
             }else
             //既に壁があるところに置けない 
             if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7){
-                console.log('illegal placement');
+                //console.log('illegal placement');
                 return;
             }else
             //縦壁が横壁に重なる場合
             if(wallBoardHorizontal[wx-1][wy+1]&&wallBoardHorizontal[wx][wy+1]){
-                console.log('illegal crossing placement');
+                //console.log('illegal crossing placement');
                 return;
             }
         }else{
             //横の上下2行に横壁は置けない
             if(wy==0||wy==9){
-                console.log('cannot place on the border')
+                //console.log('cannot place on the border')
                 return;
             }else
             //既に壁があるところに置けない
             if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7){
-                console.log('illegal placement');
+                //console.log('illegal placement');
                 return;
             }else
             //横壁が縦壁に重なる場合
             if(wallBoardVertical[wx+1][wy-1]&&wallBoardVertical[wx+1][wy]){
-                console.log('illegal　crossing placement');
+                //console.log('illegal　crossing placement');
                 return;
             }
         }
@@ -462,33 +464,33 @@ wallboard.addEventListener('mousemove',(e)=>{
         var y= xy[1]-1;
         if(stoneBoard[x][y]!=0){
             //石のあるところに置けないようにする
-            console.log('occupied position');
+            //console.log('occupied position');
             return;
         }else if(Math.abs(x-nowstoneposition[mycolor].x)>2||Math.abs(y-nowstoneposition[mycolor].y)>2){           
             //遠すぎるところに置けない
-            console.log('too far away');
+            //console.log('too far away');
             return;
         }
         
         //壁を越えてはいけない
         if(y-nowstoneposition[mycolor].y==1){//down
             if(wallBoardHorizontal[x][y]){
-                console.log('cannot go across the wall');
+                //console.log('cannot go across the wall');
                 return;
             }
         }else if(y-nowstoneposition[mycolor].y==-1){//up
             if(wallBoardHorizontal[x][y+1]){
-                console.log('cannot go across the wall');
+                //console.log('cannot go across the wall');
                 return;
             }
         }else if(x-nowstoneposition[mycolor].x==1){//right
             if(wallBoardVertical[x][y]){
-                console.log('cannot go across the wall');
+                //console.log('cannot go across the wall');
                 return;
             }
         }else if(x-nowstoneposition[mycolor].x==-1){//left
             if(wallBoardVertical[x+1][y]){
-                console.log('cannot go across the wall');
+                //console.log('cannot go across the wall');
                 return;
             }
         }
@@ -515,7 +517,7 @@ wallboard.addEventListener('mousemove',(e)=>{
                 predictStone(xline,yline)
             }
         }else{
-            console.log('illegal placement');
+            //console.log('illegal placement');
         }
         
         //上下左右一歩
@@ -524,7 +526,7 @@ wallboard.addEventListener('mousemove',(e)=>{
         }else if(Math.abs(y-nowstoneposition[mycolor].y)==1&&x==nowstoneposition[mycolor].x){
             predictStone(xline,yline)
         }else{
-            console.log('illegal placement');
+            //console.log('illegal placement');
         }
     }
 })
@@ -611,6 +613,20 @@ wallboard.addEventListener('click',(event)=>{
             }
         }
         //石を囲むように置けない
+        //仮配列を用意
+        var temporaryWallBoardVertical=deepCopy(wallBoardVertical)
+        var temporaryWallBoardHorizontal=deepCopy(wallBoardHorizontal)
+        var temporaryNowstoneposition=nowstoneposition;
+        if (mycolor==2 || mycolor==4){
+            temporaryWallBoardHorizontal[wx][wy]=true;
+            temporaryWallBoardHorizontal[wx+1][wy]=true;
+        } else {
+            temporaryWallBoardVertical[wx][wy]=true;
+            temporaryWallBoardVertical[wx][wy+1]=true;
+        }
+        if(!checkgraph(LENGTH,temporaryNowstoneposition,temporaryWallBoardHorizontal,temporaryWallBoardVertical)){
+            console.log('駒を囲むように置けない');
+            return
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
 
         //壁を置けたとする
@@ -697,12 +713,12 @@ wallboard.addEventListener('click',(event)=>{
                 return;
             }else
             //既に壁があるところに置けない 
-            if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7){
+            if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7||wy<0){
                 console.log('illegal placement');
                 return;
             }else
             //縦壁が横壁に重なる場合
-            if(wallBoardHorizontal[wx-1][wy+1]&&wallBoardHorizontal[wx][wy+1]){
+            if(wallBoardHorizontal[wx-1][wy+1]&&wallBoardHorizontal[wx][wy+1]||wx>7||wx<0){
                 console.log('illegal crossing placement');
                 return;
             }
@@ -713,18 +729,35 @@ wallboard.addEventListener('click',(event)=>{
                 return;
             }else
             //既に壁があるところに置けない
-            if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7){
+            if(wallBoardHorizontal[wx][wy]||wallBoardHorizontal[wx+1][wy]||wx>7||wx<0){
                 console.log('illegal placement');
                 return;
             }else
             //横壁が縦壁に重なる場合
-            if(wallBoardVertical[wx+1][wy-1]&&wallBoardVertical[wx+1][wy]){
+            if(wallBoardVertical[wx+1][wy-1]&&wallBoardVertical[wx+1][wy]||wy>7||wy<0){
                 console.log('illegal　crossing placement');
                 return;
             }
         }
         //石を囲むように置けない
-
+        
+        //仮配列を用意
+        //(JSの特性によって、deepCopyを使わないと仮配列は元の配列と同じメモリーアドレスにアクセスするため、仮配列の意味がなくなる)
+        var temporaryWallBoardVertical=deepCopy(wallBoardVertical)
+        var temporaryWallBoardHorizontal=deepCopy(wallBoardHorizontal)
+        var temporaryNowstoneposition=nowstoneposition;
+        if (mycolor==2 || mycolor==4){
+            temporaryWallBoardVertical[wx][wy]=true;
+            temporaryWallBoardVertical[wx][wy+1]=true;
+        } else {
+            temporaryWallBoardHorizontal[wx][wy]=true;
+            temporaryWallBoardHorizontal[wx+1][wy]=true;
+        }
+        if(!checkgraph(LENGTH,temporaryNowstoneposition,temporaryWallBoardHorizontal,temporaryWallBoardVertical)){
+            console.log('駒を囲むように置けない');
+            return;
+        }
+        
         wallcontext.lineWidth=8;
         wallcontext.strokeStyle='rgb(115, 52, 33)';
         wallcontext.beginPath();
@@ -899,6 +932,282 @@ wallboard.addEventListener('click',(event)=>{
         }
     }
 });
+
+//deepcopy array as the type of array is object
+function deepCopy(obj) {
+    // 只拷贝对象
+    if (typeof obj !== 'object') return;
+    // 根据obj的类型判断是新建一个数组还是一个对象
+    var newObj = obj instanceof Array ? [] : {};
+    for (var key in obj) {
+      // 遍历obj,并且判断是obj的属性才拷贝
+      if (obj.hasOwnProperty(key)) {
+        // 判断属性值的类型，如果是对象递归调用深拷贝
+        newObj[key] = typeof obj[key] === 'object' ? deepCopy(obj[key]) : obj[key];
+      }
+    }
+    return newObj;
+  }
+
+/*
+アルゴリズムの部分
+    壁は駒を囲んで、ゴールまで行けないようにおくことはできないようにしたい。
+    処理の流れは
+        1.クライアントは盤面から作ったグラフの隣接リストboardListを保持する
+        2.壁または駒を置きたい時、まず今のboardListを完全初期化する
+        3.仮のnowstonepositionとwallBoardVerticalとwallBoardHorizontalを作り、置きたい位置の座標で仮盤面情報配列を更新する
+        4.今置こうとする壁は各プレイヤーの駒を始点として、それらの仮盤面情報配列を利用してboardListを更新する
+        5.各プレイヤーでDFSを用いてreachableVertexの配列を得てから、ゴールが到達できるかどうかをチェックする(1であれば到達できる)
+        6.もしあるプレイヤーが一つのゴールも到達できないならfalseを返す、ここに壁を置けないと判定する
+        
+*/
+function checkgraph(LENGTH,temporaryNowstoneposition,temporaryWallBoardHorizontal,temporaryWallBoardVertical) {
+    for(var i=1;i<=4;i++){
+        var boardList=initlist(LENGTH);
+        updateListByStone(boardList,temporaryNowstoneposition,i);
+        updateListByWall(boardList,temporaryWallBoardHorizontal,temporaryWallBoardVertical);
+        var visited=reachableVertex(boardList,temporaryNowstoneposition[i]);
+        if(i==1){
+            var count=0
+            for(var j=0;j<LENGTH-1;j++){
+                if(visited[j]==1)count++
+                if(count==0){
+                    return false
+                }else {
+                    return true
+                }
+            }
+        }else if(i==2){
+            var count=0
+            for(var j=0;j<LENGTH-1;j++){
+                if(visited[j*LENGTH+LENGTH-1])count++
+                if(count==0){
+                    return false
+                }else {
+                    return true
+                }
+            }
+        }else if(i==3){
+            var count=0
+            for(var j=0;j<LENGTH-1;j++){
+                if(visited[j+LENGTH*(LENGTH-1)])count++
+                if(count==0){
+                    return false
+                }else {
+                    return true
+                }
+            }
+        }else if(i==4){
+            var count=0
+            for(var j=0;j<LENGTH-1;j++){
+                if(visited[j*LENGTH])count++
+                if(count==0){
+                    return false
+                }else {
+                    return true
+                }
+            }
+        }
+    }
+    return true
+    
+}
+
+/*
+グラフの隣接リストの初期化
+引数:ボードの辺の大きさ LENGTH
+返り値:隣接リスト(サイズが頂点の数個の配列)
+*/
+function initlist(LENGTH){
+    //駒のないボードのマスを連結リストのような1次元配列に保持
+    var boardlist=[];
+    //四角にある点
+    boardlist[0]=[1,LENGTH];//top-left
+    boardlist[LENGTH-1]=[LENGTH-2,2*LENGTH-1];//top-right
+    boardlist[LENGTH*(LENGTH-1)]=[LENGTH*(LENGTH-1)-LENGTH,LENGTH*(LENGTH-1)+1];//bottom-left
+    boardlist[LENGTH*LENGTH-1]=[LENGTH*LENGTH-2,LENGTH*LENGTH-1-LENGTH];//bottom-right
+    //四つの辺にある点
+    for(var i=1;i<=7;i++){
+        boardlist[i]=[i+1,i-1,i+LENGTH];//top=[left,right,lower]
+        boardlist[i+LENGTH*(LENGTH-1)]=[i+LENGTH*(LENGTH-1)-1,i+LENGTH*(LENGTH-1)+1,i+LENGTH*(LENGTH-2)];//bottom=[left,right,upper]
+        boardlist[i*LENGTH]=[i*LENGTH+1,i*LENGTH+LENGTH,i*LENGTH-LENGTH];//left=[upper,lower,right]
+        boardlist[i*LENGTH+LENGTH-1]=[i*LENGTH+LENGTH-1-LENGTH,i*LENGTH+LENGTH-1+LENGTH,i*LENGTH+LENGTH-1-1];//right=[upper,lower,left]
+        //真ん中の点
+        for(var j=1;j<=7;j++){
+            boardlist[i*LENGTH+j]=[i*LENGTH+j-1,i*LENGTH+j+1,i*LENGTH+j+LENGTH,i*LENGTH+j-LENGTH];
+        }
+    }
+    return boardlist
+}
+/*
+壁を保持する配列を用いて、隣接リストを更新する
+引数:
+    グラフの隣接リスト boardlist
+    石の現在位置 nowstoneposition
+    現在動けるプレイヤーの色 color
+    仮横壁の配列 temporarywallBoardHorizontal
+    仮縦壁の配列 temporarywallBoardVertical
+返り値:
+    ない
+*/
+function updateListByWall(boardlist,temporaryWallBoardHorizontal,temporaryWallBoardVertical){
+    //壁の処理
+    for(var i=0;i<LENGTH;i++){
+        for(var j=0;j<LENGTH;j++){
+            //(j,i)に横壁がある場合、マス(j,i)とマス(j,i-1)とはつながらないため、グラフ上、頂点[9i+j]と[9(i-1)+j]の間に辺はないと表示する
+            var ind=0;
+            if(temporaryWallBoardHorizontal[j][i]){
+                ind=boardlist[i*LENGTH+j].findIndex(function(value){return value==(i-1)*LENGTH+j;});//頂点[9(i-1)+j]のindexを探す
+                boardlist[i*LENGTH+j].splice(ind,1);//頂点[9i+j]とつながる頂点の中に頂点[9(i-1)+j]を削除
+                ind=boardlist[(i-1)*LENGTH+j].findIndex(function(value){return value==i*LENGTH+j});//両方の配列にある頂点を削除
+                boardlist[(i-1)*LENGTH+j].splice(ind,1);
+            }
+            //(j,i)に竪壁がある場合、マス(j,i)とマス(j-1,i)とはつながらない、処理は上と同じ
+            if(temporaryWallBoardVertical[j][i]){
+                ind=boardlist[i*LENGTH+j].findIndex(function(value){return value==i*LENGTH+j-1;});
+                boardlist[i*LENGTH+j].splice(ind,1);
+                ind=boardlist[i*LENGTH+j-1].findIndex(function(value){return value==i*LENGTH+j});
+                boardlist[i*LENGTH+j-1].splice(ind,1);
+            }
+        }
+    }
+}
+/*
+駒の現在位置を用いて、隣接リストにあるその点を削除し、上下または左右の頂点をつなげる
+注意点：始点は現在のプレイヤーの石の位置であるため、始点を削除しない
+引数:
+    グラフの隣接リスト boardlist
+    石の現在位置 temporarynowstoneposition
+    現在動けるプレイヤーの色 color
+返り値:
+    ない
+*/
+function updateListByStone(boardlist,temporaryNowstoneposition,color){
+    //駒の処理
+    for(var i=1;i<=4;i++){
+        if(i==color)continue;
+        var x=temporaryNowstoneposition[i].x;
+        var y=temporaryNowstoneposition[i].y;
+        var z=y*LENGTH+x;//頂点用のindex
+        
+        //頂点を削除
+        boardlist[y*LENGTH+x].splice(0,4);//その頂点から行ける頂点を削除
+        var ind=0;
+        if(x==0&&y==0){//top-left
+            ind=boardlist[LENGTH].findIndex(function(value){return value==z});
+            boardlist[LENGTH].splice(ind,1);
+            ind=boardlist[1].findIndex(function(value){return value==z});
+            boardlist[1].splice(ind,1);
+        }else if(x==0&&y==LENGTH-1){//bottom-left
+            ind=boardlist[LENGTH*(LENGTH-1)-LENGTH].findIndex(function(value){return value==z});
+            boardlist[LENGTH*(LENGTH-1)-LENGTH].splice(ind,1);
+            ind=boardlist[LENGTH*(LENGTH-1)+1].findIndex(function(value){return value==z});
+            boardlist[LENGTH*(LENGTH-1)+1].splice(ind,1);
+        }else if(x==LENGTH-1&&y==LENGTH-1){//bottom-right
+            ind=boardlist[LENGTH*LENGTH-2].findIndex(function(value){return value==z});
+            boardlist[LENGTH*LENGTH-2].splice(ind,1);
+            ind=boardlist[LENGTH*LENGTH-1-LENGTH].findIndex(function(value){return value==z});
+            boardlist[LENGTH*LENGTH-1-LENGTH].splice(ind,1);
+        }else if(x==LENGTH-1&&y==0){//top-right
+            ind=boardlist[LENGTH-2].findIndex(function(value){return value==z});
+            boardlist[LENGTH-2].splice(ind,1);
+            ind=boardlist[2*LENGTH-1].findIndex(function(value){return value==z});
+            boardlist[2*LENGTH-1].splice(ind,1);
+        }else if(x>0&&x<LENGTH-1&&y==0){//top
+            ind=boardlist[z-1].findIndex(function(value){return value==z});
+            boardlist[z-1].splice(ind,1);
+            ind=boardlist[z+1].findIndex(function(value){return value==z});
+            boardlist[z+1].splice(ind,1);
+            ind=boardlist[z+LENGTH].findIndex(function(value){return value==z});
+            boardlist[z+LENGTH].splice(ind,1);
+            //この位置の左右にある駒はジャンプできるから、左右の頂点をつなげる
+            boardlist[z-1].push(z+1);
+            boardlist[z+1].push(z-1)
+        }else if(x>0&&x<LENGTH-1&&y==LENGTH-1){//bottom
+            ind=boardlist[z-1].findIndex(function(value){return value==z});
+            boardlist[z-1].splice(ind,1);
+            ind=boardlist[z+1].findIndex(function(value){return value==z});
+            boardlist[z+1].splice(ind,1);
+            ind=boardlist[z-LENGTH].findIndex(function(value){return value==z});
+            boardlist[z-LENGTH].splice(ind,1);
+            //この位置の左右にある駒はジャンプできるから、左右の頂点をつなげる
+            boardlist[z-1].push(z+1);
+            boardlist[z+1].push(z-1)
+        }else if(y>0&&y<LENGTH-1&&x==LENGTH-1){//right
+            ind=boardlist[z-1].findIndex(function(value){return value==z});
+            boardlist[z-1].splice(ind,1);
+            ind=boardlist[z+LENGTH].findIndex(function(value){return value==z});
+            boardlist[z+LENGTH].splice(ind,1);
+            ind=boardlist[z-LENGTH].findIndex(function(value){return value==z});
+            boardlist[z-LENGTH].splice(ind,1);
+            //この位置の上下にある駒はジャンプできるから、上下の頂点をつなげる
+            boardlist[z-LENGTH].push(z+LENGTH);
+            boardlist[z+LENGTH].push(z-LENGTH);
+        }else if(y>0&&y<LENGTH-1&&x==0){//left
+            ind=boardlist[z+1].findIndex(function(value){return value==z});
+            boardlist[z+1].splice(ind,1);
+            ind=boardlist[z+LENGTH].findIndex(function(value){return value==z});
+            boardlist[z+LENGTH].splice(ind,1);
+            ind=boardlist[z-LENGTH].findIndex(function(value){return value==z});
+            boardlist[z-LENGTH].splice(ind,1);
+            //この位置の上下にある駒はジャンプできるから、上下の頂点をつなげる
+            boardlist[z-LENGTH].push(z+LENGTH);
+            boardlist[z+LENGTH].push(z-LENGTH);
+        }else{//center part
+            ind=boardlist[z-1].findIndex(function(value){return value==z});
+            boardlist[z-1].splice(ind,1);
+            ind=boardlist[z+1].findIndex(function(value){return value==z});
+            boardlist[z+1].splice(ind,1);
+            ind=boardlist[z+LENGTH].findIndex(function(value){return value==z});
+            boardlist[z+LENGTH].splice(ind,1);
+            ind=boardlist[z-LENGTH].findIndex(function(value){return value==z});
+            boardlist[z-LENGTH].splice(ind,1);
+            //上下と左右の頂点をつなげる
+            boardlist[z-LENGTH].push(z+LENGTH);
+            boardlist[z+LENGTH].push(z-LENGTH);
+            boardlist[z-1].push(z+1);
+            boardlist[z+1].push(z-1)
+        } 
+    }
+}
+/*
+DFSで隣接リストをチェックし、たどりつける点と到達できない点を配列に保持し、その配列を返す
+
+reachableVertex
+    引数:
+        更新後のグラフの隣接リスト boardlist
+        始点のindex(xy座標で計算した頂点のindex z=y*length+x) z
+    返り値:
+        到達できる点と到達できない点を保持する配列　visited
+dfs
+    引数:
+        到達できる点と到達できない点を保持する配列　visited
+        始点のindex(xy座標で計算したindex z=y*length+x) z
+        更新後のグラフの隣接リスト boardlist
+    返り値:
+        ない
+*/
+function reachableVertex(boardlist,temporaryNowstoneposition){
+    var z=temporaryNowstoneposition.x+temporaryNowstoneposition.y*LENGTH;
+    var visited=[];
+    for(var i=0;i<boardlist.length;i++){
+        visited[i]=0;
+    }
+    dfs(visited,z,boardlist);
+   return visited
+}
+function dfs(visited,z,boardlist) {
+    visited[z]=1;//たどり着いた頂点を記録
+    if(boardlist[z].length!=0){//頂点から出る辺があるかどうかを調べる
+        for(var i=0;i<boardlist[z].length;i++){
+            if(visited[boardlist[z][i]]==0){//その頂点からまだたどったことのない頂点を選ぶ
+                dfs(visited,boardlist[z][i],boardlist);
+            }
+        }
+    }  
+}
+
+
 
 //駒を更新する関数
 function stoneUpdate(xline,yline,x,y,nowpositionx,nowpositiony,mycolor){
