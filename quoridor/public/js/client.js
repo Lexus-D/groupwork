@@ -50,10 +50,10 @@ for(var i=0;i<LENGTH;i++){
 }
 
 // 壁用のボード  基準
-for(var i=0;i<LENGTH;i++){
+for(var i=0;i<=LENGTH;i++){
     wallBoardVertical[i]=[];
     wallBoardHorizontal[i]=[];
-    for(var j=0;j<LENGTH;j++){
+    for(var j=0;j<=LENGTH;j++){
         wallBoardVertical[i][j]=false;
         wallBoardHorizontal[i][j]=false;
     }
@@ -300,33 +300,38 @@ function rotatewalltoscreen(x,y,color,wall){
     }
 }
 
-function searchDepthFirst(color,x,y,routeFind){
+function searchDepthFirst(color,x,y){
     roadSign[x][y]=1;
+    // console.log('color:'+color+' x:'+x+' y:'+y+' routeFind:'+routeFind);
     // x,yが範囲外に出たら行き止まり
     if(x<0 || x>8 || y<0 || y>8){
-        return;
+        return 0;
     }
     // ゴールに到達できるなら1を返す
-    if( (color==1 && y==0) || (color==2 && x==0) || (color==3 && y==8) || (color==4 && x==8) && routeFind==0){
+    if( (color==1 && y==0) || (color==2 && x==8) || (color==3 && y==8) || (color==4 && x==0) && routeFind==0){
         routeFind=1; //経路が見つかったことを示す
-        return;
+        return 0;
     }
     // ゴールが見つかってないかつ未探索かつ壁がない場合にその方向へ進む
     // 上に進む
-    if( (wallBoardHorizontal[x][y]==false) && routeFind==0 && roadSign[x][y]!=1){
-        searchDepthFirst(color,x,y-1,routeFind);
+    if( (wallBoardHorizontal[x][y]==false) && routeFind==0 && y!=0){
+        if(roadSign[x][y-1]==0)
+        searchDepthFirst(color,x,y-1);
     }
     // 右に進む
-    if( (wallBoardVertical[x+1][y]==false) && routeFind==0 && roadSign[x][y]!=1){
-        searchDepthFirst(color,x+1,y,routeFind);
+    if( (wallBoardVertical[x+1][y]==false) && routeFind==0 && x!=8){
+        if(roadSign[x+1][y]==0)
+        searchDepthFirst(color,x+1,y);
     }
     // 左に進む
-    if( (wallBoardVertical[x][y]==false) && routeFind==0 && roadSign[x][y]!=1){
-        searchDepthFirst(color,x-1,y,routeFind);
+    if( (wallBoardVertical[x][y]==false) && routeFind==0 && x!=0){
+        if(roadSign[x-1][y]==0)
+        searchDepthFirst(color,x-1,y);
     }
     // 下に進む
-    if( (wallBoardHorizontal[x+1][y]==false) && routeFind==0 && roadSign[x][y]!=1){
-        searchDepthFirst(color,x,y+1,routeFind);
+    if( (wallBoardHorizontal[x][y+1]==false) && routeFind==0 && y!=8){
+        if(roadSign[x][y+1]==0)
+        searchDepthFirst(color,x,y+1);
     }
     if(routeFind){
         return 1;
@@ -335,7 +340,6 @@ function searchDepthFirst(color,x,y,routeFind){
         return 0;
     }
 }
-
 
 //予測位置を表示
 wallboard.addEventListener('mousemove',(e)=>{
@@ -627,6 +631,7 @@ wallboard.addEventListener('click',(event)=>{
         if(!checkgraph(LENGTH,temporaryNowstoneposition,temporaryWallBoardHorizontal,temporaryWallBoardVertical)){
             console.log('駒を囲むように置けない');
             return
+        }
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
 
         //壁を置けたとする
@@ -649,8 +654,9 @@ wallboard.addEventListener('click',(event)=>{
             // 深さ優先探索でゴールに到達できるか調べる
             // (石の色,壁のx座標,壁のy座標,発見したかどうか);
             routeFind = 0;
-            if(searchDepthFirst(c,xline-1,yline-1,routeFind)){
+            if(searchDepthFirst(c,nowstoneposition[c].x,nowstoneposition[c].y)){
                 checkRoute++;
+                // console.log('checkRoute:'+checkRoute);
             }
         }
         // 元に戻しておく        
@@ -664,7 +670,8 @@ wallboard.addEventListener('click',(event)=>{
 
         //checkRoute!=4なら置けない
         if(checkRoute!=4){
-            console.log('cannot place on the border');
+            console.log('cannot put this placement');
+            return;
         }
         
         wallcontext.lineWidth=8;
@@ -755,6 +762,47 @@ wallboard.addEventListener('click',(event)=>{
         }
         if(!checkgraph(LENGTH,temporaryNowstoneposition,temporaryWallBoardHorizontal,temporaryWallBoardVertical)){
             console.log('駒を囲むように置けない');
+            return;
+        }
+        //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
+
+        //壁を置けたとする
+        if (mycolor==2 || mycolor==4){
+            wallBoardVertical[wx][wy]=true;
+            wallBoardVertical[wx][wy+1]=true;
+        } else {
+            wallBoardHorizontal[wx][wy]=true;
+            wallBoardHorizontal[wx+1][wy]=true;
+        }
+        var checkRoute=0;
+        for(let c = 1; c < 5; c++){
+            // 一度通ったかを調べる配列の初期化
+            for(var i=0;i<LENGTH;i++){
+                roadSign[i]=[];
+                for(var j=0;j<LENGTH;j++){
+                    roadSign[i][j]=0;
+                }
+            }            
+            // 深さ優先探索でゴールに到達できるか調べる
+            // (石の色,壁のx座標,壁のy座標,発見したかどうか);
+            routeFind = 0;
+            if(searchDepthFirst(c,nowstoneposition[c].x,nowstoneposition[c].y)){
+                checkRoute++;
+                // console.log('checkRoute:'+checkRoute);
+            }
+        }
+        // 元に戻しておく        
+        if (mycolor==2 || mycolor==4){
+            wallBoardVertical[wx][wy]=false;
+            wallBoardVertical[wx][wy+1]=false;
+        } else {
+            wallBoardHorizontal[wx][wy]=false;
+            wallBoardHorizontal[wx+1][wy]=false;
+        }
+
+        //checkRoute!=4なら置けない
+        if(checkRoute!=4){
+            console.log('cannot put this placement');
             return;
         }
         
