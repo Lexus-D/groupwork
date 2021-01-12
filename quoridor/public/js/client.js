@@ -22,6 +22,10 @@ var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
 var gameStart = 0; // 人数が揃ったら1になる
 var wallNumMyroom;
+var displayName;
+var usernameMyroom;
+
+const PLAYER_NUM = 4;
 
 var stoneBoard=[];
 var wallBoardVertical=[];
@@ -864,18 +868,14 @@ socket.on('gameover',function (data) {
 
 // ユーザーネームの表示
 // TODO: 文字の色と背景の色によって文字が見づらいため色の調整をする．残りの壁の枚数の表示．
-socket.on("display_username",(username)=>{
-    var displayName = "";
-    for(var i = 1; i <= 4; i++){
-        if(username[roomNumber][i]){
-            displayName +=  "<span style=color:" +stoneColor[i]+ ">" + username[roomNumber][i] + "</span>"+"<br>";
-        }
-    }
-    document.getElementById("display_username").innerHTML = displayName;
+socket.on("display_username",username=>{
+    usernameMyroom = username[roomNumber];
+    display_name(username);
 })
 
 socket.on("wallNum",wallNum=>{
-    wallNumMyroom = wallNum;
+    wallNumMyroom = wallNum[roomNumber];
+    display_name();
 })
 
 function drawtext(str){
@@ -918,4 +918,14 @@ function register_username() {
     registerName = {"roomNumber":roomNumber,"color":mycolor,"username":username};
     socket.emit("register_username",registerName);
     return false;
+}
+
+function display_name(username){
+    displayName = "";
+    for(var i = 1; i <= PLAYER_NUM; i++){
+        if(usernameMyname[i]){
+            displayName +=  "<span style=color:" +stoneColor[i]+ ">" + usernameMyroom[i] + "</span>"+wallNumMyroom[i]+"<br>";
+        }
+    }
+    document.getElementById("display_username").innerHTML = displayName;
 }
