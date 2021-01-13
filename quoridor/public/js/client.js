@@ -14,6 +14,8 @@ var wallcontext = wallboard.getContext('2d');
 
 var stoneColor = {1:"rgb(245,128,120)",2:"rgb(120,130,245)",3:"rgb(120,245,143)",4:"rgb(245,234,120)"};
 
+const PLAYER_NUM = 4;
+
 var LENGTH = 9; //盤面の大きさ
 
 var myturn = 0;//初期カラーが黒なら1白なら0
@@ -22,8 +24,12 @@ var mycolor = 0;//null
 var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
 var gameStart = 0; // 人数が揃ったら1になる
-var wallNumMyroom;
 var routeFind; //壁を置けるかの判定に使う
+var wallNumMyroom = {};
+var displayName;
+var usernameMyroom = {};
+
+
 
 var stoneBoard=[];
 var wallBoardVertical=[];
@@ -51,10 +57,10 @@ for(var i=0;i<LENGTH;i++){
 }
 
 // 壁用のボード  基準
-for(var i=0;i<LENGTH;i++){
+for(var i=0;i<=LENGTH;i++){
     wallBoardVertical[i]=[];
     wallBoardHorizontal[i]=[];
-    for(var j=0;j<LENGTH;j++){
+    for(var j=0;j<=LENGTH;j++){
         wallBoardVertical[i][j]=false;
         wallBoardHorizontal[i][j]=false;
     }
@@ -301,33 +307,38 @@ function rotatewalltoscreen(x,y,color,wall){
     }
 }
 
-function searchDepthFirst(color,x,y,routeFind){
+function searchDepthFirst(color,x,y){
     roadSign[x][y]=1;
+    // console.log('color:'+color+' x:'+x+' y:'+y+' routeFind:'+routeFind);
     // x,yが範囲外に出たら行き止まり
     if(x<0 || x>8 || y<0 || y>8){
-        return;
+        return 0;
     }
     // ゴールに到達できるなら1を返す
-    if( (color==1 && y==0) || (color==2 && x==0) || (color==3 && y==8) || (color==4 && x==8) && routeFind==0){
+    if( (color==1 && y==0) || (color==2 && x==8) || (color==3 && y==8) || (color==4 && x==0) && routeFind==0){
         routeFind=1; //経路が見つかったことを示す
-        return;
+        return 0;
     }
     // ゴールが見つかってないかつ未探索かつ壁がない場合にその方向へ進む
     // 上に進む
-    if( (wallBoardHorizontal[x][y]==false) && routeFind==0 && roadSign[x][y]!=1){
-        searchDepthFirst(color,x,y-1,routeFind);
+    if( (wallBoardHorizontal[x][y]==false) && routeFind==0 && y!=0){
+        if(roadSign[x][y-1]==0)
+        searchDepthFirst(color,x,y-1);
     }
     // 右に進む
-    if( (wallBoardVertical[x+1][y]==false) && routeFind==0 && roadSign[x][y]!=1){
-        searchDepthFirst(color,x+1,y,routeFind);
+    if( (wallBoardVertical[x+1][y]==false) && routeFind==0 && x!=8){
+        if(roadSign[x+1][y]==0)
+        searchDepthFirst(color,x+1,y);
     }
     // 左に進む
-    if( (wallBoardVertical[x][y]==false) && routeFind==0 && roadSign[x][y]!=1){
-        searchDepthFirst(color,x-1,y,routeFind);
+    if( (wallBoardVertical[x][y]==false) && routeFind==0 && x!=0){
+        if(roadSign[x-1][y]==0)
+        searchDepthFirst(color,x-1,y);
     }
     // 下に進む
-    if( (wallBoardHorizontal[x+1][y]==false) && routeFind==0 && roadSign[x][y]!=1){
-        searchDepthFirst(color,x,y+1,routeFind);
+    if( (wallBoardHorizontal[x][y+1]==false) && routeFind==0 && y!=8){
+        if(roadSign[x][y+1]==0)
+        searchDepthFirst(color,x,y+1);
     }
     if(routeFind){
         return 1;
@@ -336,7 +347,6 @@ function searchDepthFirst(color,x,y,routeFind){
         return 0;
     }
 }
-
 
 //予測位置を表示
 wallboard.addEventListener('mousemove',(e)=>{
@@ -613,7 +623,7 @@ wallboard.addEventListener('click',(event)=>{
                 return;
             }
         }
-        //石を囲むように置けない
+        /*石を囲むように置けない
         //仮配列を用意
         var temporaryWallBoardVertical=deepCopy(wallBoardVertical)
         var temporaryWallBoardHorizontal=deepCopy(wallBoardHorizontal)
@@ -629,6 +639,7 @@ wallboard.addEventListener('click',(event)=>{
             console.log('駒を囲むように置けない');
             return
         }
+        */
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
 
         //壁を置けたとする
@@ -651,8 +662,9 @@ wallboard.addEventListener('click',(event)=>{
             // 深さ優先探索でゴールに到達できるか調べる
             // (石の色,壁のx座標,壁のy座標,発見したかどうか);
             routeFind = 0;
-            if(searchDepthFirst(c,xline-1,yline-1,routeFind)){
+            if(searchDepthFirst(c,nowstoneposition[c].x,nowstoneposition[c].y)){
                 checkRoute++;
+                // console.log('checkRoute:'+checkRoute);
             }
         }
         // 元に戻しておく        
@@ -666,7 +678,8 @@ wallboard.addEventListener('click',(event)=>{
 
         //checkRoute!=4なら置けない
         if(checkRoute!=4){
-            console.log('cannot place on the border');
+            console.log('cannot put this placement');
+            return;
         }
         
         wallcontext.lineWidth=8;
@@ -742,7 +755,7 @@ wallboard.addEventListener('click',(event)=>{
             }
         }
         //石を囲むように置けない
-        
+        /*
         //仮配列を用意
         //(JSの特性によって、deepCopyを使わないと仮配列は元の配列と同じメモリーアドレスにアクセスするため、仮配列の意味がなくなる)
         var temporaryWallBoardVertical=deepCopy(wallBoardVertical)
@@ -757,6 +770,49 @@ wallboard.addEventListener('click',(event)=>{
         }
         if(!checkgraph(LENGTH,temporaryNowstoneposition,temporaryWallBoardHorizontal,temporaryWallBoardVertical)){
             console.log('駒を囲むように置けない');
+            return;
+        }
+
+        */
+        //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
+
+        //壁を置けたとする
+        if (mycolor==2 || mycolor==4){
+            wallBoardVertical[wx][wy]=true;
+            wallBoardVertical[wx][wy+1]=true;
+        } else {
+            wallBoardHorizontal[wx][wy]=true;
+            wallBoardHorizontal[wx+1][wy]=true;
+        }
+        var checkRoute=0;
+        for(let c = 1; c < 5; c++){
+            // 一度通ったかを調べる配列の初期化
+            for(var i=0;i<LENGTH;i++){
+                roadSign[i]=[];
+                for(var j=0;j<LENGTH;j++){
+                    roadSign[i][j]=0;
+                }
+            }            
+            // 深さ優先探索でゴールに到達できるか調べる
+            // (石の色,壁のx座標,壁のy座標,発見したかどうか);
+            routeFind = 0;
+            if(searchDepthFirst(c,nowstoneposition[c].x,nowstoneposition[c].y)){
+                checkRoute++;
+                // console.log('checkRoute:'+checkRoute);
+            }
+        }
+        // 元に戻しておく        
+        if (mycolor==2 || mycolor==4){
+            wallBoardVertical[wx][wy]=false;
+            wallBoardVertical[wx][wy+1]=false;
+        } else {
+            wallBoardHorizontal[wx][wy]=false;
+            wallBoardHorizontal[wx+1][wy]=false;
+        }
+
+        //checkRoute!=4なら置けない
+        if(checkRoute!=4){
+            console.log('cannot put this placement');
             return;
         }
         
@@ -937,14 +993,10 @@ wallboard.addEventListener('click',(event)=>{
 
 //deepcopy array as the type of array is object
 function deepCopy(obj) {
-    // 只拷贝对象
     if (typeof obj !== 'object') return;
-    // 根据obj的类型判断是新建一个数组还是一个对象
     var newObj = obj instanceof Array ? [] : {};
     for (var key in obj) {
-      // 遍历obj,并且判断是obj的属性才拷贝
       if (obj.hasOwnProperty(key)) {
-        // 判断属性值的类型，如果是对象递归调用深拷贝
         newObj[key] = typeof obj[key] === 'object' ? deepCopy(obj[key]) : obj[key];
       }
     }
@@ -1041,6 +1093,7 @@ function initlist(LENGTH){
     }
     return boardlist
 }
+
 /*
 壁を保持する配列を用いて、隣接リストを更新する
 引数:
@@ -1074,6 +1127,7 @@ function updateListByWall(boardlist,temporaryWallBoardHorizontal,temporaryWallBo
         }
     }
 }
+
 /*
 駒の現在位置を用いて、隣接リストにあるその点を削除し、上下または左右の頂点をつなげる
 注意点：始点は現在のプレイヤーの石の位置であるため、始点を削除しない
@@ -1172,6 +1226,7 @@ function updateListByStone(boardlist,temporaryNowstoneposition,color){
         } 
     }
 }
+
 /*
 DFSで隣接リストをチェックし、たどりつける点と到達できない点を配列に保持し、その配列を返す
 
@@ -1209,8 +1264,6 @@ function dfs(visited,z,boardlist) {
     }  
 }
 
-
-
 //駒を更新する関数
 function stoneUpdate(xline,yline,x,y,nowpositionx,nowpositiony,mycolor){
     //移動前の駒の場所を取得
@@ -1246,6 +1299,7 @@ socket.on('setting',(setting)=>{
     userID = setting.id;
     roomNumber = setting.room;
     mycolor=setting.color;
+
     
     if (setting.color==1) {
         
@@ -1443,22 +1497,24 @@ socket.on('gameover',function (data) {
     reset.disabled=false;
     reset.style.display='inline';
 
-})
+});
 
 // ユーザーネームの表示
 // TODO: 文字の色と背景の色によって文字が見づらいため色の調整をする．残りの壁の枚数の表示．
-socket.on("display_username",(username)=>{
-    var displayName = "";
-    for(var i = 1; i <= 4; i++){
-        if(username[roomNumber][i]){
-            displayName +=  "<span style=color:" +stoneColor[i]+ ">" + username[roomNumber][i] + "</span>"+"<br>";
-        }
+socket.on("display_username",username=>{
+    for(var i = 1; i <= PLAYER_NUM; i++){
+        if(username[roomNumber][i])
+            usernameMyroom[i] = username[roomNumber][i]
     }
-    document.getElementById("display_username").innerHTML = displayName;
+    display_name();
 })
 
 socket.on("wallNum",wallNum=>{
-    wallNumMyroom = wallNum;
+    for(var i = 1; i <= PLAYER_NUM;i++){
+        if(wallNum[roomNumber][i])
+            wallNumMyroom[i] = wallNum[roomNumber][i];
+    }
+    display_name();
 })
 
 socket.on("result", result =>{
@@ -1509,4 +1565,17 @@ function register_username() {
     registerName = {"roomNumber":roomNumber,"color":mycolor,"username":username};
     socket.emit("register_username",registerName);
     return false;
+}
+
+function display_name(){
+    displayName = "";
+    for(var i = 1; i <= PLAYER_NUM; i++){
+        if(usernameMyroom[i]){
+            displayName +=  "<span style=color:" +stoneColor[i]+ ">" + usernameMyroom[i] + "</span>";
+        }
+        if(wallNumMyroom[i])
+            displayName += " 壁：" + wallNumMyroom[i];
+        displayName += "<br>"
+    }
+    document.getElementById("display_username").innerHTML = displayName;
 }

@@ -15,6 +15,7 @@ const LENGTH = 9; // 奇数のみ
 const ROOMMAX = 20; // 部屋の最大数
 const PLAYERNUM = 4; // プレイヤーの数 2or4
 const TOTALWALL = 20; // 合計の壁の枚数
+const WALL_NUM_PERSON = TOTALWALL / PLAYERNUM; //一人当たりの壁の枚数
 
 // グローバル変数
 var stoneBoard=[];
@@ -74,9 +75,9 @@ for(var k=0;k<ROOMMAX;k++){
 
     // 壁をおける残りの枚数を初期化
     wallNum[k] = {};
-    for(var i = 1; i <= PLAYERNUM;i++){
-        wallNum[k][i] = TOTALWALL / PLAYERNUM;
-    }
+    // for(var i = 1; i <= PLAYERNUM;i++){
+    //     wallNum[k][i] = TOTALWALL / PLAYERNUM;
+    // }
 }
 
 server.listen(process.env.PORT || PORT,()=>{
@@ -128,6 +129,7 @@ io.on('connection',socket=>{
     username[settingInfo.room][settingInfo.color] = "ユーザー" + settingInfo.color; //デフォルトのユーザーネーム
     io.emit("display_username",username);
     // console.log(username);
+    wallNum[settingInfo.room][settingInfo.color] = WALL_NUM_PERSON;
     io.emit('wallNum',wallNum);
     console.log(wallNum);
     
