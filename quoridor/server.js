@@ -75,9 +75,6 @@ for(var k=0;k<ROOMMAX;k++){
 
     // 壁をおける残りの枚数を初期化
     wallNum[k] = {};
-    // for(var i = 1; i <= PLAYERNUM;i++){
-    //     wallNum[k][i] = TOTALWALL / PLAYERNUM;
-    // }
 }
 
 server.listen(process.env.PORT || PORT,()=>{
@@ -128,10 +125,8 @@ io.on('connection',socket=>{
 
     username[settingInfo.room][settingInfo.color] = "ユーザー" + settingInfo.color; //デフォルトのユーザーネーム
     io.emit("display_username",username);
-    // console.log(username);
     wallNum[settingInfo.room][settingInfo.color] = WALL_NUM_PERSON;
     io.emit('wallNum',wallNum);
-    console.log(wallNum);
     
 
     // 石や壁をおけるかどうかの判断はclient側だけでいいかもしれない
@@ -198,13 +193,11 @@ io.on('connection',socket=>{
         }
         wallNum[putWall.room][putWall.color] -= 1;
         io.emit('wallNum',wallNum);
-        console.log(wallNum);
     })
 
     //ユーザーネームの登録
     socket.on("register_username",(register_username) =>{
         username[register_username["roomNumber"]][register_username["color"]] = register_username["username"];
-        //console.log(username);
         io.emit("display_username",username);
     })
 

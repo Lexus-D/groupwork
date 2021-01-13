@@ -623,6 +623,13 @@ wallboard.addEventListener('click',(event)=>{
                 return;
             }
         }
+        //残りの壁の枚数が0のとき置けない
+        /*
+        if(wallNumMyroom[mycolor] <= 0){
+            return;
+        }
+        */
+       
         /*石を囲むように置けない
         //仮配列を用意
         var temporaryWallBoardVertical=deepCopy(wallBoardVertical)
@@ -640,6 +647,7 @@ wallboard.addEventListener('click',(event)=>{
             return
         }
         */
+        
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
 
         //壁を置けたとする
@@ -774,6 +782,13 @@ wallboard.addEventListener('click',(event)=>{
         }
 
         */
+        //残りの壁の枚数が0のとき置けない
+        /*
+        if(wallNumMyroom[mycolor] <= 0){
+            return;
+        }
+        */
+
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
 
         //壁を置けたとする
@@ -1500,7 +1515,7 @@ socket.on('gameover',function (data) {
 });
 
 // ユーザーネームの表示
-// TODO: 文字の色と背景の色によって文字が見づらいため色の調整をする．残りの壁の枚数の表示．
+// TODO: 文字の色と背景の色によって文字が見づらいため色の調整をする．
 socket.on("display_username",username=>{
     for(var i = 1; i <= PLAYER_NUM; i++){
         if(username[roomNumber][i])
