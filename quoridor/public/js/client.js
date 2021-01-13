@@ -9,7 +9,8 @@ var stoneboard = document.getElementById('stoneboard');
 var wallboard = document.getElementById('wallboard');
 var turn = document.getElementById('turn');
 var reset = document.getElementById('reset');
-var wallcontext = wallboard.getContext('2d')
+var wallcontext = wallboard.getContext('2d');
+
 
 var stoneColor = {1:"rgb(245,128,120)",2:"rgb(120,130,245)",3:"rgb(120,245,143)",4:"rgb(245,234,120)"};
 
@@ -627,6 +628,7 @@ wallboard.addEventListener('click',(event)=>{
         if(!checkgraph(LENGTH,temporaryNowstoneposition,temporaryWallBoardHorizontal,temporaryWallBoardVertical)){
             console.log('駒を囲むように置けない');
             return
+        }
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
 
         //壁を置けたとする
@@ -1457,6 +1459,14 @@ socket.on("display_username",(username)=>{
 
 socket.on("wallNum",wallNum=>{
     wallNumMyroom = wallNum;
+})
+
+socket.on("result", result =>{
+    var results = document.getElementById('resultstext');
+    var li = document.createElement('li');
+    var text = document.createTextNode('ルーム' + result[0] + ': ' + result[1] + ' が勝利')
+    li.appendChild(text);
+    results.appendChild(li);
 })
 
 function drawtext(str){

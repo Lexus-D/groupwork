@@ -159,19 +159,27 @@ io.on('connection',socket=>{
 
         if(gameover(stoneBoard[putStone.room])==1){
             io.to(putStone.room).emit('gameover',1);
+            var result = [1,username[putStone.room][1]];
+            io.emit('result',result);
         }else if(gameover(stoneBoard[putStone.room])==2){
             io.to(putStone.room).emit('gameover',2);
+            var result = [2,username[putStone.room][2]];
+            io.emit('result',result);
         }else if(gameover(stoneBoard[putStone.room])==3){
             io.to(putStone.room).emit('gameover',3);
+            var result = [3,username[putStone.room][3]];
+            io.emit('result',result);
         }else if(gameover(stoneBoard[putStone.room])==4){
             io.to(putStone.room).emit('gameover',4);
+            var result = [4,username[putStone.room][4]];
+            io.emit('result',result);
         }
 
     })
 
     // 壁を置いた場合の処理
     socket.on('wall',putWall=>{
-
+        console.log(username[countRooms])
         var x=putWall.wall[0];
         var y=putWall.wall[1];
         // 縦壁か横壁かの情報をwall[2]に入れてほしいです
@@ -194,7 +202,7 @@ io.on('connection',socket=>{
     //ユーザーネームの登録
     socket.on("register_username",(register_username) =>{
         username[register_username["roomNumber"]][register_username["color"]] = register_username["username"];
-        // console.log(username);
+        //console.log(username);
         io.emit("display_username",username);
     })
 
