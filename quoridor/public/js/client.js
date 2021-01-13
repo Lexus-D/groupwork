@@ -13,6 +13,8 @@ var wallcontext = wallboard.getContext('2d')
 
 var stoneColor = {1:"rgb(245,128,120)",2:"rgb(120,130,245)",3:"rgb(120,245,143)",4:"rgb(245,234,120)"};
 
+const PLAYER_NUM = 4;
+
 var LENGTH = 9; //盤面の大きさ
 
 var myturn = 0;//初期カラーが黒なら1白なら0
@@ -21,11 +23,11 @@ var mycolor = 0;//null
 var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
 var gameStart = 0; // 人数が揃ったら1になる
-var wallNumMyroom;
+var wallNumMyroom = {};
 var displayName;
 var usernameMyroom = {};
 
-const PLAYER_NUM = 4;
+
 
 var stoneBoard=[];
 var wallBoardVertical=[];
@@ -667,6 +669,7 @@ socket.on('setting',(setting)=>{
     userID = setting.id;
     roomNumber = setting.room;
     mycolor=setting.color;
+
     
     if (setting.color==1) {
         
@@ -876,6 +879,14 @@ socket.on("display_username",username=>{
     display_name();
 })
 
+socket.on("wallNum",wallNum=>{
+    for(var i = 1; i <= PLAYER_NUM;i++){
+        if(wallNum[roomNumber][i])
+            wallNumMyroom[i] = wallNum[roomNumber][i];
+    }
+    display_name();
+})
+
 // socket.on("wallNum",wallNum=>{
 //     wallNumMyroom = wallNum[roomNumber];
 //     display_name();
@@ -927,8 +938,11 @@ function display_name(){
     displayName = "";
     for(var i = 1; i <= PLAYER_NUM; i++){
         if(usernameMyroom[i]){
-            displayName +=  "<span style=color:" +stoneColor[i]+ ">" + usernameMyroom[i] + "</span>" + "<br>";
+            displayName +=  "<span style=color:" +stoneColor[i]+ ">" + usernameMyroom[i] + "</span>";
         }
+        if(wallNumMyroom[i])
+            displayName += " 壁：" + wallNumMyroom[i];
+        displayName += "<br>"
     }
     document.getElementById("display_username").innerHTML = displayName;
 }
