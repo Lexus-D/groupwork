@@ -7,9 +7,11 @@
 {
     /*margin-right: auto;
     margin-left : auto;*/
+    flex-basis: 600px;
     height: 600px;
     position: relative;
     width: 600px;
+    flex-shrink: 0;
 }
 #imageboard
 {
@@ -75,11 +77,75 @@
 }
 #box{
     display: flex;
-    justify-content: center;
+    /*justify-content: space-around;*/
 }
-#results{
-
+.box1 {
+    flex-basis: 275px;
+    position: relative;
+    margin: 2em 3em;
+    padding: 0.5em 1em;
+    border: solid 3px #95ccff;
+    border-radius: 8px;
+    flex-shrink: 0;
 }
+.box1 .boxtitle {
+    position: absolute;
+    top: -13px;
+    left: 10px;
+    padding: 0 9px;
+    line-height: 1;
+    font-size: 19px;
+    background: #FFF;
+    color: #95ccff;
+    font-weight: bold;
+}
+.a {
+    flex-basis: 275px;
+    position: relative;
+    margin: 2em 3em;
+    padding: 0.5em 1em;
+    border: solid 3px #95ccff;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+.a .chat {
+    position: absolute;
+    top: -13px;
+    left: 10px;
+    padding: 0 9px;
+    line-height: 1;
+    font-size: 19px;
+    background: #FFF;
+    color: #95ccff;
+    font-weight: bold;
+}
+.results {
+    margin: auto;
+    width: 600px;
+    font-size: 24px;
+    text-align: center;
+    overflow: hidden;
+}
+.results #resultstext {
+    display: inline-block;
+    margin: 0;
+    padding-left: 100%;
+    white-space: nowrap;
+    line-height: 1em;
+    animation: scrollresults 20s linear infinite;
+}
+.results #resultstext li {
+    display: inline;
+    margin: 0 300px 0 0;
+}
+@keyframes scrollresults {
+    0% { transform: translateX(0);}
+    100% { transform: translateX(-100%);}
+}
+/*.box1 p {
+    margin: 0; 
+    padding: 0;
+}*/
         </style>
         <title>コリドール</title>
         <script src="/socket.io/socket.io.js"></script> <!--websocketでsocket.io使うなら-->
@@ -90,7 +156,11 @@
                 <a>コリドール</a>
             </h1>
         </header>
-        
+        <div class="results">
+            <ul id="resultstext">
+        </ul>
+        </div>
+
         ユーザー名を登録
         <form id="register_name" action="#" onsubmit="return register_username()">
             <input type="text" id="username" value="">
@@ -100,14 +170,19 @@
           <!--ユーザー名の表示-->
           <div id="display_username"></div>
         <div id="box">
-            <div id="results">
-                ルーム1
+            <div class="a">
+                <span class="chat">チャット</span>
+                チャット実装するか、ユーザー名の表示とかをここに表示するかしたい
             </div>
             <div id="container">
                 <canvas id="imageboard"></canvas>
                 <canvas id="lineboard"></canvas>
                 <canvas id="stoneboard"></canvas>
                 <canvas id="wallboard"></canvas>
+            </div>
+            <div class="box1">
+                <span class="boxtitle">ルール</span>
+                ここにルール説明入れる予定
             </div>
         </div>
         
