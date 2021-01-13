@@ -616,7 +616,7 @@ wallboard.addEventListener('click',(event)=>{
                 return;
             }
         }
-        //石を囲むように置けない
+        /*石を囲むように置けない
         //仮配列を用意
         var temporaryWallBoardVertical=deepCopy(wallBoardVertical)
         var temporaryWallBoardHorizontal=deepCopy(wallBoardHorizontal)
@@ -632,6 +632,7 @@ wallboard.addEventListener('click',(event)=>{
             console.log('駒を囲むように置けない');
             return
         }
+        */
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
 
         //壁を置けたとする
@@ -747,7 +748,7 @@ wallboard.addEventListener('click',(event)=>{
             }
         }
         //石を囲むように置けない
-        
+        /*
         //仮配列を用意
         //(JSの特性によって、deepCopyを使わないと仮配列は元の配列と同じメモリーアドレスにアクセスするため、仮配列の意味がなくなる)
         var temporaryWallBoardVertical=deepCopy(wallBoardVertical)
@@ -764,6 +765,8 @@ wallboard.addEventListener('click',(event)=>{
             console.log('駒を囲むように置けない');
             return;
         }
+
+        */
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
 
         //壁を置けたとする
@@ -983,14 +986,10 @@ wallboard.addEventListener('click',(event)=>{
 
 //deepcopy array as the type of array is object
 function deepCopy(obj) {
-    // 只拷贝对象
     if (typeof obj !== 'object') return;
-    // 根据obj的类型判断是新建一个数组还是一个对象
     var newObj = obj instanceof Array ? [] : {};
     for (var key in obj) {
-      // 遍历obj,并且判断是obj的属性才拷贝
       if (obj.hasOwnProperty(key)) {
-        // 判断属性值的类型，如果是对象递归调用深拷贝
         newObj[key] = typeof obj[key] === 'object' ? deepCopy(obj[key]) : obj[key];
       }
     }
@@ -1087,6 +1086,7 @@ function initlist(LENGTH){
     }
     return boardlist
 }
+
 /*
 壁を保持する配列を用いて、隣接リストを更新する
 引数:
@@ -1120,6 +1120,7 @@ function updateListByWall(boardlist,temporaryWallBoardHorizontal,temporaryWallBo
         }
     }
 }
+
 /*
 駒の現在位置を用いて、隣接リストにあるその点を削除し、上下または左右の頂点をつなげる
 注意点：始点は現在のプレイヤーの石の位置であるため、始点を削除しない
@@ -1218,6 +1219,7 @@ function updateListByStone(boardlist,temporaryNowstoneposition,color){
         } 
     }
 }
+
 /*
 DFSで隣接リストをチェックし、たどりつける点と到達できない点を配列に保持し、その配列を返す
 
@@ -1254,8 +1256,6 @@ function dfs(visited,z,boardlist) {
         }
     }  
 }
-
-
 
 //駒を更新する関数
 function stoneUpdate(xline,yline,x,y,nowpositionx,nowpositiony,mycolor){
