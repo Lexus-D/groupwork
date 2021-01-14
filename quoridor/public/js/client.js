@@ -283,7 +283,7 @@ function rotatewalltoscreen(x,y,color,wall){
             screeny=LENGTH+2-x;
             return [screenx,screeny]
         }
-        
+
     } else if (color==3) {
         if (wall){
             screenx=LENGTH+2-x-2;
@@ -348,6 +348,75 @@ function searchDepthFirst(color,x,y){
     }
 }
 
+function predictReachGoal(d,wx,wy){
+    console.log(d,wx,wy);
+    //壁を置けたとする d=0で横 d=1で縦
+    if(d==1){
+        if (mycolor==2 || mycolor==4){
+            wallBoardVertical[wx][wy]=true;
+            wallBoardVertical[wx][wy+1]=true;
+        } else {
+            wallBoardHorizontal[wx][wy]=true;
+            wallBoardHorizontal[wx+1][wy]=true;
+        }
+    }
+    if(d==0){
+        if (mycolor==2 || mycolor==4){
+            wallBoardHorizontal[wx][wy]=true;
+            wallBoardHorizontal[wx+1][wy]=true;
+        } else {
+            wallBoardVertical[wx][wy]=true;
+            wallBoardVertical[wx][wy+1]=true;
+        }
+    }
+    var checkRoute=0;
+    for(let c = 1; c < 5; c++){
+        // 一度通ったかを調べる配列の初期化
+        for(var i=0;i<LENGTH;i++){
+            roadSign[i]=[];
+            for(var j=0;j<LENGTH;j++){
+                roadSign[i][j]=0;
+            }
+        }
+        // 深さ優先探索でゴールに到達できるか調べる
+        // (石の色,壁のx座標,壁のy座標,発見したかどうか);
+        routeFind = 0;
+        if(searchDepthFirst(c,nowstoneposition[c].x,nowstoneposition[c].y)){
+            checkRoute++;
+            // console.log('checkRoute:'+checkRoute);
+        }
+    }
+    // 元に戻しておく
+    if(d==1){
+        if (mycolor==2 || mycolor==4){
+            wallBoardVertical[wx][wy]=false;
+            wallBoardVertical[wx][wy+1]=false;
+        } else {
+            wallBoardHorizontal[wx][wy]=false;
+            wallBoardHorizontal[wx+1][wy]=false;
+        }
+    }
+    if(d==0){
+        if (mycolor==2 || mycolor==4){
+            wallBoardHorizontal[wx][wy]=false;
+            wallBoardHorizontal[wx+1][wy]=false;
+        } else {
+            wallBoardVertical[wx][wy]=false;
+            wallBoardVertical[wx][wy+1]=false;
+        }
+    }
+
+    console.log('finish');
+    //checkRoute!=4なら置けない
+    if(checkRoute!=4){
+        console.log('cannot put this placement');
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
 //予測位置を表示
 wallboard.addEventListener('mousemove',(e)=>{
     if(!(myturn && gameStart)){
@@ -358,7 +427,7 @@ wallboard.addEventListener('mousemove',(e)=>{
     var y = e.clientY-Math.floor(rect.top);
     var xline = Math.floor((x+5)*(LENGTH + 2)/600);
     var yline = Math.floor((y+5)*(LENGTH + 2)/600);
-    
+
     var wallcontext = wallboard.getContext('2d');
     if((xline*600/(LENGTH + 2))-5<=x & x<=(xline*600/(LENGTH + 2))+5) {
         if (premousex == xline * 600 / (LENGTH + 2) & premousey == yline * 600 / (LENGTH + 2) & premousedirection == 1) {
@@ -367,7 +436,7 @@ wallboard.addEventListener('mousemove',(e)=>{
         var wxy=rotatewallfromscreen(xline,yline,mycolor,0);
         var wx=wxy[0]-1;
         var wy=wxy[1]-1;
-        
+
         //置けない判定
         if(wallNumMyroom[mycolor]==0)return;
         if(mycolor==2||mycolor==4){//player 2と4が置いた壁の向きは逆だから、逆方向のwallBoardをチェック
@@ -390,7 +459,7 @@ wallboard.addEventListener('mousemove',(e)=>{
             if(wx==0||wx==9){
                 //console.log('cannot place on the border');
                 return;
-            }else 
+            }else
             if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7||wy<0){
                 //console.log('illegal placement');
                 return;
@@ -400,6 +469,9 @@ wallboard.addEventListener('mousemove',(e)=>{
                 //console.log('illegal crossing placement');
                 return;
             }
+        }
+        if(predictReachGoal(0,wx,wy)){
+            return;
         }
         stonecontext.strokeStyle = 'rgb(26,65,69)';
         stonecontext.lineWidth = 8;
@@ -420,7 +492,7 @@ wallboard.addEventListener('mousemove',(e)=>{
         var wxy=rotatewallfromscreen(xline,yline,mycolor,1);
         var wx=wxy[0]-1;
         var wy=wxy[1]-1;
-        
+
         //置けない判定
         if(wallNumMyroom[mycolor]==0)return;
         if(mycolor==2||mycolor==4){
@@ -429,7 +501,7 @@ wallboard.addEventListener('mousemove',(e)=>{
                 //console.log('cannot place on the border');
                 return;
             }else
-            //既に壁があるところに置けない 
+            //既に壁があるところに置けない
             if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7){
                 //console.log('illegal placement');
                 return;
@@ -453,6 +525,9 @@ wallboard.addEventListener('mousemove',(e)=>{
             //横壁が縦壁に重なる場合
             if(wallBoardVertical[wx+1][wy-1]&&wallBoardVertical[wx+1][wy]){
                 //console.log('illegal　crossing placement');
+                return;
+            }
+            if(predictReachGoal(1,wx,wy)){
                 return;
             }
         }
@@ -479,12 +554,12 @@ wallboard.addEventListener('mousemove',(e)=>{
             //石のあるところに置けないようにする
             //console.log('occupied position');
             return;
-        }else if(Math.abs(x-nowstoneposition[mycolor].x)>2||Math.abs(y-nowstoneposition[mycolor].y)>2){           
+        }else if(Math.abs(x-nowstoneposition[mycolor].x)>2||Math.abs(y-nowstoneposition[mycolor].y)>2){
             //遠すぎるところに置けない
             //console.log('too far away');
             return;
         }
-        
+
         //壁を越えてはいけない
         if(y-nowstoneposition[mycolor].y==1){//down
             if(wallBoardHorizontal[x][y]){
@@ -532,7 +607,7 @@ wallboard.addEventListener('mousemove',(e)=>{
         }else{
             //console.log('illegal placement');
         }
-        
+
         //上下左右一歩
         if(Math.abs(x-nowstoneposition[mycolor].x)==1&&y==nowstoneposition[mycolor].y){
             predictStone(xline,yline)
@@ -575,24 +650,24 @@ wallboard.addEventListener('click',(event)=>{
     var rect = wallboard.getBoundingClientRect();
     var screenx = event.clientX-Math.floor(rect.left);
     var screeny = event.clientY-Math.floor(rect.top);
- 
+
     //ローカル座標
     var xline = Math.floor((screenx+5)*(LENGTH + 2)/600)
     var yline = Math.floor((screeny+5)*(LENGTH + 2)/600)
     console.log('ボード上にクリックしたローカル座標 ',xline-1,yline-1)//index starts from 0
-    
+
     //石のローカル座標を用いてグローバル座標を計算し、serverとclientの盤面を更新
     var xy = rotatefromscreen(xline,yline,mycolor);
     var x= xy[0]-1;
     var y= xy[1]-1;
-    
+
     //縦向きの壁置 walldirection=0
     if ((xline*600/(LENGTH + 2))-5 <= screenx & screenx <= (xline*600/(LENGTH + 2)) + 5 ){
         //クリックのローカル座標を用いて縦壁のグローバル座標を計算
         var wxy=rotatewallfromscreen(xline,yline,mycolor,0);
         var wx=wxy[0]-1;
         var wy=wxy[1]-1;
-        
+
         //置けない判定
         if(wallNumMyroom[mycolor]<1){
             console.log('no wall to place')
@@ -618,7 +693,7 @@ wallboard.addEventListener('click',(event)=>{
             if(wx==0||wx==9){
                 console.log('cannot place on the border');
                 return;
-            }else 
+            }else
             if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7||wy<0){
                 console.log('illegal placement');
                 return;
@@ -635,7 +710,7 @@ wallboard.addEventListener('click',(event)=>{
             return;
         }
         */
-       
+
         /*石を囲むように置けない
         //仮配列を用意
         var temporaryWallBoardVertical=deepCopy(wallBoardVertical)
@@ -653,56 +728,19 @@ wallboard.addEventListener('click',(event)=>{
             return
         }
         */
-        
+
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
-
-        //壁を置けたとする
-        if (mycolor==2 || mycolor==4){
-            wallBoardHorizontal[wx][wy]=true;
-            wallBoardHorizontal[wx+1][wy]=true;
-        } else {
-            wallBoardVertical[wx][wy]=true;
-            wallBoardVertical[wx][wy+1]=true;
-        }
-        var checkRoute=0;
-        for(let c = 1; c < 5; c++){
-            // 一度通ったかを調べる配列の初期化
-            for(var i=0;i<LENGTH;i++){
-                roadSign[i]=[];
-                for(var j=0;j<LENGTH;j++){
-                    roadSign[i][j]=0;
-                }
-            }            
-            // 深さ優先探索でゴールに到達できるか調べる
-            // (石の色,壁のx座標,壁のy座標,発見したかどうか);
-            routeFind = 0;
-            if(searchDepthFirst(c,nowstoneposition[c].x,nowstoneposition[c].y)){
-                checkRoute++;
-                // console.log('checkRoute:'+checkRoute);
-            }
-        }
-        // 元に戻しておく        
-        if (mycolor==2 || mycolor==4){
-            wallBoardHorizontal[wx][wy]=false;
-            wallBoardHorizontal[wx+1][wy]=false;
-        } else {
-            wallBoardVertical[wx][wy]=false;
-            wallBoardVertical[wx][wy+1]=false;
-        }
-
-        //checkRoute!=4なら置けない
-        if(checkRoute!=4){
-            console.log('cannot put this placement');
+        if(predictReachGoal(0,wx,wy)){
             return;
         }
-        
+
         wallcontext.lineWidth=8;
         wallcontext.strokeStyle='rgb(115, 52, 33)';
         wallcontext.beginPath();
         wallcontext.moveTo(xline*600/(LENGTH + 2),yline*600/(LENGTH + 2));
         wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
         wallcontext.stroke();
-        
+
         //置かれた壁のグローバル向きを計算し、wallboardを更新する
         if (mycolor==2 || mycolor==4){
             wall[2]=1;//player 2,4が置いた縦壁はグローバル上では横壁
@@ -724,16 +762,16 @@ wallboard.addEventListener('click',(event)=>{
         } else {
             changeturn(mycolor + 1);
         }
-           
-    } else 
+
+    } else
     //横向きの壁置く　walldirection=1
     if ((yline*600/(LENGTH + 2))-5 <= screeny & screeny <= (yline*600/(LENGTH + 2)) + 5) {
-    
+
         //クリックのローカル座標を用いて横壁のグローバル座標を計算
         var wxy=rotatewallfromscreen(xline,yline,mycolor,1);
         var wx=wxy[0]-1;
         var wy=wxy[1]-1;
-        
+
         //置けない判定
         if(wallNumMyroom[mycolor]<1){
             console.log('no wall to place')
@@ -745,7 +783,7 @@ wallboard.addEventListener('click',(event)=>{
                 console.log('cannot place on the border');
                 return;
             }else
-            //既に壁があるところに置けない 
+            //既に壁があるところに置けない
             if(wallBoardVertical[wx][wy]||wallBoardVertical[wx][wy+1]||wy>7||wy<0){
                 console.log('illegal placement');
                 return;
@@ -800,47 +838,10 @@ wallboard.addEventListener('click',(event)=>{
         */
 
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
-
-        //壁を置けたとする
-        if (mycolor==2 || mycolor==4){
-            wallBoardVertical[wx][wy]=true;
-            wallBoardVertical[wx][wy+1]=true;
-        } else {
-            wallBoardHorizontal[wx][wy]=true;
-            wallBoardHorizontal[wx+1][wy]=true;
-        }
-        var checkRoute=0;
-        for(let c = 1; c < 5; c++){
-            // 一度通ったかを調べる配列の初期化
-            for(var i=0;i<LENGTH;i++){
-                roadSign[i]=[];
-                for(var j=0;j<LENGTH;j++){
-                    roadSign[i][j]=0;
-                }
-            }            
-            // 深さ優先探索でゴールに到達できるか調べる
-            // (石の色,壁のx座標,壁のy座標,発見したかどうか);
-            routeFind = 0;
-            if(searchDepthFirst(c,nowstoneposition[c].x,nowstoneposition[c].y)){
-                checkRoute++;
-                // console.log('checkRoute:'+checkRoute);
-            }
-        }
-        // 元に戻しておく        
-        if (mycolor==2 || mycolor==4){
-            wallBoardVertical[wx][wy]=false;
-            wallBoardVertical[wx][wy+1]=false;
-        } else {
-            wallBoardHorizontal[wx][wy]=false;
-            wallBoardHorizontal[wx+1][wy]=false;
-        }
-
-        //checkRoute!=4なら置けない
-        if(checkRoute!=4){
-            console.log('cannot put this placement');
+        if(predictReachGoal(1,wx,wy)){
             return;
         }
-        
+
         wallcontext.lineWidth=8;
         wallcontext.strokeStyle='rgb(115, 52, 33)';
         wallcontext.beginPath();
@@ -868,21 +869,21 @@ wallboard.addEventListener('click',(event)=>{
             changeturn(1);
         } else {
             changeturn(mycolor + 1);
-        } 
-        
-        
-    } else //石を置く  
-     {     
+        }
+
+
+    } else //石を置く
+     {
         if(stoneBoard[x][y]!=0){
             //石のあるところに置けないようにする
             console.log('occupied position');
             return;
-        }else if(Math.abs(x-nowstoneposition[mycolor].x)>2||Math.abs(y-nowstoneposition[mycolor].y)>2){           
+        }else if(Math.abs(x-nowstoneposition[mycolor].x)>2||Math.abs(y-nowstoneposition[mycolor].y)>2){
             //遠すぎるところに置けない
             console.log('too far away');
             return;
         }
-        
+
         //壁を越えてはいけない判定(斜めに壁を超える場合はある)
         if(y-nowstoneposition[mycolor].y==1&&x==nowstoneposition[mycolor].x){//down
             if(wallBoardHorizontal[x][y]){
@@ -950,7 +951,7 @@ wallboard.addEventListener('click',(event)=>{
             }
         }else{
             console.log('illegal placement');
-        }  
+        }
 
         //斜めにいく判定
         if(x-nowstoneposition[mycolor].x==1&&y-nowstoneposition[mycolor].y==-1){
@@ -996,7 +997,7 @@ wallboard.addEventListener('click',(event)=>{
         }else{
             console.log('illegal diagonal placement')
         }
-        
+
         //上下左右一歩
         if(Math.abs(x-nowstoneposition[mycolor].x)==1&&y==nowstoneposition[mycolor].y){
             stoneUpdate(xline,yline,x,y,nowstoneposition[mycolor].x,nowstoneposition[mycolor].y,mycolor)
@@ -1039,7 +1040,7 @@ function deepCopy(obj) {
         4.今置こうとする壁は各プレイヤーの駒を始点として、それらの仮盤面情報配列を利用してboardListを更新する
         5.各プレイヤーでDFSを用いてreachableVertexの配列を得てから、ゴールが到達できるかどうかをチェックする(1であれば到達できる)
         6.もしあるプレイヤーが一つのゴールも到達できないならfalseを返す、ここに壁を置けないと判定する
-        
+
 */
 function checkgraph(LENGTH,temporaryNowstoneposition,temporaryWallBoardHorizontal,temporaryWallBoardVertical) {
     for(var i=1;i<=4;i++){
@@ -1090,7 +1091,7 @@ function checkgraph(LENGTH,temporaryNowstoneposition,temporaryWallBoardHorizonta
         }
     }
     return true
-    
+
 }
 
 /*
@@ -1171,7 +1172,7 @@ function updateListByStone(boardlist,temporaryNowstoneposition,color){
         var x=temporaryNowstoneposition[i].x;
         var y=temporaryNowstoneposition[i].y;
         var z=y*LENGTH+x;//頂点用のindex
-        
+
         //頂点を削除
         boardlist[y*LENGTH+x].splice(0,4);//その頂点から行ける頂点を削除
         var ind=0;
@@ -1249,7 +1250,7 @@ function updateListByStone(boardlist,temporaryNowstoneposition,color){
             boardlist[z+LENGTH].push(z-LENGTH);
             boardlist[z-1].push(z+1);
             boardlist[z+1].push(z-1)
-        } 
+        }
     }
 }
 
@@ -1287,7 +1288,7 @@ function dfs(visited,z,boardlist) {
                 dfs(visited,boardlist[z][i],boardlist);
             }
         }
-    }  
+    }
 }
 
 //駒を更新する関数
@@ -1295,7 +1296,7 @@ function stoneUpdate(xline,yline,x,y,nowpositionx,nowpositiony,mycolor){
     //移動前の駒の場所を取得
     var previousx=nowpositionx
     var previousy=nowpositiony
-    
+
     var previousscreen=rotatetoscreen(previousx+1,previousy+1,mycolor);//index starts from 1
     var previousscreenx=previousscreen[0];
     var previousscreeny=previousscreen[1];
@@ -1313,33 +1314,33 @@ function stoneUpdate(xline,yline,x,y,nowpositionx,nowpositiony,mycolor){
 
     console.log('前の駒のグローバル座標:',previousx,previousy)//index starts from 0
     console.log(mycolor,'色の駒を新しく置いたグローバル座標',x,y);//index starts from 0
-    
+
     stoneBoard[previousx][previousy]=0;//以前の位置を0に
     stoneBoard[x][y]=mycolor;//新しく置かれた位置に色を書き込む
     nowstoneposition[mycolor].x=x;//受け取った色の現在位置を更新
     nowstoneposition[mycolor].y=y;
 }
 
-//ローカル盤面初期化 
+//ローカル盤面初期化
 socket.on('setting',(setting)=>{
     userID = setting.id;
     roomNumber = setting.room;
     mycolor=setting.color;
 
-    
+
     if (setting.color==1) {
-        
+
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),1)// した
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),3)// 上
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),4)//右
         drawcircle(1.5*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),2)//左
-        
+
         drawuprect("rgb(245,128,120)")
         drawrightrect("rgb(120,130,245)")
         drawdownrect("rgb(120,245,143)")
         drawleftrect("rgb(245,234,120)")
     } else if (setting.color==2) {
-        
+
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),2)
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),4)
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1)
@@ -1349,7 +1350,7 @@ socket.on('setting',(setting)=>{
         drawrightrect("rgb(120,245,143)")
         drawdownrect("rgb(245,234,120)")
     } else if (setting.color==3) {
-        
+
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),3)
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),1)
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),2)
@@ -1359,7 +1360,7 @@ socket.on('setting',(setting)=>{
         drawuprect("rgb(120,245,143)")
         drawrightrect("rgb(245,234,120)")
     } else if (setting.color==4) {
-        
+
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),(LENGTH+0.5)*600/(LENGTH + 2),4)
         drawcircle(((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),1.5*600/(LENGTH + 2),2)
         drawcircle((LENGTH+0.5)*600/(LENGTH + 2),((LENGTH + 1)/2 + 0.5)*600/(LENGTH + 2),3)
@@ -1411,7 +1412,7 @@ socket.on('Broadcast',(msg,previousStone)=>{
     console.log('色:',color,'の駒の現在のglobal座標',msg[0],msg[1])//index starts from 0
     console.log('色:',color,'の駒の以前のlocal座標',previousscreenx-1,previousscreeny-1)//index starts from 0
     console.log('色:',color,'の駒の現在のlocal座標',xline-1,yline-1)//index starts from 0
-    
+
 
     //消去该棋子前一步位置上的棋子，然后画到新的位置上
     wallcontext.clearRect((previousscreenx)*600/(LENGTH + 2) + 4,(previousscreeny)*600/(LENGTH + 2) + 4,600/(LENGTH + 2) - 8,600/(LENGTH +2) -8)
@@ -1434,7 +1435,7 @@ socket.on('wallbroadcast',(msg)=>{
     if (msg[3]==mycolor) {
         return;
     }
-    
+
     var wallDirection=msg[2];
     console.log('壁のglobal向き:',wallDirection==0?'縦':'横')
 
@@ -1445,7 +1446,7 @@ socket.on('wallbroadcast',(msg)=>{
     var xline=screenx;
     var yline=screeny;
 
-    if (wallDirection) {  
+    if (wallDirection) {
         //横壁
         console.log('受け取った横壁のグローバル座標:(',msg[0],msg[1],')(',msg[0]+1,msg[1],')');
         wallBoardHorizontal[msg[0]][msg[1]]=true;
@@ -1474,7 +1475,7 @@ socket.on('wallbroadcast',(msg)=>{
             wallcontext.lineTo((xline + 2)*600/(LENGTH + 2),yline*600/(LENGTH + 2));
             wallcontext.stroke();
         }
-        
+
     } else {
         if (mycolor==2 || mycolor==4) {
             console.log('横壁のローカル座標:(',xline-1,yline-1,')(',xline,yline-1,')')//index starts from 0
@@ -1491,9 +1492,9 @@ socket.on('wallbroadcast',(msg)=>{
             wallcontext.lineTo(xline*600/(LENGTH + 2),(yline + 2)*600/(LENGTH + 2));
             wallcontext.stroke();
         }
-        
+
     }
-    
+
     if (msg[3] == 4){
         changeturn(1);
     } else {
@@ -1591,7 +1592,7 @@ function display_name(){
     for(var i = 1; i <= PLAYER_NUM; i++){
         if(usernameMyroom[i]){
             displayName +=  "<span style=color:" +stoneColor[i]+ ";text-shadow:1px 1px 0 #212121, -1px -1px 0 #212121,-1px 1px 0 #212121, 1px -1px 0 #212121,0px 1px 0 #212121,  0-1px 0 #212121,-1px 0 0 #212121, 1px 0 0 #212121;" + ">" + usernameMyroom[i] + "</span>";
-        
+
             displayName += " 壁の枚数：" + wallNumMyroom[i] + "<br>";
             // displayName += "<br>";
         }
