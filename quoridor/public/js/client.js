@@ -369,6 +369,7 @@ wallboard.addEventListener('mousemove',(e)=>{
         var wy=wxy[1]-1;
         
         //置けない判定
+        if(wallNumMyroom[mycolor]==0)return;
         if(mycolor==2||mycolor==4){//player 2と4が置いた壁の向きは逆だから、逆方向のwallBoardをチェック
             //横の上下2行に横壁は置けない
             if(wy==0||wy==9){
@@ -421,6 +422,7 @@ wallboard.addEventListener('mousemove',(e)=>{
         var wy=wxy[1]-1;
         
         //置けない判定
+        if(wallNumMyroom[mycolor]==0)return;
         if(mycolor==2||mycolor==4){
             //縦の左右2列に縦壁は置けない
             if(wx==0||wx==9){
@@ -592,6 +594,10 @@ wallboard.addEventListener('click',(event)=>{
         var wy=wxy[1]-1;
         
         //置けない判定
+        if(wallNumMyroom[mycolor]<1){
+            console.log('no wall to place')
+            return;
+        }
         if(mycolor==2||mycolor==4){//player 2と4が置いた壁の向きは逆だから、逆方向のwallBoardをチェック
             //横の上下2行に横壁は置けない
             if(wy==0||wy==9){
@@ -729,6 +735,10 @@ wallboard.addEventListener('click',(event)=>{
         var wy=wxy[1]-1;
         
         //置けない判定
+        if(wallNumMyroom[mycolor]<1){
+            console.log('no wall to place')
+            return;
+        }
         if(mycolor==2||mycolor==4){
             //縦の左右2列に縦壁は置けない
             if(wx==0||wx==9){
@@ -1005,6 +1015,7 @@ wallboard.addEventListener('click',(event)=>{
         }
     }
 });
+
 
 //deepcopy array as the type of array is object
 function deepCopy(obj) {
@@ -1519,8 +1530,7 @@ socket.on("display_username",username=>{
 
 socket.on("wallNum",wallNum=>{
     for(var i = 1; i <= PLAYER_NUM;i++){
-        if(wallNum[roomNumber][i])
-            wallNumMyroom[i] = wallNum[roomNumber][i];
+        wallNumMyroom[i] = wallNum[roomNumber][i];
     }
     display_name();
 })
@@ -1581,8 +1591,8 @@ function display_name(){
         if(usernameMyroom[i]){
             displayName +=  "<span style=color:" +stoneColor[i]+ ">" + usernameMyroom[i] + "</span>";
         }
-        if(wallNumMyroom[i])
-            displayName += " 壁：" + wallNumMyroom[i];
+        
+        displayName += " 壁：" + wallNumMyroom[i];
         displayName += "<br>"
     }
     document.getElementById("display_username").innerHTML = displayName;
