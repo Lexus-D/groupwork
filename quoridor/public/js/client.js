@@ -1499,7 +1499,7 @@ socket.on('gameStart',judge=>{
 //勝ち負けの判定が終わったら、勝者を表示し、石を置けなくする
 socket.on('gameover',function (data) {
     console.log(data);
-    drawtext('プレイヤー' + String(data) +'の勝利' )
+    drawtext('プレイヤー' + usernameMyroom[data] +'の勝利' )
     //stoneboard.removeEventListener('click',function (param) {  });
     myturn=0;
     reset.disabled=false;
@@ -1556,13 +1556,13 @@ function changeturn(player){
     else {
         myturn=0;
         if (player == 1) {
-            turn.innerText="プレイヤー1の番";
+            turn.innerText = usernameMyroom[1] + "の番";
         } else if (player == 2) {
-            turn.innerText="プレイヤー2の番";
+            turn.innerText = usernameMyroom[2] + "の番";
         } else if (player == 3) {
-            turn.innerText="プレイヤー3の番";
+            turn.innerText = usernameMyroom[3] + "の番";
         } else if (player == 4) {
-            turn.innerText="プレイヤー4の番";
+            turn.innerText = usernameMyroom[4] + "の番";
         }
     }
 }
@@ -1579,7 +1579,7 @@ function display_name(){
     displayName = "";
     for(var i = 1; i <= PLAYER_NUM; i++){
         if(usernameMyroom[i]){
-            displayName +=  "<span style=color:" +stoneColor[i]+ ">" + usernameMyroom[i] + "</span>";
+            displayName +=  "<span style=color:" +stoneColor[i]+ ";text-shadow:1px 1px 0 #212121, -1px -1px 0 #212121,-1px 1px 0 #212121, 1px -1px 0 #212121,0px 1px 0 #212121,  0-1px 0 #212121,-1px 0 0 #212121, 1px 0 0 #212121;" + ">" + usernameMyroom[i] + "</span>";
         }
         if(wallNumMyroom[i])
             displayName += " 壁：" + wallNumMyroom[i];
