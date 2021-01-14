@@ -527,9 +527,9 @@ wallboard.addEventListener('mousemove',(e)=>{
                 //console.log('illegal　crossing placement');
                 return;
             }
-            if(predictReachGoal(1,wx,wy)){
-                return;
-            }
+        }
+        if(predictReachGoal(1,wx,wy)){
+            return;
         }
         stonecontext.strokeStyle = 'rgb(26,65,69)';
         stonecontext.lineWidth = 8;
