@@ -1519,7 +1519,6 @@ socket.on('gameover',function (data) {
 });
 
 // ユーザーネームの表示
-// TODO: 文字の色と背景の色によって文字が見づらいため色の調整をする．
 socket.on("display_username",username=>{
     for(var i = 1; i <= PLAYER_NUM; i++){
         if(username[roomNumber][i])
@@ -1585,15 +1584,17 @@ function register_username() {
     return false;
 }
 
+// ユーザ名と壁の枚数を表示
+// 壁の枚数が0になると壁の枚数が表示されなくなるため修正する
 function display_name(){
     displayName = "";
     for(var i = 1; i <= PLAYER_NUM; i++){
         if(usernameMyroom[i]){
             displayName +=  "<span style=color:" +stoneColor[i]+ ";text-shadow:1px 1px 0 #212121, -1px -1px 0 #212121,-1px 1px 0 #212121, 1px -1px 0 #212121,0px 1px 0 #212121,  0-1px 0 #212121,-1px 0 0 #212121, 1px 0 0 #212121;" + ">" + usernameMyroom[i] + "</span>";
+        
+            displayName += " 壁の枚数：" + wallNumMyroom[i] + "<br>";
+            // displayName += "<br>";
         }
-        if(wallNumMyroom[i])
-            displayName += " 壁：" + wallNumMyroom[i];
-        displayName += "<br>"
     }
     document.getElementById("display_username").innerHTML = displayName;
 }
