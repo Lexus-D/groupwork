@@ -1499,14 +1499,7 @@ socket.on('gameStart',judge=>{
 //勝ち負けの判定が終わったら、勝者を表示し、石を置けなくする
 socket.on('gameover',function (data) {
     console.log(data);
-    if(data==mycolor){
-        var text="You Win!";
-        drawtext(text);
-    }else{
-        var text="You Lose";
-        drawtext(text);
-    }
-
+    drawtext('プレイヤー' + String(data) +'の勝利' )
     //stoneboard.removeEventListener('click',function (param) {  });
     myturn=0;
     reset.disabled=false;
@@ -1541,18 +1534,18 @@ socket.on("result", result =>{
 })
 
 function drawtext(str){
-    var stoneboardcontext=stoneboard.getContext('2d');
-    stoneboardcontext.fillStyle="aliceblue";
-    stoneboardcontext.fillRect(200,225,200,130);
-    stoneboardcontext.strokeStyle="black";
-    stoneboardcontext.strokeRect(200,225,200,130);
-    stoneboardcontext.textBaseline='center';
-    stoneboardcontext.textAlign='center';
-    stoneboardcontext.font='40px serif';
-    stoneboardcontext.fillStyle="black";
-    var x=stoneboard.width/2;
-    var y=stoneboard.height/2;
-    stoneboardcontext.fillText(str,x,y);
+    var wallcontext = wallboard.getContext('2d');
+    wallcontext.fillStyle="aliceblue";
+    wallcontext.fillRect(200,225,200,130);
+    wallcontext.strokeStyle="black";
+    wallcontext.strokeRect(200,225,200,130);
+    wallcontext.textBaseline='center';
+    wallcontext.textAlign='center';
+    wallcontext.font='20px serif';
+    wallcontext.fillStyle="black";
+    var x=wallboard.width/2;
+    var y=wallboard.height/2;
+    wallcontext.fillText(str,x,y);
 }
 
 function changeturn(player){
