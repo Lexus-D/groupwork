@@ -1591,8 +1591,8 @@ function display_name(){
         if(usernameMyroom[i]){
             displayName +=  "<span style=color:" +stoneColor[i]+ ";text-shadow:1px 1px 0 #212121, -1px -1px 0 #212121,-1px 1px 0 #212121, 1px -1px 0 #212121,0px 1px 0 #212121,  0-1px 0 #212121,-1px 0 0 #212121, 1px 0 0 #212121;" + ">" + usernameMyroom[i] + "</span>";
         }
-        
-        displayName += " 壁：" + wallNumMyroom[i];
+        if(wallNumMyroom[i])
+            displayName += " 壁：" + wallNumMyroom[i];
         displayName += "<br>"
     }
     document.getElementById("display_username").innerHTML = displayName;
