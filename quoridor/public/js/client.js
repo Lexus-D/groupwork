@@ -5,6 +5,7 @@ var wall = new Array(4);
 
 var imageboard = document.getElementById('imageboard');
 var lineboard = document.getElementById('lineboard');
+var turnboard = document.getElementById('turnboard')
 var stoneboard = document.getElementById('stoneboard');
 var wallboard = document.getElementById('wallboard');
 var turn = document.getElementById('turn');
@@ -29,6 +30,10 @@ var wallNumMyroom = {};
 var displayName;
 var usernameMyroom = {};
 
+usernameMyroom[1]="ユーザー1";
+usernameMyroom[2]="ユーザー2";
+usernameMyroom[3]="ユーザー3";
+usernameMyroom[4]="ユーザー4";
 
 
 var stoneBoard=[];
@@ -94,6 +99,8 @@ imageboard.width = 600;
 imageboard.height = 600;
 lineboard.width = 600;
 lineboard.height = 600;
+turnboard.width = 600;
+turnboard.height = 600;
 stoneboard.width = 600;
 stoneboard.height = 600;
 wallboard.width = 600;
@@ -121,6 +128,7 @@ for(let i=1;i<=LENGTH + 1;i++){
 var stonecontext=stoneboard.getContext('2d');
 function　drawcircle(x,y,color){
     wallcontext.lineWidth = 1;
+    wallcontext.strokeStyle = "#000000"
     if (color == 1) {
         wallcontext.fillStyle="rgb(245,128,120)";// 赤
     } else if (color == 2) {
@@ -1559,12 +1567,27 @@ function drawtext(str){
 }
 
 function changeturn(player){
+    turncontext = turnboard.getContext('2d')
     if (player == mycolor) {
         myturn=1;
         turn.innerText="あなたの番";
+        
+        var turnX = nowstoneposition[mycolor].x;
+        var turnY = nowstoneposition[mycolor].y;
+        var turnscreenXY = rotatetoscreen(turnX + 1,turnY + 1,mycolor)
+        var turnscreenX = turnscreenXY[0];
+        var turnscreenY = turnscreenXY[1];
+        console.log(turnscreenX,turnscreenY);
+        turncontext.lineWidth = 1;
+        turncontext.fillStyle = "#d50000";
+        turncontext.beginPath();
+        turncontext.arc((turnscreenX + 0.5) * 600 / (LENGTH + 2),(turnscreenY + 0.5) * 600 / (LENGTH + 2),22,0,2*Math.PI,true);
+        turncontext.fill();
+        turncontext.stroke();
     }
     else {
         myturn=0;
+        turncontext.clearRect(0, 0, 600, 600);
         if (player == 1) {
             turn.innerText = usernameMyroom[1] + "の番";
         } else if (player == 2) {
@@ -1589,7 +1612,7 @@ function display_name(){
     displayName = "";
     for(var i = 1; i <= PLAYER_NUM; i++){
         if(usernameMyroom[i]){
-            displayName +=  "<span style=color:" +stoneColor[i]+ ";text-shadow:1px 1px 0 #212121, -1px -1px 0 #212121,-1px 1px 0 #212121, 1px -1px 0 #212121,0px 1px 0 #212121,  0-1px 0 #212121,-1px 0 0 #212121, 1px 0 0 #212121;" + ">" + usernameMyroom[i] + "</span>";
+            displayName +=  "<span style='color:" +stoneColor[i]+ ";text-shadow:1px 1px 0 #212121, -1px -1px 0 #212121,-1px 1px 0 #212121, 1px -1px 0 #212121,0px 1px 0 #212121,  0-1px 0 #212121,-1px 0 0 #212121, 1px 0 0 #212121;'" + ">" + usernameMyroom[i] + "</span>";
         }
         
         displayName += " 壁：" + wallNumMyroom[i];
