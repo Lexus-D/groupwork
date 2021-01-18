@@ -110,14 +110,7 @@ io.on('connection',socket=>{
     console.log(settingInfo.color);
     //
 
-    // PLAYNUMだけ入ったら次の部屋へ
-    if(countRoomUsers[countRooms]==PLAYERNUM){
-        // 人数が揃ったら開始
-        io.to(countRooms).emit('gameStart',1);
-
-        countRooms = countRooms + 1;
-        console.log("open next room");
-    }
+    
 
     // アクセスしてきたclientに設定データを送る
     io.to(userID).emit('setting',settingInfo);
@@ -127,7 +120,14 @@ io.on('connection',socket=>{
     io.emit("display_username",username);
     wallNum[settingInfo.room][settingInfo.color] = WALL_NUM_PERSON;
     io.emit('wallNum',wallNum);
-    
+    // PLAYNUMだけ入ったら次の部屋へ
+    if(countRoomUsers[countRooms]==PLAYERNUM){
+        // 人数が揃ったら開始
+        io.to(countRooms).emit('gameStart',1);
+
+        countRooms = countRooms + 1;
+        console.log("open next room");
+    }
 
     // 石や壁をおけるかどうかの判断はclient側だけでいいかもしれない
 
