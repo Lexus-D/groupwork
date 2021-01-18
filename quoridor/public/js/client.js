@@ -30,10 +30,6 @@ var wallNumMyroom = {};
 var displayName;
 var usernameMyroom = {};
 
-usernameMyroom[1]="ユーザー1";
-usernameMyroom[2]="ユーザー2";
-usernameMyroom[3]="ユーザー3";
-usernameMyroom[4]="ユーザー4";
 
 
 var stoneBoard=[];
@@ -113,14 +109,14 @@ context.strokeStyle="rgb(170,211,214)"
 
 for(let i=1;i<=LENGTH + 1;i++){
     context.beginPath();
-    context.moveTo(i*600/(LENGTH + 2),0);
-    context.lineTo(i*600/(LENGTH + 2),600);
+    context.moveTo(i*600/(LENGTH + 2),35);
+    context.lineTo(i*600/(LENGTH + 2),565);
     context.stroke();
 }
 for(let i=1;i<=LENGTH + 1;i++){
     context.beginPath();
-    context.moveTo(0,i*600/(LENGTH + 2));
-    context.lineTo(600,i*600/(LENGTH + 2));
+    context.moveTo(35,i*600/(LENGTH + 2));
+    context.lineTo(565,i*600/(LENGTH + 2));
     context.stroke();
 }
 
@@ -437,6 +433,15 @@ wallboard.addEventListener('mousemove',(e)=>{
     var yline = Math.floor((y+5)*(LENGTH + 2)/600);
 
     var wallcontext = wallboard.getContext('2d');
+    if (x < 600 / (LENGTH + 2) || x > 600 - 600 / (LENGTH + 2)) {
+        console.log('aaa')
+        stonecontext.clearRect(0, 0, 600, 600);
+        return;
+    }
+    if (y < 600 / (LENGTH + 2) || y > 600 - 600 / (LENGTH + 2)) {
+        stonecontext.clearRect(0, 0, 600, 600);
+        return;
+    }
     if((xline*600/(LENGTH + 2))-5<=x & x<=(xline*600/(LENGTH + 2))+5) {
         if (premousex == xline * 600 / (LENGTH + 2) & premousey == yline * 600 / (LENGTH + 2) & premousedirection == 1) {
             return;
