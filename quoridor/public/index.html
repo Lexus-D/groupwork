@@ -28,21 +28,38 @@
     position: absolute;
     z-index: 2;
 }
-#stoneboard
+#turnboard
 {
     height: 100%;
     width: 100%;
     position: absolute;
     z-index: 3;
+    animation: flash 2s linear infinite;
 }
-#wallboard
+
+@keyframes flash {
+  0%,100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+#stoneboard
 {
     height: 100%;
     width: 100%;
     position: absolute;
     z-index: 4;
 }
-
+#wallboard
+{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 5;
+}
 #turn
 {
     margin: 0 auto;
@@ -84,7 +101,9 @@
     position: relative;
     margin: 2em 3em;
     padding: 0.5em 1em;
-    border: solid 3px #95ccff;
+    /*border: solid 3px #95ccff;*/
+    border: solid 3px #78909C;
+    background-color: #BDBDBD;
     border-radius: 8px;
     flex-shrink: 0;
     align-self: flex-start;
@@ -97,7 +116,7 @@
     line-height: 1;
     font-size: 19px;
     background: #ECEFF1;
-    color: #95ccff;
+    color: rgb(18,42,43);
     font-weight: bold;
 }
 .player {
@@ -112,10 +131,7 @@
     align-self: flex-start;
 }
 .player .playername {
-    text-shadow:1px 1px 0 #212121, -1px -1px 0 #212121,
-              -1px 1px 0 #212121, 1px -1px 0 #212121,
-              0px 1px 0 #212121,  0-1px 0 #212121,
-              -1px 0 0 #212121, 1px 0 0 #212121;
+    
     position: absolute;
     top: -13px;
     left: 10px;
@@ -123,7 +139,7 @@
     line-height: 1;
     font-size: 19px;
     background: #ECEFF1;
-    color: #95ccff;
+    color: rgb(18,42,43);
     font-weight: bold;
 }
 .results {
@@ -178,7 +194,7 @@
           
         <div id="box">
             <div class="player">
-                <span class="playername">プレイヤー</span>
+                <span class="playername">ユーザー</span>
                 ユーザー名を登録
                 <form id="register_name" action="#" onsubmit="return register_username()">
                     <input type="text" id="username" value="">
@@ -191,12 +207,18 @@
             <div id="container">
                 <canvas id="imageboard"></canvas>
                 <canvas id="lineboard"></canvas>
+                <canvas id="turnboard"></canvas>
                 <canvas id="stoneboard"></canvas>
                 <canvas id="wallboard"></canvas>
             </div>
             <div class="box1">
                 <span class="boxtitle">ルール</span>
-                ここにルール説明入れる予定
+                <br>
+                ・対面(駒と同色の領域)方向の端の列へ最初に辿り着いたプレイヤーの勝利 <br>
+                ・自分のターンでは駒を1マス移動、もしくは壁を1枚置くことができる <br>
+                ・駒は壁で遮られていない方向へ前後左右1マス移動可能<br>
+                ・壁は誰かがゴールできなくなるような場所には置けない
+
             </div>
         </div>
         
