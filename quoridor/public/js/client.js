@@ -109,14 +109,14 @@ context.strokeStyle="rgb(170,211,214)"
 
 for(let i=1;i<=LENGTH + 1;i++){
     context.beginPath();
-    context.moveTo(i*600/(LENGTH + 2),35);
-    context.lineTo(i*600/(LENGTH + 2),565);
+    context.moveTo(i*600/(LENGTH + 2),600 / (LENGTH + 2) - 4);
+    context.lineTo(i*600/(LENGTH + 2),600 * (1 - 1 / (LENGTH + 2)) + 4);
     context.stroke();
 }
 for(let i=1;i<=LENGTH + 1;i++){
     context.beginPath();
-    context.moveTo(35,i*600/(LENGTH + 2));
-    context.lineTo(565,i*600/(LENGTH + 2));
+    context.moveTo(600 / (LENGTH + 2) -4,i*600/(LENGTH + 2));
+    context.lineTo(600 * (1 - 1 / (LENGTH + 2)) + 4,i*600/(LENGTH + 2));
     context.stroke();
 }
 
@@ -560,6 +560,8 @@ wallboard.addEventListener('mousemove',(e)=>{
         if (premousex == xline * 600 / (LENGTH + 2) & premousey == yline * 600 / (LENGTH + 2) & premousedirection == 0) {
             return;
         }
+        stonecontext.clearRect(0, 0, 600, 600);
+        premousedirection = 0;
         var xy = rotatefromscreen(xline,yline,mycolor);
         var x= xy[0]-1;
         var y= xy[1]-1;
