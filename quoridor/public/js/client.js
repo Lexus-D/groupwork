@@ -20,7 +20,6 @@ const PLAYER_NUM = 4;
 var LENGTH = 9; //盤面の大きさ
 
 var myturn = 0;//初期カラーが黒なら1白なら0
-var myTurnNum; //自分は何番目か
 var mycolor = 0;//null
 var userID;//サーバから割り当てられるID
 var roomNumber;//サーバから割り当てられる部屋番号
@@ -719,12 +718,6 @@ wallboard.addEventListener('click',(event)=>{
                 return;
             }
         }
-        //残りの壁の枚数が0のとき置けない
-        /*
-        if(wallNumMyroom[mycolor] <= 0){
-            return;
-        }
-        */
 
         /*石を囲むように置けない
         //仮配列を用意
@@ -844,12 +837,6 @@ wallboard.addEventListener('click',(event)=>{
             return;
         }
 
-        */
-        //残りの壁の枚数が0のとき置けない
-        /*
-        if(wallNumMyroom[mycolor] <= 0){
-            return;
-        }
         */
 
         //壁を置いたことにより，ゴールへ到達できない石があるかを調べる
@@ -1438,7 +1425,7 @@ socket.on('Broadcast',(msg,previousStone)=>{
     nowstoneposition[color].x=msg[0];//受け取った色の現在位置を更新
     nowstoneposition[color].y=msg[1];
     console.log(nowstoneposition);
-    //changeturn(nextTurn == myTurnNum); //4人用のとき
+
     if (color == 4){
         changeturn(1);
     } else {
@@ -1607,6 +1594,7 @@ function changeturn(player){
     }
 }
 
+//ユーザー名の登録
 function register_username() {
     var username;
     username = document.getElementById("username").value;
@@ -1616,15 +1604,12 @@ function register_username() {
 }
 
 // ユーザ名と壁の枚数を表示
-// 壁の枚数が0になると壁の枚数が表示されなくなるため修正する
 function display_name(){
     displayName = "";
     for(var i = 1; i <= PLAYER_NUM; i++){
         if(usernameMyroom[i]){
             displayName +=  "<span style='color:" +stoneColor[i]+ ";text-shadow:1px 1px 0 #212121, -1px -1px 0 #212121,-1px 1px 0 #212121, 1px -1px 0 #212121,0px 1px 0 #212121,  0-1px 0 #212121,-1px 0 0 #212121, 1px 0 0 #212121;'" + ">" + usernameMyroom[i] + "</span>";
-
             displayName += " 壁の枚数：" + wallNumMyroom[i] + "<br>";
-            // displayName += "<br>";
         }
     }
     document.getElementById("display_username").innerHTML = displayName;
